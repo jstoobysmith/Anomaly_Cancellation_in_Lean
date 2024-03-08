@@ -1,7 +1,8 @@
-
 import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Tactic.Ring
+import Mathlib.Algebra.GroupWithZero.Units.Lemmas
+
 universe v u
 open Nat
 
@@ -28,15 +29,6 @@ theorem ext {a b : oneFamilyCharge}
   simp_all only
 
 end oneFamilyCharge
-
-@[simps!]
-def oneFamilyHyperCharge : oneFamilyCharge where
-  Q := 1
-  U := -4
-  D := 2
-  L := -3
-  E := 6
-  N := 0
 
 structure threeFamilyCharge where
   Q1 : ℚ
@@ -99,49 +91,14 @@ def threeFamilyChargeAdd (X Y : threeFamilyCharge) : threeFamilyCharge :=
 
 @[simps!]
 def threeFamilyChargeZero : threeFamilyCharge :=
-   {
-    Q1 := 0
-    Q2 := 0
-    Q3 := 0
-    U1 := 0
-    U2 := 0
-    U3 := 0
-    D1 := 0
-    D2 := 0
-    D3 := 0
-    L1 := 0
-    L2 := 0
-    L3 := 0
-    E1 := 0
-    E2 := 0
-    E3 := 0
-    N1 := 0
-    N2 := 0
-    N3 := 0
-  }
+  ⟨0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0⟩
 
 @[simps!]
 def threeFamilyChargeSMul (a : ℚ) (X : threeFamilyCharge) : threeFamilyCharge :=
-   {
-    Q1 := a * X.Q1
-    Q2 := a * X.Q2
-    Q3 := a * X.Q3
-    U1 := a * X.U1
-    U2 := a * X.U2
-    U3 := a * X.U3
-    D1 := a * X.D1
-    D2 := a * X.D2
-    D3 := a * X.D3
-    L1 := a * X.L1
-    L2 := a * X.L2
-    L3 := a * X.L3
-    E1 := a * X.E1
-    E2 := a * X.E2
-    E3 := a * X.E3
-    N1 := a * X.N1
-    N2 := a * X.N2
-    N3 := a * X.N3
-  }
+  ⟨a * X.Q1, a * X.Q2, a * X.Q3, a * X.U1, a * X.U2, a * X.U3, a * X.D1, a * X.D2,
+  a * X.D3, a * X.L1, a * X.L2, a * X.L3, a * X.E1, a * X.E2, a * X.E3, a * X.N1,
+  a * X.N2, a * X.N3⟩
+
 
 @[simps!]
 instance threeFamilyChargeAddCommMonoid : AddCommMonoid threeFamilyCharge where
@@ -186,8 +143,7 @@ instance threeFamilyChargeModule : Module ℚ threeFamilyCharge where
 def oneFamilyToThreeFamily (S : oneFamilyCharge) : threeFamilyCharge :=
   ⟨S.Q, S.Q, S.Q, S.U, S.U, S.U, S.D, S.D, S.D, S.L, S.L, S.L, S.E, S.E, S.E, S.N, S.N, S.N⟩
 
-@[simps!]
-def hyperCharge : threeFamilyCharge := oneFamilyToThreeFamily oneFamilyHyperCharge
+
 
 /-- The anomaly cancelation condition for the gravity anomaly. -/
 @[simp]
@@ -280,33 +236,51 @@ def accQuad (S : threeFamilyCharge) : ℚ :=
   + (S.E1^2 + S.E2^2 + S.E3^2)
 
 @[simp]
-def accQuadDiv (S T : threeFamilyCharge) : ℚ :=
-  2 * ((T.Q1 * S.Q1 + T.Q2 * S.Q2 + T.Q3 * S.Q3)
+def accQuadDiv (T S : threeFamilyCharge) : ℚ :=
+  ((T.Q1 * S.Q1 + T.Q2 * S.Q2 + T.Q3 * S.Q3)
   - 2 * (T.U1 * S.U1 + T.U2 * S.U2 + T.U3 * S.U3)
   + (T.D1 * S.D1 + T.D2 * S.D2 + T.D3 * S.D3)
   - (T.L1 * S.L1 + T.L2 * S.L2 + T.L3 * S.L3)
   + (T.E1 * S.E1 + T.E2 * S.E2 + T.E3 * S.E3))
 
-lemma accQuadDiv_hyperCharge (S : threeFamilyCharge) :
-    accQuadDiv hyperCharge S = 2 * accYY S := by
-  simp [hyperCharge, oneFamilyHyperCharge]
-  ring
-
-lemma accQuadDiv_symm : accQuadDiv S T = accQuadDiv T S := by
+lemma accQuadDiv_self (S : threeFamilyCharge) : accQuadDiv S S = accQuad S := by
   simp
   ring
+
+lemma accQuadDiv_symm (S T : threeFamilyCharge) : accQuadDiv S T = accQuadDiv T S := by
+  simp
+  ring
+
+lemma accQuadDiv_smul_left (a : ℚ) (S T : threeFamilyCharge) :
+    accQuadDiv (a • S) T = a * accQuadDiv T S := by
+  simp [HSMul.hSMul]
+  ring
+
+lemma accQuadDiv_smul_right (a : ℚ) (S T : threeFamilyCharge) :
+    accQuadDiv S (a • T) = a * accQuadDiv T S := by
+  rw [accQuadDiv_symm, accQuadDiv_symm T S]
+  exact accQuadDiv_smul_left _ _ _
 
 lemma accQuad_add (S T : threeFamilyCharge) :
-    accQuad (S + T) = accQuad S + accQuadDiv S T + accQuad T := by
+    accQuad (S + T) = accQuad S + 2 * accQuadDiv S T + accQuad T := by
   simp
   ring_nf
-
 
 @[simp]
 lemma accQuad_smul (a : ℚ) (S : threeFamilyCharge) :
     accQuad (a • S) = a^2 * accQuad S := by
   simp [HSMul.hSMul]
   ring
+
+
+@[simp]
+def accCubeDivT (T S L : threeFamilyCharge) : ℚ :=
+  6 * (T.Q1 * S.Q1 * L.Q1 + T.Q2 * S.Q2 * L.Q2 + T.Q3 * S.Q3 * L.Q3)
+  + 3 * (T.U1 * S.U1 * L.U1 + T.U2 * S.U2 * L.U2 + T.U3 * S.U3 * L.U3)
+  + 3 * (T.D1 * S.D1 * L.D1 + T.D2 * S.D2 * L.D2 + T.D3 * S.D3 * L.D3)
+  + 2 * (T.L1 * S.L1 * L.L1 + T.L2 * S.L2 * L.L2 + T.L3 * S.L3 * L.L3)
+  + (T.E1 * S.E1 * L.E1 + T.E2 * S.E2 * L.E2 + T.E3 * S.E3 * L.E3)
+  + (T.N1 * S.N1 * L.N1 + T.N2 * S.N2 * L.N2 + T.N3 * S.N3 * L.N3)
 
 /-- The anomaly cancelation condition for Y anomaly. -/
 @[simp]
@@ -317,6 +291,34 @@ def accCube (S : threeFamilyCharge) : ℚ :=
   + 2 * (S.L1^3 + S.L2^3 + S.L3^3)
   + (S.E1^3 + S.E2^3 + S.E3^3)
   + (S.N1^3 + S.N2^3 + S.N3^3)
+
+
+
+@[simp]
+def accCubeDiv  (T S : threeFamilyCharge) : ℚ :=
+  6 * (T.Q1 * S.Q1^2 + T.Q2 * S.Q2^2 + T.Q3 * S.Q3^2)
+  + 3 * (T.U1 * S.U1^2 + T.U2 * S.U2^2 + T.U3 *  S.U3^2)
+  + 3 * (T.D1 * S.D1^2 + T.D2 * S.D2^2 + T.D3 *  S.D3^2)
+  + 2 * (T.L1 * S.L1^2 + T.L2 * S.L2^2 + T.L3 *  S.L3^2)
+  + (T.E1 * S.E1^2 + T.E2 * S.E2^2 + T.E3 *  S.E3^2)
+  + (T.N1 * S.N1^2 + T.N2 * S.N2^2 + T.N3 *  S.N3^2)
+
+
+lemma accCubeDiv_smul_left (a : ℚ)  (T S : threeFamilyCharge) :
+    accCubeDiv (a • T) S = a * accCubeDiv T S := by
+  simp [HSMul.hSMul]
+  ring
+
+lemma accCubeDiv_smul_right (a : ℚ)  (T S : threeFamilyCharge) :
+    accCubeDiv T (a • S) = a^2 * accCubeDiv T S := by
+  simp [HSMul.hSMul]
+  ring
+
+lemma accCube_add (S T : threeFamilyCharge) :
+    accCube (S + T) = accCube S + 3 * accCubeDiv S T  + 3 * accCubeDiv T S + accCube T := by
+  simp
+  ring_nf
+
 
 @[simp]
 lemma accCube_smul (a : ℚ) (S : threeFamilyCharge) :
@@ -337,8 +339,6 @@ lemma AnomalyFreeLinear.ext {S T : AnomalyFreeLinear} (h : S.val = T.val) : S = 
   cases' S
   simp_all only
 
-def hyperChargeLinear : AnomalyFreeLinear :=
-  ⟨hyperCharge, by rfl, by rfl , by rfl, by rfl⟩
 
 @[simps!]
 instance AnomalyFreeLinearAdd : AddCommMonoid AnomalyFreeLinear where
@@ -387,13 +387,327 @@ instance AnomalyFreeLinearModule : Module ℚ AnomalyFreeLinear where
     apply AnomalyFreeLinear.ext
     exact threeFamilyChargeModule.zero_smul _
 
-structure AnomalyFree where
+structure AnomalyFreeQuad where
   val : AnomalyFreeLinear
   Quad : accQuad val.val = 0
-  Cube : accCube val.val = 0
+
+@[ext]
+lemma AnomalyFreeQuad.ext {S T : AnomalyFreeQuad} (h : S.val.val = T.val.val) : S = T := by
+  have h1 : S.val = T.val := AnomalyFreeLinear.ext h
+  cases' S
+  simp_all
+
 
 /-- The scalar multiple of any solution is also a solution. -/
-def AnomalyFreeSMul (a : ℚ) (S : AnomalyFree) : AnomalyFree :=
+@[simps!]
+def AnomalyFreeQuadSmul (a : ℚ) (S : AnomalyFreeQuad) : AnomalyFreeQuad :=
   ⟨a • S.val,
-    by erw [accQuad_smul, S.Quad, Rat.mul_zero],
+    by erw [accQuad_smul, S.Quad, Rat.mul_zero]⟩
+
+lemma AnomalyFreeQuad_mul_smul (a b : ℚ) (S : AnomalyFreeQuad) :
+    AnomalyFreeQuadSmul (a * b) S = AnomalyFreeQuadSmul a (AnomalyFreeQuadSmul b S) := by
+  apply AnomalyFreeQuad.ext
+  exact mul_smul _ _ _
+
+lemma AnomalyFreeQuad_one_smul (S : AnomalyFreeQuad) :
+    AnomalyFreeQuadSmul 1 S =S := by
+  apply AnomalyFreeQuad.ext
+  exact one_smul _ _
+
+structure AnomalyFree where
+  val : AnomalyFreeQuad
+  Cube : accCube val.val.val = 0
+
+
+@[ext]
+lemma AnomalyFree.ext {S T : AnomalyFree} (h : S.val.val.val = T.val.val.val) : S = T := by
+  have h1 : S.val = T.val := AnomalyFreeQuad.ext h
+  cases' S
+  simp_all
+
+
+/-- The scalar multiple of any solution is also a solution. -/
+@[simps!]
+def AnomalyFreeSMul (a : ℚ) (S : AnomalyFree) : AnomalyFree :=
+  ⟨AnomalyFreeQuadSmul a S.val,
     by erw [accCube_smul, S.Cube, Rat.mul_zero]⟩
+
+lemma AnomalyFree_mul_smul (a b : ℚ) (S : AnomalyFree) :
+    AnomalyFreeSMul (a * b) S = AnomalyFreeSMul a (AnomalyFreeSMul b S) := by
+  apply AnomalyFree.ext
+  exact mul_smul _ _ _
+
+lemma AnomalyFree_one_smul (S : AnomalyFree) :
+    AnomalyFreeSMul 1 S =S := by
+  apply AnomalyFree.ext
+  exact one_smul _ _
+section hyperCharge
+
+@[simps!]
+def oneFamilyHyperCharge : oneFamilyCharge :=
+  ⟨1, -4, 2, -3, 6, 0⟩
+
+@[simps!]
+def hyperCharge : AnomalyFree :=
+  ⟨⟨⟨oneFamilyToThreeFamily oneFamilyHyperCharge, by rfl, by rfl, by rfl, by rfl⟩, by rfl⟩, by rfl⟩
+
+lemma accQuadDiv_hyperCharge (S : threeFamilyCharge) :
+    accQuadDiv hyperCharge.1.1.1 S = accYY S := by
+  simp [hyperCharge, oneFamilyHyperCharge]
+  ring
+
+lemma accCubeDiv_hyperCharge_of (S : threeFamilyCharge) :
+    accCubeDiv hyperCharge.1.1.1 S = 6 * accQuad S := by
+  simp [hyperCharge, oneFamilyHyperCharge]
+  ring
+
+@[simp]
+lemma accCubeDiv_hyperCharge_AnomalyFreeLinear (S : AnomalyFreeQuad) :
+    accCubeDiv hyperCharge.val.val.val S.val.val = 0 := by
+  rw [accCubeDiv_hyperCharge_of, S.Quad]
+  rfl
+
+@[simp]
+lemma accCubeDiv_of_hyperCharge (S : threeFamilyCharge) :
+    accCubeDiv S hyperCharge.val.val.val = 6 * accYY S := by
+  simp [hyperCharge, oneFamilyHyperCharge]
+  ring
+
+@[simp]
+lemma accCubeDiv_AnomalyFreeLinear_hyperCharge (S : AnomalyFreeLinear) :
+    accCubeDiv S.val hyperCharge.val.val.val = 0 := by
+  rw [accCubeDiv_of_hyperCharge, S.YY]
+  rfl
+
+def AnomalyFreeQuadAddHyperCharge  (a : ℚ) (S : AnomalyFreeQuad) : AnomalyFreeQuad :=
+   ⟨S.val + a • hyperCharge.val.val,
+    by
+      erw [accQuad_add, S.Quad, accQuad_smul, hyperCharge.val.Quad, accQuadDiv_smul_right,
+      accQuadDiv_hyperCharge, S.val.YY]
+      simp only [mul_zero, add_zero]⟩
+
+
+def AnomalyFreeAddHyperCharge (a : ℚ) (S : AnomalyFree) : AnomalyFree :=
+  ⟨AnomalyFreeQuadAddHyperCharge a S.val
+    ,
+    by
+      rw [AnomalyFreeQuadAddHyperCharge]
+      erw [accCube_add]
+      rw [S.Cube]
+      erw [accCubeDiv_smul_left]
+      rw [accCubeDiv_hyperCharge_AnomalyFreeLinear]
+      erw [accCubeDiv_smul_right]
+      rw [accCubeDiv_AnomalyFreeLinear_hyperCharge]
+      erw [accCube_smul]
+      rw [hyperCharge.Cube]
+      simp only [mul_zero, add_zero]⟩
+
+
+end hyperCharge
+
+section BMinusL
+
+@[simps!]
+def oneFamilyBMinusL : oneFamilyCharge := ⟨1, -1, -1, -3, 3, 3⟩
+
+@[simps!]
+def BMinusL : AnomalyFree :=
+  ⟨⟨⟨oneFamilyToThreeFamily oneFamilyBMinusL, by rfl, by rfl, by rfl, by rfl⟩, by rfl⟩, by rfl⟩
+
+@[simp]
+lemma accQuadDiv_BMinusL (S : threeFamilyCharge) :
+    accQuadDiv BMinusL.val.val.val S = 1/2 * accYY S + 3/2 * accSU2 S - 2 * accSU3 S := by
+  simp [BMinusL, oneFamilyBMinusL]
+  ring
+
+@[simp]
+def AnomalyFreeQuadAddBMinusL (a : ℚ) (S : AnomalyFreeQuad) : AnomalyFreeQuad :=
+   ⟨S.val + a • BMinusL.val.val,
+    by
+      erw [accQuad_add, S.Quad, accQuad_smul, BMinusL.val.Quad, accQuadDiv_smul_right,
+      accQuadDiv_BMinusL, S.val.YY, S.val.SU3, S.val.SU2]
+      simp only [one_div, mul_zero, add_zero, sub_self]⟩
+
+def AnomalyFreeQuadAddBMinusL_zero (S : AnomalyFreeQuad) : AnomalyFreeQuadAddBMinusL 0 S = S := by
+  simp only [AnomalyFreeQuadAddBMinusL, zero_smul, add_zero]
+
+
+@[simp]
+lemma accQuadDiv_BMinusL_AnomalyFreeLinear (S : AnomalyFreeLinear) :
+    accQuadDiv BMinusL.val.val.val S.val = 0 := by
+  rw [accQuadDiv_BMinusL]
+  rw [S.YY, S.SU2, S.SU3]
+  rfl
+
+@[simp]
+lemma accCubeDiv_of_BMinusL (S : threeFamilyCharge) :
+    accCubeDiv S BMinusL.val.val.val = 9 * accGrav S - 24 * accSU3 S := by
+  simp [BMinusL, oneFamilyBMinusL]
+  ring
+
+@[simp]
+lemma accCubeDiv_AnomalyFreeLinear_BMinusL (S : AnomalyFreeLinear) :
+    accCubeDiv S.val BMinusL.val.val.val = 0 := by
+  rw [accCubeDiv_of_BMinusL]
+  rw [S.Grav, S.SU3]
+  rfl
+
+
+end BMinusL
+
+section mapToQuad
+
+def mapToQuadPointPt : threeFamilyCharge :=
+  ⟨-1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, 0, 0, 0⟩
+
+def mapToQuadPoint : AnomalyFree :=
+  ⟨⟨⟨mapToQuadPointPt, by rfl, by rfl, by rfl, by rfl⟩, by rfl⟩, by rfl⟩
+
+def mapToQuadGeneric (S : AnomalyFreeLinear) : AnomalyFreeQuad :=
+  ⟨(accQuad S.val) • mapToQuadPoint.val.val +
+    (- 2 * (accQuadDiv mapToQuadPoint.val.val.val S.val)) • S
+   , by
+    erw [accQuad_add, accQuad_smul, accQuad_smul]
+    rw [mapToQuadPoint.val.Quad]
+    simp only [mul_zero, neg_mul, zero_add]
+    erw [accQuadDiv_smul_left]
+    erw [accQuadDiv_smul_left]
+    ring⟩
+
+lemma mapToQuadGeneric_on_quad  (S : AnomalyFreeQuad) :
+    mapToQuadGeneric S.val =
+     AnomalyFreeQuadSmul (- 2 * (accQuadDiv mapToQuadPoint.val.val.val S.val.val)) S := by
+  rw [mapToQuadGeneric]
+  apply AnomalyFreeQuad.ext
+  simp only
+  rw [S.Quad, zero_smul, zero_add]
+  rfl
+
+def mapToQuadSpecial (S : AnomalyFreeLinear) (hSS : accQuad S.val = 0)
+    (hCS : accQuadDiv mapToQuadPoint.val.val.val S.val = 0) (a b : ℚ) : AnomalyFreeQuad :=
+  ⟨ a • mapToQuadPoint.val.val + b • S, by
+    erw [accQuad_add, accQuad_smul, accQuad_smul]
+    erw [accQuadDiv_smul_left]
+    erw [accQuadDiv_smul_left]
+    rw [hCS]
+    rw [hSS]
+    rw [mapToQuadPoint.val.Quad]
+    simp⟩
+
+@[simp]
+def mapToQuad  : AnomalyFreeLinear × ℚ × ℚ → AnomalyFreeQuad :=  fun S =>
+  if h : accQuad S.1.val = 0 ∧ accQuadDiv mapToQuadPoint.val.val.val S.1.val = 0 then
+    mapToQuadSpecial S.1 h.left h.right S.2.1 S.2.2
+  else
+    AnomalyFreeQuadSmul S.2.1 (mapToQuadGeneric S.1)
+
+theorem mapToQuad_surjective : Function.Surjective mapToQuad := by
+  intro S
+  by_cases hS :  accQuad S.val.val = 0 ∧ accQuadDiv mapToQuadPoint.val.val.val S.val.val = 0
+  · use ⟨S.val, ⟨0, 1⟩⟩
+    rw [mapToQuad]
+    rw [dif_pos hS]
+    rw [mapToQuadSpecial]
+    apply AnomalyFreeQuad.ext
+    simp only [zero_smul, one_smul, zero_add]
+  · use ⟨S.val, ⟨1/((-2 * accQuadDiv mapToQuadPoint.val.val.val S.val.val)), 0⟩⟩
+    rw [mapToQuad]
+    rw [dif_neg hS]
+    rw [mapToQuadGeneric_on_quad]
+    rw [← AnomalyFreeQuad_mul_smul]
+    rw [div_mul]
+    rw [one_div_div]
+    rw [div_self, AnomalyFreeQuad_one_smul]
+    rw [S.Quad] at hS
+    simp_all only [accQuadDiv, true_and, neg_mul, ne_eq, neg_eq_zero, _root_.mul_eq_zero,
+      OfNat.ofNat_ne_zero, or_self, not_false_eq_true]
+
+end mapToQuad
+
+section mapToCube
+
+def mapToCubeGeneric (S : AnomalyFreeQuad) : AnomalyFree :=
+  ⟨AnomalyFreeQuadAddBMinusL (accCube S.val.val)
+  (AnomalyFreeQuadSmul (- 3 * accCubeDiv BMinusL.val.val.val S.val.val) S),
+  by
+   simp only [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul, HAdd.hAdd]
+   simp only [Add.add]
+   simp only [HSMul.hSMul]
+   simp only [SMul.smul]
+   rw [accCube_add, accCube_smul, accCube_smul, accCubeDiv_smul_left,
+   accCubeDiv_smul_left, accCubeDiv_smul_right, accCubeDiv_smul_right]
+   rw [BMinusL.Cube, accCubeDiv_AnomalyFreeLinear_BMinusL]
+   ring
+  ⟩
+
+lemma mapToCubeGeneric_on_cube (S : AnomalyFree) :
+    mapToCubeGeneric S.val =
+     AnomalyFreeSMul (- 3 * accCubeDiv BMinusL.val.val.val S.val.val.val) S := by
+  rw [mapToCubeGeneric]
+  apply AnomalyFree.ext
+  simp only
+  rw [S.Cube]
+  rw [AnomalyFreeQuadAddBMinusL_zero]
+  rfl
+
+
+def mapToCubeSpecial (S : AnomalyFreeQuad) (hSSS : accCube S.val.val = 0)
+    (hB : accCubeDiv BMinusL.val.val.val S.val.val = 0) (a b : ℚ) : AnomalyFree :=
+  ⟨AnomalyFreeQuadAddBMinusL a (AnomalyFreeQuadSmul b S), by
+   simp only [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul, HAdd.hAdd]
+   simp only [Add.add]
+   simp only [HSMul.hSMul]
+   simp only [SMul.smul]
+   rw [accCube_add, accCube_smul, accCube_smul, accCubeDiv_smul_left,
+   accCubeDiv_smul_left, accCubeDiv_smul_right, accCubeDiv_smul_right]
+   rw [BMinusL.Cube, hSSS, accCubeDiv_AnomalyFreeLinear_BMinusL, hB]
+   simp only [mul_zero, add_zero]
+  ⟩
+
+@[simp]
+def mapToCube : AnomalyFreeQuad × ℚ × ℚ → AnomalyFree :=  fun S =>
+  if h : accCube S.1.val.val = 0 ∧ accCubeDiv BMinusL.val.val.val S.1.val.val = 0 then
+    mapToCubeSpecial S.1 h.left h.right S.2.1 S.2.2
+  else
+    AnomalyFreeSMul S.2.1 (mapToCubeGeneric S.1)
+
+theorem mapToCube_surjective : Function.Surjective mapToCube := by
+  intro S
+  by_cases hS :  accCube S.val.val.val = 0 ∧ accCubeDiv BMinusL.val.val.val S.val.val.val = 0
+  · use ⟨S.val, ⟨0, 1⟩⟩
+    rw [mapToCube]
+    rw [dif_pos hS]
+    rw [mapToCubeSpecial]
+    apply AnomalyFree.ext
+    simp [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul]
+  · use ⟨S.val, ⟨1/((-3 * accCubeDiv BMinusL.val.val.val S.val.val.val)), 0⟩⟩
+    rw [mapToCube]
+    rw [dif_neg hS]
+    rw [mapToCubeGeneric_on_cube]
+    rw [← AnomalyFree_mul_smul]
+    rw [div_mul]
+    rw [one_div_div]
+    rw [div_self, AnomalyFree_one_smul]
+    rw [S.Cube] at hS
+    simp_all only [accCubeDiv, true_and, neg_mul, ne_eq, neg_eq_zero, _root_.mul_eq_zero,
+      OfNat.ofNat_ne_zero, or_self, not_false_eq_true]
+
+end mapToCube
+
+def map : AnomalyFreeLinear × (Fin 4 →  ℚ) → AnomalyFree := fun S =>
+  mapToCube ⟨mapToQuad ⟨S.1, ⟨S.2 0, S.2 1⟩⟩, ⟨S.2 2, S.2 3⟩⟩
+
+theorem map_surjective : Function.Surjective map := by
+  intro S
+  obtain ⟨S1, hS1⟩ := mapToCube_surjective S
+  obtain ⟨S2, hS2⟩ := mapToQuad_surjective S1.1
+  let r (a : Fin 4) : ℚ :=
+    match a with
+    | 0 => S2.2.1
+    | 1 => S2.2.2
+    | 2 => S1.2.1
+    | 3 => S1.2.2
+  use ⟨S2.1, r⟩
+  change mapToCube ⟨mapToQuad S2, _⟩ = _
+  rw [hS2]
+  exact hS1
