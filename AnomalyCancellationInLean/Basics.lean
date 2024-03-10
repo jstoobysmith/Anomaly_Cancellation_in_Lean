@@ -7,33 +7,10 @@ import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
+import AnomalyCancellationInLean.OneFamily.Basics
 
 universe v u
 open Nat
-
-structure oneFamilyCharge where
-  Q : ℚ
-  U : ℚ
-  D : ℚ
-  L : ℚ
-  E : ℚ
-  N : ℚ
-
-namespace oneFamilyCharge
-
-@[ext]
-theorem ext {a b : oneFamilyCharge}
-    (hQ : a.Q = b.Q)
-    (hU : a.U = b.U)
-    (hD : a.D = b.D)
-    (hL : a.L = b.L)
-    (hE : a.E = b.E)
-    (hN : a.N = b.N) :
-    a = b := by
-  cases' a
-  simp_all only
-
-end oneFamilyCharge
 
 structure threeFamilyCharge where
   Q1 : ℚ
@@ -69,7 +46,132 @@ theorem ext {a b : threeFamilyCharge}
   cases' a
   simp_all only
 
+@[simp]
+def Q (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.Q1
+  | 1 => S.Q2
+  | 2 => S.Q3
+
+@[simp]
+def U (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.U1
+  | 1 => S.U2
+  | 2 => S.U3
+
+@[simp]
+def D (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.D1
+  | 1 => S.D2
+  | 2 => S.D3
+
+
+@[simp]
+def L (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.L1
+  | 1 => S.L2
+  | 2 => S.L3
+
+@[simp]
+def E (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.E1
+  | 1 => S.E2
+  | 2 => S.E3
+
+@[simp]
+def N (S : threeFamilyCharge) : Fin 3 → ℚ := fun a =>
+  match a with
+  | 0 => S.N1
+  | 1 => S.N2
+  | 2 => S.N3
+
+
+@[simp]
+def QSum (S : threeFamilyCharge) : ℚ := S.Q1 + S.Q2 + S.Q3
+
+@[simp]
+def USum (S : threeFamilyCharge) : ℚ := S.U1 + S.U2 + S.U3
+
+@[simp]
+def DSum (S : threeFamilyCharge) : ℚ := S.D1 + S.D2 + S.D3
+
+@[simp]
+def LSum (S : threeFamilyCharge) : ℚ := S.L1 + S.L2 + S.L3
+
+@[simp]
+def ESum (S : threeFamilyCharge) : ℚ := S.E1 + S.E2 + S.E3
+
+@[simp]
+def NSum (S : threeFamilyCharge) : ℚ := S.N1 + S.N2 + S.N3
+
+@[simp]
+def QSqSum (S : threeFamilyCharge) : ℚ := S.Q1^2 + S.Q2^2 + S.Q3^2
+
+@[simp]
+def USqSum (S : threeFamilyCharge) : ℚ := S.U1^2 + S.U2^2+ S.U3^2
+
+@[simp]
+def DSqSum (S : threeFamilyCharge) : ℚ := S.D1^2 + S.D2^2 + S.D3^2
+
+@[simp]
+def LSqSum (S : threeFamilyCharge) : ℚ := S.L1^2 + S.L2^2 + S.L3^2
+
+@[simp]
+def ESqSum (S : threeFamilyCharge) : ℚ := S.E1^2 + S.E2^2 + S.E3^2
+
+@[simp]
+def NSqSum (S : threeFamilyCharge) : ℚ := S.N1^2 + S.N2^2 + S.N3^2
+
 end threeFamilyCharge
+
+section MK
+
+@[simps!]
+def threeFamilyChargeMk (SQ SU SD SL SE SN : Fin 3 → ℚ) : threeFamilyCharge :=
+  ⟨SQ 0, SQ 1, SQ 2, SU 0, SU 1, SU 2, SD 0, SD 1, SD 2, SL 0, SL 1, SL 2, SE 0, SE 1, SE 2, SN 0,
+   SN 1, SN 2⟩
+
+lemma threeFamilyChargeMk_Q (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).Q = SQ := by
+  ext
+  simp only [threeFamilyCharge.Q]
+  split <;> rfl
+
+lemma threeFamilyChargeMk_U (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).U = SU := by
+  ext
+  simp only [threeFamilyCharge.U]
+  split <;> rfl
+
+lemma threeFamilyChargeMk_D (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).D = SD := by
+  ext
+  simp only [threeFamilyCharge.D]
+  split <;> rfl
+
+lemma threeFamilyChargeMk_L (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).L = SL := by
+  ext
+  simp only [threeFamilyCharge.L]
+  split <;> rfl
+
+lemma threeFamilyChargeMk_E (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).E = SE := by
+  ext
+  simp only [threeFamilyCharge.E]
+  split <;> rfl
+
+lemma threeFamilyChargeMk_N (SQ SU SD SL SE SN : Fin 3 → ℚ) :
+    (threeFamilyChargeMk SQ SU SD SL SE SN).N = SN := by
+  ext
+  simp only [threeFamilyCharge.N]
+  split <;> rfl
+
+end MK
 
 @[simps!]
 def threeFamilyChargeAdd (X Y : threeFamilyCharge) : threeFamilyCharge :=
@@ -143,6 +245,10 @@ instance threeFamilyChargeModule : Module ℚ threeFamilyCharge where
     intro x a b
     apply threeFamilyCharge.ext <;> exact Rat.add_mul _ _ _
 
+
+
+
+
 @[simps!]
 def oneFamilyToThreeFamily (S : oneFamilyCharge) : threeFamilyCharge :=
   ⟨S.Q, S.Q, S.Q, S.U, S.U, S.U, S.D, S.D, S.D, S.L, S.L, S.L, S.E, S.E, S.E, S.N, S.N, S.N⟩
@@ -151,12 +257,7 @@ def oneFamilyToThreeFamily (S : oneFamilyCharge) : threeFamilyCharge :=
 /-- The anomaly cancelation condition for the gravity anomaly. -/
 @[simp]
 def accGrav (S : threeFamilyCharge) : ℚ :=
-  6 * (S.Q1 + S.Q2 + S.Q3)
-  + 3 * (S.U1 + S.U2 + S.U3)
-  + 3 * (S.D1 + S.D2 + S.D3)
-  + 2 * (S.L1 + S.L2 + S.L3)
-  + (S.E1 + S.E2 + S.E3)
-  + (S.N1 + S.N2 + S.N3)
+  6 * S.QSum + 3 * S.USum + 3 * S.DSum + 2 * S.LSum + S.ESum + S.NSum
 
 @[simp]
 lemma accGrav_add (S T : threeFamilyCharge) :
@@ -173,8 +274,7 @@ lemma accGrav_smul (a : ℚ) (S : threeFamilyCharge) :
 /-- The anomaly cancelation condition for SU(2) anomaly. -/
 @[simp]
 def accSU2 (S : threeFamilyCharge) : ℚ :=
-  3 * (S.Q1 + S.Q2 + S.Q3)
-  + (S.L1 + S.L2 + S.L3)
+  3 * S.QSum + S.LSum
 
 @[simp]
 lemma accSU2_add (S T : threeFamilyCharge) :
@@ -191,9 +291,7 @@ lemma accSU2_smul (a : ℚ) (S : threeFamilyCharge) :
 /-- The anomaly cancelation condition for SU(3) anomaly. -/
 @[simp]
 def accSU3 (S : threeFamilyCharge) : ℚ :=
-  2 * (S.Q1 + S.Q2 + S.Q3)
-  + (S.U1 + S.U2 + S.U3)
-  + (S.D1 + S.D2 + S.D3)
+  2 * S.QSum + S.USum + S.DSum
 
 @[simp]
 lemma accSU3_add (S T : threeFamilyCharge) :
@@ -210,11 +308,7 @@ lemma accSU3_smul (a : ℚ) (S : threeFamilyCharge) :
 /-- The anomaly cancelation condition for Y² anomaly. -/
 @[simp]
 def accYY (S : threeFamilyCharge) : ℚ :=
-  (S.Q1 + S.Q2 + S.Q3)
-  + 8 * (S.U1 + S.U2 + S.U3)
-  + 2 * (S.D1 + S.D2 + S.D3)
-  + 3 * (S.L1 + S.L2 + S.L3)
-  + 6 * (S.E1 + S.E2 + S.E3)
+  S.QSum + 8 * S.USum + 2 * S.DSum + 3 * S.LSum + 6 * S.ESum
 
 @[simp]
 lemma accYY_add (S T : threeFamilyCharge) :
@@ -400,22 +494,15 @@ lemma AnomalyFreeQuad.ext {S T : AnomalyFreeQuad} (h : S.val.val = T.val.val) : 
   cases' S
   simp_all
 
-
-/-- The scalar multiple of any solution is also a solution. -/
-@[simps!]
-def AnomalyFreeQuadSmul (a : ℚ) (S : AnomalyFreeQuad) : AnomalyFreeQuad :=
-  ⟨a • S.val,
+instance AnomalyFreeQuadMulAction : MulAction ℚ AnomalyFreeQuad where
+  smul a S := ⟨a • S.val,
     by erw [accQuad_smul, S.Quad, Rat.mul_zero]⟩
-
-lemma AnomalyFreeQuad_mul_smul (a b : ℚ) (S : AnomalyFreeQuad) :
-    AnomalyFreeQuadSmul (a * b) S = AnomalyFreeQuadSmul a (AnomalyFreeQuadSmul b S) := by
-  apply AnomalyFreeQuad.ext
-  exact mul_smul _ _ _
-
-lemma AnomalyFreeQuad_one_smul (S : AnomalyFreeQuad) :
-    AnomalyFreeQuadSmul 1 S =S := by
-  apply AnomalyFreeQuad.ext
-  exact one_smul _ _
+  mul_smul a b S := by
+    apply AnomalyFreeQuad.ext
+    exact mul_smul _ _ _
+  one_smul S := by
+    apply AnomalyFreeQuad.ext
+    exact one_smul _ _
 
 structure AnomalyFree where
   val : AnomalyFreeQuad
@@ -428,17 +515,12 @@ lemma AnomalyFree.ext {S T : AnomalyFree} (h : S.val.val.val = T.val.val.val) : 
   simp_all
 
 /-- The scalar multiple of any solution is also a solution. -/
-@[simps!]
-def AnomalyFreeSMul (a : ℚ) (S : AnomalyFree) : AnomalyFree :=
-  ⟨AnomalyFreeQuadSmul a S.val,
+instance AnomalyFreeMulAction : MulAction ℚ AnomalyFree where
+  smul a S :=  ⟨ a • S.val,
     by erw [accCube_smul, S.Cube, Rat.mul_zero]⟩
-
-lemma AnomalyFree_mul_smul (a b : ℚ) (S : AnomalyFree) :
-    AnomalyFreeSMul (a * b) S = AnomalyFreeSMul a (AnomalyFreeSMul b S) := by
-  apply AnomalyFree.ext
-  exact mul_smul _ _ _
-
-lemma AnomalyFree_one_smul (S : AnomalyFree) :
-    AnomalyFreeSMul 1 S =S := by
-  apply AnomalyFree.ext
-  exact one_smul _ _
+  mul_smul a b S := by
+    apply AnomalyFree.ext
+    exact mul_smul _ _ _
+  one_smul S := by
+    apply AnomalyFree.ext
+    exact one_smul _ _

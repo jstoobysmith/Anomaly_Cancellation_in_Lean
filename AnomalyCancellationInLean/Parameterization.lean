@@ -24,14 +24,35 @@ structure linearParameters where
   N2 : ℚ
   N3 : ℚ
 
+@[simp]
+def linearParameters.DSum (S : linearParameters) : ℚ := S.D1 + S.D2 + S.D3
+
+@[simp]
+def linearParameters.NSum (S : linearParameters) : ℚ := S.N1 + S.N2 + S.N3
+
+@[simp]
+def linearParameters.Q3 (S : linearParameters) : ℚ :=
+  1/2 * (-2 * S.Q1 - 2 * S.Q2 + S.DSum + S.NSum)
+
+@[simp]
+def linearParameters.U3 (S : linearParameters) : ℚ :=
+  - (S.U1 + S.U2 + 2 * S.DSum + S.NSum)
+
+@[simp]
+def linearParameters.L3 (S : linearParameters) : ℚ :=
+  -1/2 * (2 * S.L1 + 2 * S.L2 +  3 * S.DSum + 3 * S.NSum)
+
+@[simp]
+def linearParameters.E3 (S : linearParameters) : ℚ :=
+  - (S.E1 + S.E2 - 3 * S.DSum - 2 * S.NSum)
+
 def linearParameterization : linearParameters ≃ AnomalyFreeLinear where
   toFun := fun S =>
-    ⟨⟨S.Q1, S.Q2, 1/2 * (-2 * S.Q1 - 2 * S.Q2 + (S.D1 + S.D2 + S.D3) + (S.N1 + S.N2 + S.N3)),
-      S.U1, S.U2, - (S.U1 + S.U2 + 2 * (S.D1 + S.D2 + S.D3) + (S.N1 + S.N2 + S.N3)),
+    ⟨⟨S.Q1, S.Q2, S.Q3,
+      S.U1, S.U2, S.U3,
       S.D1, S.D2, S.D3,
-      S.L1, S.L2, -1/2 * (2 * S.L1 + 2 * S.L2 +  3 * (S.D1 + S.D2 + S.D3) +
-        3 * (S.N1 + S.N2 + S.N3)),
-      S.E1, S.E2, - (S.E1 + S.E2 - 3 * (S.D1 + S.D2 + S.D3) - 2 * (S.N1 + S.N2 + S.N3) ),
+      S.L1, S.L2, S.L3,
+      S.E1, S.E2, S.E3,
       S.N1, S.N2, S.N3⟩,
       by simp; ring, by simp; ring, by simp; ring, by simp; ring⟩
   invFun := fun S =>
@@ -55,10 +76,6 @@ def linearParameterization : linearParameters ≃ AnomalyFreeLinear where
     linear_combination -(1 * hS1) + 3 / 2 * hS2 + 2 / 3 * hS3 + hS4 / 6
     linear_combination -(3 / 2 * hS1) + 5 / 4 * hS2 + 5 / 2 * hS3 + hS4 / 4
     linear_combination 2 * hS1 - 5 / 2 * hS2 - 2 * hS3 + -1 * hS4 / 2
-
-
-
-
 
 
 end linearParameters
@@ -247,5 +264,6 @@ lemma map'_surjective : Function.Surjective map' := by
 
 def map : parameters → AnomalyFree := map' ∘ parametersEquiv.toFun
 
+/-- The map from parameters to `AnomalyFree` is surjective. -/
 theorem map_surjective : Function.Surjective map :=
   Function.Surjective.comp (map'_surjective) (Equiv.surjective _)
