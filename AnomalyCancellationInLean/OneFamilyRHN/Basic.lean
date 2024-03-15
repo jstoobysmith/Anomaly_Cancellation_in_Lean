@@ -11,7 +11,12 @@ import Mathlib.Algebra.GroupWithZero.Units.Lemmas
 universe v u
 open Nat
 
-structure oneFamilyCharge where
+
+
+namespace OneFamily
+
+section Charges
+structure Charges where
   Q : ℚ
   U : ℚ
   D : ℚ
@@ -19,10 +24,8 @@ structure oneFamilyCharge where
   E : ℚ
   N : ℚ
 
-namespace oneFamilyCharge
-
 @[ext]
-theorem ext {a b : oneFamilyCharge}
+theorem Charge.ext {a b : Charges}
     (hQ : a.Q = b.Q)
     (hU : a.U = b.U)
     (hD : a.D = b.D)
@@ -33,15 +36,13 @@ theorem ext {a b : oneFamilyCharge}
   cases' a
   simp_all only
 
-end oneFamilyCharge
 
-section theACCs
+end Charges
+
 
 /-- The anomaly cancelation condition for the gravity anomaly. -/
 @[simp]
-def accGrav₁ (S : oneFamilyCharge) : ℚ :=
+def accGrav (S : Charges) : ℚ :=
   6 * S.Q + 3 * S.U + 3 * S.D + 2 * S.L + S.E + S.N
 
-
-
-end theACCs
+end OneFamily

@@ -3,10 +3,10 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import AnomalyCancellationInLean.Basics
+import AnomalyCancellationInLean.ThreeFamily.Basic
 
 @[simps!]
-def oneFamilyBMinusL : oneFamilyCharge := ⟨1, -1, -1, -3, 3, 3⟩
+def oneFamilyBMinusL : OneFamily.Charges := ⟨1, -1, -1, -3, 3, 3⟩
 
 @[simps!]
 def BMinusL : AnomalyFree :=
