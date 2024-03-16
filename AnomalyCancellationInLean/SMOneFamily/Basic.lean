@@ -45,40 +45,6 @@ quadratic `accQaud` and cubic `accCube` anomaly equations.
 
 namespace SMOneFamily
 
-structure Charges where
-  Q : ℚ
-  U : ℚ
-  D : ℚ
-  L : ℚ
-  E : ℚ
-
-@[ext]
-lemma Charges.ext {S T : Charges}
-  (hQ : S.Q = T.Q) (hU : S.U = T.U) (hD : S.D = T.D) (hL : S.L = T.L) (hE : S.E = T.E) : S = T := by
-  cases' S
-  simp_all only
-
-@[simps!]
-def equiv : Charges ≃ (Fin 5 → ℚ) where
-  toFun S := fun i =>
-    match i with
-    | 0 => S.Q
-    | 1 => S.U
-    | 2 => S.D
-    | 3 => S.L
-    | 4 => S.E
-  invFun f := ⟨f 0, f 1, f 2, f 3, f 4⟩
-  left_inv S := by
-    apply Charges.ext <;> rfl
-  right_inv f := by
-    funext i
-    match i with
-    | 0 => rfl
-    | 1 => rfl
-    | 2 => rfl
-    | 3 => rfl
-    | 4 => rfl
-def Charges' : Type := Fin 5 → ℚ
 
 @[simps!]
 def SMOneFamilyCharges : ACCSystemCharges := ACCSystemChargesMk 5
@@ -93,7 +59,6 @@ def _root_.ACCSystemCharges.charges.D (S : SMOneFamilyCharges.charges) : ℚ := 
 def _root_.ACCSystemCharges.charges.L (S : SMOneFamilyCharges.charges) : ℚ := S 3
 @[simp]
 def _root_.ACCSystemCharges.charges.E (S : SMOneFamilyCharges.charges) : ℚ := S 4
-
 
 def accGrav : (SMOneFamilyCharges.charges →ₗ[ℚ] ℚ) where
   toFun S := 6 * S.Q + 3 * S.U + 3 * S.D + 2 * S.L + S.E
@@ -137,12 +102,10 @@ def accCube :
     simp [HSMul.hSMul, SMul.smul]
     ring
 
-
-
 end SMOneFamily
 
 @[simps!]
-def SMOneFamily: ACCSystem where
+def SMOneFamily : ACCSystem where
   numberLinear := 3
   linearACCs := fun i =>
     match i with

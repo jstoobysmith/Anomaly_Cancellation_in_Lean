@@ -125,6 +125,15 @@ instance chargesModule (χ : ACCSystemCharges) : Module ℚ χ.charges where
     simp [χ.equiv.right_inv]
     exact χ.chargesFunModule.add_smul _ _ _
 
+structure Hom (χ η : ACCSystemCharges) where
+  charges : χ.charges →ₗ[ℚ] η.charges
+
+
+
+def Hom.comp {χ η ε : ACCSystemCharges} (g : Hom η ε) (f : Hom χ η) : Hom χ ε where
+  charges := LinearMap.comp g.charges f.charges
+
+
 
 end ACCSystemCharges
 
@@ -132,15 +141,7 @@ structure ACCSystemLinear extends ACCSystemCharges where
   numberLinear : ℕ
   linearACCs :  Fin numberLinear → (charges →ₗ[ℚ] ℚ)
 
-
-structure ACCSystemLinear' where
-  val : ACCSystemCharges
-  numberLinear : ℕ
-  linearACCs : Fin numberLinear → (val.charges →ₗ[ℚ] ℚ)
-
-
 namespace ACCSystemLinear
-
 
 structure AnomalyFreeLinear (χ : ACCSystemLinear) where
   val : χ.1.charges
@@ -291,7 +292,7 @@ namespace ACCSystem
 structure AnomalyFree (χ : ACCSystem) extends χ.AnomalyFreeQuad where
   cubicSol : χ.cubicACC val = 0
 
-@[ext]
+
 lemma AnomalyFree.ext {χ : ACCSystem} {S T : χ.AnomalyFree} (h : S.val = T.val) :
     S = T := by
   have h  := ACCSystemQuad.AnomalyFreeQuad.ext h
@@ -312,15 +313,20 @@ instance AnomalyFreeMulAction (χ : ACCSystem) : MulAction ℚ χ.AnomalyFree wh
     apply AnomalyFree.ext
     exact one_smul _ _
 
+/-- The inclusion of the anomaly free solution into solutions of the quadratic and
+linear equations -/
 def AnomalyFreeInclQuad (χ : ACCSystem) :
     MulActionHom ℚ χ.AnomalyFree χ.AnomalyFreeQuad  where
   toFun  := AnomalyFree.toAnomalyFreeQuad
   map_smul' _ _ := rfl
 
+/-- The inclusion of anomaly free solutions into all solutions of the linear equations. -/
 def AnomalyFreeInclLinear (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.AnomalyFreeLinear :=
   MulActionHom.comp χ.AnomalyFreeQuadInclLinear χ.AnomalyFreeInclQuad
 
+/-- The inclusion of anomaly free solutions into all charges. -/
 def AnomalyFreeIncl (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.charges :=
   MulActionHom.comp χ.AnomalyFreeQuadIncl χ.AnomalyFreeInclQuad
+
 
 end ACCSystem

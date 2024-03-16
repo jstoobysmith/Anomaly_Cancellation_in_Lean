@@ -9,7 +9,8 @@ import Mathlib.Tactic.Ring
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
 import AnomalyCancellationInLean.Basic
 import AnomalyCancellationInLean.OneFamilyRHN.Basic
-
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Logic.Equiv.Fin
 /-!
 # Anomaly cancellation conditions for 3 families with RHN.
 
@@ -21,51 +22,66 @@ open Nat
 namespace ThreeFamilyChargesRHN
 
 @[simps!]
-def ThreeFamilyChargesRHN : ACCSystemCharges := ACCSystemChargesMk 18
+def ThreeFamilyChargesRHN : ACCSystemCharges := ACCSystemChargesMk (6 * 3)
+
+@[simps!]
+def toFamilyMaps : ThreeFamilyChargesRHN.charges ≃ (Fin 6 → Fin 3 → ℚ) :=
+   ((Equiv.curry _ _ _).symm.trans
+    ((@finProdFinEquiv 6 3).arrowCongr (Equiv.refl ℚ))).symm
 
 @[simp]
-def _root_.ACCSystemCharges.charges.Q1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 0
-@[simp]
-def _root_.ACCSystemCharges.charges.Q2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 1
-@[simp]
-def _root_.ACCSystemCharges.charges.Q3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 2
-@[simp]
-def _root_.ACCSystemCharges.charges.U1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 3
-@[simp]
-def _root_.ACCSystemCharges.charges.U2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 4
-@[simp]
-def _root_.ACCSystemCharges.charges.U3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 5
-@[simp]
-def _root_.ACCSystemCharges.charges.D1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 6
-@[simp]
-def _root_.ACCSystemCharges.charges.D2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 7
-@[simp]
-def _root_.ACCSystemCharges.charges.D3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 8
-@[simp]
-def _root_.ACCSystemCharges.charges.L1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 9
-@[simp]
-def _root_.ACCSystemCharges.charges.L2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 10
-@[simp]
-def _root_.ACCSystemCharges.charges.L3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 11
-@[simp]
-def _root_.ACCSystemCharges.charges.E1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 12
-@[simp]
-def _root_.ACCSystemCharges.charges.E2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 13
-@[simp]
-def _root_.ACCSystemCharges.charges.E3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 14
-@[simp]
-def _root_.ACCSystemCharges.charges.N1 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 15
-@[simp]
-def _root_.ACCSystemCharges.charges.N2 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 16
-@[simp]
-def _root_.ACCSystemCharges.charges.N3 (S : ThreeFamilyChargesRHN.charges) : ℚ := S 17
+def _root_.ACCSystemCharges.charges.Q (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 0
+
 
 @[simp]
-def _root_.ACCSystemCharges.charges.N (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ := fun i =>
-  match i with
-  | 0 => S.N1
-  | 1 => S.N1
-  | 2 => S.N2
+def _root_.ACCSystemCharges.charges.U (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 1
+
+  @[simp]
+def _root_.ACCSystemCharges.charges.D (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 2
+
+@[simp]
+def _root_.ACCSystemCharges.charges.L (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 3
+
+@[simp]
+def _root_.ACCSystemCharges.charges.E (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 4
+
+
+@[simp]
+def _root_.ACCSystemCharges.charges.N (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
+  toFamilyMaps S 5
+
+open BigOperators in
+@[simp]
+def accGrav : ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
+  toFun S := ∑ i, (6 * S.Q i + 3 * S.U i + 3 * S.D i + 2 * S.L i + S.E i + S.N i)
+  map_add' S T := by
+    simp [toFamilyMaps]
+    simp only [Rat.mul_add]
+    repeat erw [Finset.sum_add_distrib]
+    ring
+  map_smul' a S := by
+    simp only
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat erw [Finset.sum_add_distrib]
+    repeat erw [← Finset.mul_sum]
+    rw [show Rat.cast a = a from rfl]
+    ring
+
+
+
+
+
+
+
+
+
+
+
 
 end ThreeFamilyChargesRHN
 
