@@ -18,6 +18,7 @@ import Mathlib.Logic.Equiv.Fin
 
 universe v u
 open Nat
+open BigOperators
 
 namespace ThreeFamilyChargesRHN
 
@@ -32,7 +33,6 @@ def toFamilyMaps : ThreeFamilyChargesRHN.charges ≃ (Fin 6 → Fin 3 → ℚ) :
 @[simp]
 def _root_.ACCSystemCharges.charges.Q (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
   toFamilyMaps S 0
-
 
 @[simp]
 def _root_.ACCSystemCharges.charges.U (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
@@ -55,7 +55,17 @@ def _root_.ACCSystemCharges.charges.E (S : ThreeFamilyChargesRHN.charges) : Fin 
 def _root_.ACCSystemCharges.charges.N (S : ThreeFamilyChargesRHN.charges) : Fin 3 → ℚ :=
   toFamilyMaps S 5
 
-open BigOperators in
+def mkFromFamily (SQ SU SD SL SE SN : Fin 3 → ℚ) : ThreeFamilyChargesRHN.charges :=
+  toFamilyMaps.invFun ( fun i =>
+    match i with
+    | 0 => SQ
+    | 1 => SU
+    | 2 => SD
+    | 3 => SE
+    | 4 => SL
+    | 5 => SN
+  )
+
 @[simp]
 def accGrav : ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (6 * S.Q i + 3 * S.U i + 3 * S.D i + 2 * S.L i + S.E i + S.N i)
@@ -72,8 +82,57 @@ def accGrav : ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
     rw [show Rat.cast a = a from rfl]
     ring
 
+/-- The anomaly cancelation condition for SU(2) anomaly. -/
+@[simp]
+def accSU2 : ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
+  toFun S := ∑ i, (3 * S.Q i + S.L i)
+  map_add' S T := by
+    simp [toFamilyMaps]
+    simp only [Rat.mul_add]
+    repeat erw [Finset.sum_add_distrib]
+    ring
+  map_smul' a S := by
+    simp only
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat erw [Finset.sum_add_distrib]
+    repeat erw [← Finset.mul_sum]
+    rw [show Rat.cast a = a from rfl]
+    ring
+
+/-- The anomaly cancelation condition for SU(2) anomaly. -/
+@[simp]
+def accSU3 : ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
+  toFun S := ∑ i, (2 * S.Q i + S.U i + S.D i)
+  map_add' S T := by
+    simp [toFamilyMaps]
+    simp only [Rat.mul_add]
+    repeat erw [Finset.sum_add_distrib]
+    ring
+  map_smul' a S := by
+    simp only
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat erw [Finset.sum_add_distrib]
+    repeat erw [← Finset.mul_sum]
+    rw [show Rat.cast a = a from rfl]
+    ring
 
 
+/-- The anomaly cancelation condition for Y² anomaly. -/
+@[simp]
+def accYY :  ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
+  toFun S := ∑ i, (S.Q i + 8 * S.U i + 2 * S.D i + 3 * S.L i + 6 * S.E i)
+  map_add' S T := by
+    simp [toFamilyMaps]
+    simp only [Rat.mul_add]
+    repeat erw [Finset.sum_add_distrib]
+    ring
+  map_smul' a S := by
+    simp only
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat erw [Finset.sum_add_distrib]
+    repeat erw [← Finset.mul_sum]
+    rw [show Rat.cast a = a from rfl]
+    ring
 
 
 
