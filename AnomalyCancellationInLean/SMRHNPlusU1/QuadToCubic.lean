@@ -15,71 +15,91 @@ open BigOperators
 
 namespace QuadToCubic
 
-def generic {n : ℕ} (S : AnomalyFreeQuad) : AnomalyFree :=
-  ⟨AnomalyFreeQuadAddBMinusL (accCube S.val.val)
-  (AnomalyFreeQuadSmul (- 3 * accCubeDiv BMinusL.val.val.val S.val.val) S),
-  by
-   simp only [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul, HAdd.hAdd]
-   simp only [Add.add]
-   simp only [HSMul.hSMul]
-   simp only [SMul.smul]
-   rw [accCube_add, accCube_smul, accCube_smul, accCubeDiv_smul_left,
-   accCubeDiv_smul_left, accCubeDiv_smul_right, accCubeDiv_smul_right]
-   rw [BMinusL.Cube, accCubeDiv_AnomalyFreeLinear_BMinusL]
-   ring
-  ⟩
-
-lemma mapToCubeGeneric_on_cube (S : AnomalyFree) :
-    mapToCubeGeneric S.val =
-     AnomalyFreeSMul (- 3 * accCubeDiv BMinusL.val.val.val S.val.val.val) S := by
-  rw [mapToCubeGeneric]
-  apply AnomalyFree.ext
-  simp only
-  rw [S.Cube]
-  rw [AnomalyFreeQuadAddBMinusL_zero]
-  rfl
-
-def mapToCubeSpecial (S : AnomalyFreeQuad) (hSSS : accCube S.val.val = 0)
-    (hB : accCubeDiv BMinusL.val.val.val S.val.val = 0) (a b : ℚ) : AnomalyFree :=
-  ⟨AnomalyFreeQuadAddBMinusL a (AnomalyFreeQuadSmul b S), by
-   simp only [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul, HAdd.hAdd]
-   simp only [Add.add]
-   simp only [HSMul.hSMul]
-   simp only [SMul.smul]
-   rw [accCube_add, accCube_smul, accCube_smul, accCubeDiv_smul_left,
-   accCubeDiv_smul_left, accCubeDiv_smul_right, accCubeDiv_smul_right]
-   rw [BMinusL.Cube, hSSS, accCubeDiv_AnomalyFreeLinear_BMinusL, hB]
-   simp only [mul_zero, add_zero]
-  ⟩
+@[simp]
+def α₁ {n : ℕ} (S : (SMRHNPlusU1 n).AnomalyFreeQuad) : ℚ :=
+  - 3 * accCubeTriLinSymm.toFun (S.val, S.val, (BMinusLNFamily n).val)
 
 @[simp]
-def mapToCube : AnomalyFreeQuad × ℚ × ℚ → AnomalyFree :=  fun S =>
-  if h : accCube S.1.val.val = 0 ∧ accCubeDiv BMinusL.val.val.val S.1.val.val = 0 then
-    mapToCubeSpecial S.1 h.left h.right S.2.1 S.2.2
-  else
-    AnomalyFreeSMul S.2.1 (mapToCubeGeneric S.1)
+def α₂ {n : ℕ} (S : (SMRHNPlusU1 n).AnomalyFreeQuad) : ℚ :=
+  (accCube.toFun S.val)
 
-theorem mapToCube_surjective : Function.Surjective mapToCube := by
-  intro S
-  by_cases hS :  accCube S.val.val.val = 0 ∧ accCubeDiv BMinusL.val.val.val S.val.val.val = 0
-  · use ⟨S.val, ⟨0, 1⟩⟩
-    rw [mapToCube]
-    rw [dif_pos hS]
-    rw [mapToCubeSpecial]
-    apply AnomalyFree.ext
-    simp [AnomalyFreeQuadAddBMinusL, AnomalyFreeQuadSmul]
-  · use ⟨S.val, ⟨1/((-3 * accCubeDiv BMinusL.val.val.val S.val.val.val)), 0⟩⟩
-    rw [mapToCube]
-    rw [dif_neg hS]
-    rw [mapToCubeGeneric_on_cube]
-    rw [← AnomalyFree_mul_smul]
-    rw [div_mul]
-    rw [one_div_div]
-    rw [div_self, AnomalyFree_one_smul]
-    rw [S.Cube] at hS
-    simp_all only [accCubeDiv, true_and, neg_mul, ne_eq, neg_eq_zero, _root_.mul_eq_zero,
-      OfNat.ofNat_ne_zero, or_self, not_false_eq_true]
+
+@[simps!]
+def generic {n : ℕ} (S : (SMRHNPlusU1 n).AnomalyFreeQuad) : (SMRHNPlusU1 n).AnomalyFree :=
+  ⟨anomalyFreeQuadPlusBMinusL (α₂ S) ((α₁ S) • S),
+  by
+   simp only [anomalyFreeQuadPlusBMinusL]
+   erw [TriLinearSymm.toHomogeneousCubic_add]
+   erw [HomogeneousCubic.map_smul']
+   erw [HomogeneousCubic.map_smul']
+   erw [TriLinear.map_smul₁, TriLinear.map_smul₁]
+   erw [TriLinear.map_smul₂, TriLinear.map_smul₂]
+   erw [TriLinear.map_smul₃, TriLinear.map_smul₃]
+   erw [(BMinusLNFamily n).cubicSol]
+   rw [accCubeTriLinear_BMinusL₂_AnomalyFreeLinear]
+   rw [α₁]
+   ring_nf
+   simp
+  ⟩
+
+lemma generic_on_AnomalyFree (S : (SMRHNPlusU1 n).AnomalyFree) :
+    generic S.1 = (α₁ S.1) • S := by
+  rw [generic]
+  apply ACCSystem.AnomalyFree.ext
+  simp only
+  rw [α₂]
+  erw [S.cubicSol]
+  rw [anomalyFreeQuadPlusBMinusL_zero]
+  rfl
+
+def special (S : (SMRHNPlusU1 n).AnomalyFreeQuad)
+    (h1 : α₁ S = 0) (h2 : α₂ S = 0) (a b : ℚ) : (SMRHNPlusU1 n).AnomalyFree :=
+  ⟨anomalyFreeQuadPlusBMinusL a (b • S), by
+    simp only [anomalyFreeQuadPlusBMinusL]
+    erw [TriLinearSymm.toHomogeneousCubic_add]
+    erw [HomogeneousCubic.map_smul']
+    erw [HomogeneousCubic.map_smul']
+    erw [TriLinear.map_smul₁, TriLinear.map_smul₁]
+    erw [TriLinear.map_smul₂, TriLinear.map_smul₂]
+    erw [TriLinear.map_smul₃, TriLinear.map_smul₃]
+    rw [accCubeTriLinear_BMinusL₂_AnomalyFreeLinear]
+    erw [(BMinusLNFamily n).cubicSol]
+    simp_all
+  ⟩
+
 
 end QuadToCubic
+
+open QuadToCubic
+
+@[simp]
+def quadToCube (n : ℕ) : (SMRHNPlusU1 n).AnomalyFreeQuad × ℚ × ℚ → (SMRHNPlusU1 n).AnomalyFree :=
+  fun S =>
+    if h : α₁ S.1 = 0 ∧ α₂ S.1 = 0 then
+      special S.1 h.left h.right S.2.1 S.2.2
+    else
+      S.2.1 • (generic S.1)
+
+theorem quadToCube_surjective (n : ℕ) : Function.Surjective (quadToCube n) := by
+  intro S
+  by_cases hS :  α₁ S.1 = 0 ∧ α₂ S.1 = 0
+  · use ⟨S.1, ⟨0, 1⟩⟩
+    rw [quadToCube]
+    rw [dif_pos hS]
+    rw [special]
+    apply ACCSystem.AnomalyFree.ext
+    simp [anomalyFreeQuadPlusBMinusL]
+  · use ⟨S.1, ⟨1/(α₁ S.1), 0⟩⟩
+    rw [quadToCube]
+    rw [dif_neg hS]
+    rw [generic_on_AnomalyFree]
+    rw [← (SMRHNPlusU1 n).AnomalyFreeMulAction.mul_smul]
+    rw [div_mul]
+    rw [one_div_div]
+    rw [div_self, (SMRHNPlusU1 n).AnomalyFreeMulAction.one_smul]
+    erw [α₂, S.cubicSol] at hS
+    simp_all only [α₁, SMRHNPlusU1Charges_charges, BMinusLNFamily_val, accCubeTriLinSymm_toFun,
+      neg_mul, neg_eq_zero, mul_eq_zero, OfNat.ofNat_ne_zero, false_or, and_true, ne_eq, or_self,
+      not_false_eq_true]
 
 end SMRHNPlusU1

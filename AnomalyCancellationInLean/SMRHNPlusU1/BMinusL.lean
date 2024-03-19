@@ -35,7 +35,7 @@ lemma accQuadBiLinear_BMinusL {n : ℕ} (S : (SMRHNPlusU1 n).charges) :
   ring
 
 lemma accCubeTriLinear_BMinusL₂ {n : ℕ} (S : (SMRHNPlusU1 n).charges) :
-    accCubeTriLinSymm.toFun ((BMinusLNFamily n).val, (BMinusLNFamily n).val, S) = 
+    accCubeTriLinSymm.toFun ((BMinusLNFamily n).val, (BMinusLNFamily n).val, S) =
     9 * accGrav S  + (- 24 * accSU3 S) := by
   rw [accCubeTriLinSymm, accGrav, accSU3]
   simp only [SMRHNPlusU1Charges_charges, SMRHNPlusU1Species_charges, BMinusLNFamily_val,
@@ -50,19 +50,28 @@ lemma accCubeTriLinear_BMinusL₂ {n : ℕ} (S : (SMRHNPlusU1 n).charges) :
   simp
   ring
 
-def anomalyFreeQuadPlusBMinusL (a : ℚ) (S : (SMRHNPlusU1 n).AnomalyFreeQuad) : 
-    (SMRHNPlusU1 n).AnomalyFreeQuad := 
-  ⟨S.1 + a • (BMinusLNFamily n).1.1, by 
-    intro i 
-    simp at i 
-    match i with 
-    | 0 =>  
+lemma accCubeTriLinear_BMinusL₂_AnomalyFreeLinear {n : ℕ} (S : (SMRHNPlusU1 n).AnomalyFreeLinear) :
+    accCubeTriLinSymm.toFun ((BMinusLNFamily n).val, (BMinusLNFamily n).val, S.val) = 0 := by
+  rw [accCubeTriLinear_BMinusL₂]
+  have h := S.linearSol
+  simp at h
+  erw [h 0, h 2]
+  simp
+
+
+def anomalyFreeQuadPlusBMinusL (a : ℚ) (S : (SMRHNPlusU1 n).AnomalyFreeQuad) :
+    (SMRHNPlusU1 n).AnomalyFreeQuad :=
+  ⟨S.1 + a • (BMinusLNFamily n).1.1, by
+    intro i
+    simp at i
+    match i with
+    | 0 =>
       erw [BiLinearSymm.toHomogeneousQuad_add]
-      have hS := S.quadSol 
+      have hS := S.quadSol
       simp at hS
-      have hS' := S.linearSol 
+      have hS' := S.linearSol
       simp at hS'
-      have hBL := (BMinusLNFamily n).quadSol 
+      have hBL := (BMinusLNFamily n).quadSol
       simp at hBL
       erw [hS 0]
       erw [accQuadBiLinear.map_smul₂]
@@ -70,8 +79,12 @@ def anomalyFreeQuadPlusBMinusL (a : ℚ) (S : (SMRHNPlusU1 n).AnomalyFreeQuad) :
       erw [hS' 1, hS' 2, hS' 3]
       simp only [zero_add, one_div, mul_zero, add_zero]
       change accQuad.toFun (a • _) = _
-      rw [accQuad.map_smul'] 
+      rw [accQuad.map_smul']
       erw [hBL 0]
       simp⟩
+
+lemma anomalyFreeQuadPlusBMinusL_zero  (S : (SMRHNPlusU1 n).AnomalyFreeQuad) :
+    anomalyFreeQuadPlusBMinusL 0 S = S := by
+  simp [anomalyFreeQuadPlusBMinusL]
 
 end SMRHNPlusU1
