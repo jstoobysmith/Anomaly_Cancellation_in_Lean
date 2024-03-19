@@ -11,6 +11,90 @@ import Mathlib.Algebra.QuadraticDiscriminant
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Module.LinearMap.Basic
 
+section HomogeneousEquations
+
+structure HomogeneousQuadratic (V : Type) [AddCommMonoid V]
+    [Module ℚ V] where
+  toFun : V → ℚ
+  map_smul' : ∀ a S,  toFun (a • S) = a ^ 2 * toFun S
+
+structure HomogeneousCubic (V : Type) [AddCommMonoid V] [Module ℚ V] where
+  toFun : V → ℚ
+  map_smul' : ∀ a S,  toFun (a • S) = a ^ 3 * toFun S
+
+structure BiLinear (V : Type) [AddCommMonoid V] [Module ℚ V] where
+  toFun : V × V → ℚ
+  map_smul₁ : ∀ a S T, toFun (a • S, T) = a * toFun (S, T)
+  map_smul₂ : ∀ a S T , toFun (S, a • T) = a * toFun (S, T)
+  map_add₁ : ∀ S1 S2 T, toFun (S1 + S2, T) = toFun (S1, T) + toFun (S2, T)
+  map_add₂ : ∀ S T1 T2, toFun (S, T1 + T2) = toFun (S, T1) + toFun (S, T2)
+
+
+structure BiLinearSymm (V : Type) [AddCommMonoid V] [Module ℚ V] extends
+    BiLinear V where
+  swap : ∀ S T, toFun (S, T) = toFun (T, S)
+
+namespace BiLinearSymm
+
+@[simps!]
+def toHomogeneousQuad {V : Type} [AddCommMonoid V] [Module ℚ V]
+    (τ : BiLinearSymm V) : HomogeneousQuadratic V where
+  toFun S := τ.toFun (S, S)
+  map_smul' a S := by
+    simp
+    rw [τ.map_smul₁, τ.map_smul₂]
+    ring
+
+def toHomogeneousQuad_add {V : Type} [AddCommMonoid V] [Module ℚ V]
+    (τ : BiLinearSymm V) (S T : V) :
+    τ.toHomogeneousQuad.toFun (S + T) = τ.toHomogeneousQuad.toFun S +
+    τ.toHomogeneousQuad.toFun T + 2 * τ.toFun (S, T) := by
+  simp
+  rw [τ.map_add₁, τ.map_add₂, τ.map_add₂]
+  rw [τ.swap T S]
+  ring
+
+end BiLinearSymm
+
+structure TriLinear (charges : Type) [AddCommMonoid charges] [Module ℚ charges] where
+  toFun : charges × charges × charges → ℚ
+  map_smul₁ : ∀ a S T L, toFun (a • S, T, L) = a * toFun (S, T, L)
+  map_smul₂ : ∀ a S T L, toFun (S, a • T, L) = a * toFun (S, T, L)
+  map_smul₃ : ∀ a S T L, toFun (S, T, a • L) = a * toFun (S, T, L)
+  map_add₁ : ∀ S1 S2 T L, toFun (S1 + S2, T, L) = toFun (S1, T, L) + toFun (S2, T, L)
+  map_add₂ : ∀ S T1 T2 L, toFun (S, T1 + T2, L) = toFun (S, T1, L) + toFun (S, T2, L)
+  map_add₃ : ∀ S T L1 L2, toFun (S, T, L1 + L2) = toFun (S, T, L1) + toFun (S, T, L2)
+
+structure TriLinearSymm (charges : Type) [AddCommMonoid charges] [Module ℚ charges] extends
+    TriLinear charges where
+  swap₁ : ∀ S T L, toFun (S, T, L) = toFun (T, S, L)
+  swap₂ : ∀ S T L, toFun (S, T, L) = toFun (S, L, T)
+
+
+namespace TriLinearSymm
+
+@[simps!]
+def toHomogeneousCubic {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
+    (τ : TriLinearSymm charges) : HomogeneousCubic charges where
+  toFun S := τ.toFun (S, S, S)
+  map_smul' a S := by
+    simp
+    rw [τ.map_smul₁, τ.map_smul₂, τ.map_smul₃]
+    ring
+
+def toHomogeneousCubic_add {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
+    (τ : TriLinearSymm charges) (S T : charges) :
+    τ.toHomogeneousCubic.toFun (S + T) = τ.toHomogeneousCubic.toFun S +
+    τ.toHomogeneousCubic.toFun T + 3 * τ.toFun (S, S, T) + 3 * τ.toFun (T, T, S) := by
+  simp
+  rw [τ.map_add₁, τ.map_add₂, τ.map_add₂, τ.map_add₃, τ.map_add₃, τ.map_add₃, τ.map_add₃]
+  rw [τ.swap₂ S T S, τ.swap₁ T S S, τ.swap₂ S T S, τ.swap₂ T S T, τ.swap₁ S T T, τ.swap₂ T S T]
+  ring
+
+end TriLinearSymm
+
+end HomogeneousEquations
+
 structure ACCSystemCharges where
   charges : Type
   numberCharges : ℕ
@@ -204,10 +288,6 @@ def anomalyFreeLinearIncl  (χ : ACCSystemLinear) :
 
 end ACCSystemLinear
 
-structure HomogeneousQuadratic (charges : Type) [AddCommMonoid charges]
-    [Module ℚ charges] where
-  toFun : charges → ℚ
-  map_smul' : ∀ a S,  toFun (a • S) = a ^ 2 * toFun S
 
 structure ACCSystemQuad extends ACCSystemLinear where
   numberQuadratic : ℕ
@@ -257,50 +337,6 @@ def AnomalyFreeQuadIncl (χ : ACCSystemQuad) :
   MulActionHom.comp χ.anomalyFreeLinearIncl  χ.AnomalyFreeQuadInclLinear
 
 end ACCSystemQuad
-
-structure HomogeneousCubic (charges : Type) [AddCommMonoid charges]
-    [Module ℚ charges] where
-  toFun : charges → ℚ
-  map_smul' : ∀ a S,  toFun (a • S) = a ^ 3 * toFun S
-
-structure TriLinear (charges : Type) [AddCommMonoid charges] [Module ℚ charges] where
-  toFun : charges × charges × charges → ℚ
-  map_smul₁ : ∀ a S T L, toFun (a • S, T, L) = a * toFun (S, T, L)
-  map_smul₂ : ∀ a S T L, toFun (S, a • T, L) = a * toFun (S, T, L)
-  map_smul₃ : ∀ a S T L, toFun (S, T, a • L) = a * toFun (S, T, L)
-  map_add₁ : ∀ S1 S2 T L, toFun (S1 + S2, T, L) = toFun (S1, T, L) + toFun (S2, T, L)
-  map_add₂ : ∀ S T1 T2 L, toFun (S, T1 + T2, L) = toFun (S, T1, L) + toFun (S, T2, L)
-  map_add₃ : ∀ S T L1 L2, toFun (S, T, L1 + L2) = toFun (S, T, L1) + toFun (S, T, L2)
-
-structure TriLinearSymm (charges : Type) [AddCommMonoid charges] [Module ℚ charges] extends
-    TriLinear charges where
-  swap₁ : ∀ S T L, toFun (S, T, L) = toFun (T, S, L)
-  swap₂ : ∀ S T L, toFun (S, T, L) = toFun (S, L, T)
-
-
-namespace TriLinearSymm
-
-@[simps!]
-def toHomogeneousCubic {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
-    (τ : TriLinearSymm charges) : HomogeneousCubic charges where
-  toFun S := τ.toFun (S, S, S)
-  map_smul' a S := by
-    simp
-    rw [τ.map_smul₁, τ.map_smul₂, τ.map_smul₃]
-    ring
-
-def toHomogeneousCubic_add {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
-    (τ : TriLinearSymm charges) (S T : charges) :
-    τ.toHomogeneousCubic.toFun (S + T) = τ.toHomogeneousCubic.toFun S +
-    τ.toHomogeneousCubic.toFun T + 3 * τ.toFun (S, S, T) + 3 * τ.toFun (T, T, S) := by
-  simp
-  rw [τ.map_add₁, τ.map_add₂, τ.map_add₂, τ.map_add₃, τ.map_add₃, τ.map_add₃, τ.map_add₃]
-  rw [τ.swap₂ S T S, τ.swap₁ T S S, τ.swap₂ S T S, τ.swap₂ T S T, τ.swap₁ S T T, τ.swap₂ T S T]
-  ring
-
-
-
-end TriLinearSymm
 
 structure ACCSystem extends ACCSystemQuad where
   cubicACC : HomogeneousCubic charges

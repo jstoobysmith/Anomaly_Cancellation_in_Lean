@@ -15,6 +15,7 @@ open SMRHNPlusU1Charges
 open SMRHNPlusU1ACCs
 open BigOperators
 
+@[simps!]
 def hyperChargeOneFamily : (SMRHNPlusU1 1).AnomalyFree where
   val := fun i =>
     match i with

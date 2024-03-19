@@ -15,7 +15,7 @@ open  Finset
 namespace PureU1
 
 @[simp]
-def permGroup (n  : ℕ ) := Equiv.Perm (Fin n)
+def permGroup (n  : ℕ) := Equiv.Perm (Fin n)
 
 instance {n : ℕ} : Group (permGroup n) := by
   simp [permGroup]

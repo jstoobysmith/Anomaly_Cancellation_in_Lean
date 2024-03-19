@@ -20,7 +20,7 @@ universe v u
 open Nat
 open BigOperators
 
-namespace ThreeFamilyChargesRHN
+section ThreeFamilyChargesRHN
 
 @[simps!]
 def ThreeFamilyChargesRHN : ACCSystemCharges := ACCSystemChargesMk (6 * 3)
@@ -124,37 +124,60 @@ def accYY :  ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp [toFamilyMaps]
     simp only [Rat.mul_add]
-    repeat erw [Finset.sum_add_distrib]
+    repeat rw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
     simp only
     simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
-    repeat erw [Finset.sum_add_distrib]
-    repeat erw [← Finset.mul_sum]
+    repeat rw [Finset.sum_add_distrib]
+    repeat rw [← Finset.mul_sum]
     rw [show Rat.cast a = a from rfl]
     ring
-
-
-/-- The anomaly cancelation condition for Y anomaly. -/
-@[simp]
-def accQuad : HomogeneousQuadratic ThreeFamilyChargesRHN.charges where
- toFun S := (∑ i, ((S.Q i)^2  + (- 2 * (S.U i)^2) + (S.D i)^2 + (- (S.L i)^2)  + (S.E i)^2))
- map_smul' a S:= by
-  simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
-  repeat erw [Finset.sum_add_distrib]
-  repeat erw [Finset.sum_neg_distrib]
-  repeat erw [← Finset.mul_sum]
-  ring_nf
-  repeat erw [← Finset.mul_sum]
-
-
-
 
 
 
 
 end ThreeFamilyChargesRHN
 
+/-- The anomaly cancelation condition for Y anomaly. -/
+@[simp]
+def accQuad : HomogeneousQuadratic ThreeFamilyChargesRHN.charges where
+  toFun S := ∑ i, ((S.Q i)^2 + (- 2 * (S.U i)^2) + (S.D i)^2 + (- (S.L i)^2)  + (S.E i)^2)
+  map_smul' a S:= by
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat rw [Finset.sum_add_distrib]
+    repeat rw [Finset.sum_neg_distrib]
+    repeat rw [← Finset.mul_sum]
+    ring_nf
+    repeat rw [← Finset.mul_sum]
+
+
+@[simp]
+def accCube: HomogeneousCubic ThreeFamilyChargesRHN.charges where
+  toFun S := ∑ i, (6 * (S.Q i)^3 + 3 * (S.U i)^3 + 3 * (S.D i)^3 + 2 * (S.L i)^3
+    + (S.E i)^3 + (S.N i)^3)
+  map_smul' a S := by
+    simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+    repeat rw [Finset.sum_add_distrib]
+    repeat rw [Finset.sum_neg_distrib]
+    repeat rw [← Finset.mul_sum]
+    ring_nf
+    repeat rw [← Finset.mul_sum]
+
+
+def ThreeFamilyRHN : ACCSystem where
+  numberLinear := 4
+  linearACCs := fun i =>
+    match i with
+    | 0 => accGrav
+    | 1 => accSU2
+    | 2 => accSU3
+    | 3 => accYY
+  numberQuadratic := 1
+  quadraticACCs := fun i =>
+    match i with
+    | 0 => accQuad
+  cubicACC := accCube
 
 structure threeFamilyCharge where
   Q1 : ℚ

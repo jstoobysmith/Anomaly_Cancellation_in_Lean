@@ -255,20 +255,50 @@ lemma accYY_eq_of_sum_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}
   erw [hQ, hU, hD, hL, hE]
   rfl
 
-/-- The anomaly cancelation condition for Y anomaly. -/
-@[simp]
-def accQuad {n : ℕ} : HomogeneousQuadratic (SMRHNPlusU1Charges n).charges where
-  toFun S := ∑ i, ((Q.toFun S i)^2 + (- 2 * (U.toFun S i)^2) + (D.toFun S i)^2
-    + (- (L.toFun S i)^2)  + (E.toFun S i)^2)
-  map_smul' a S:= by
-    simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
+@[simps!]
+def accQuadBiLinear {n : ℕ} : BiLinearSymm (SMRHNPlusU1Charges n).charges where
+  toFun S := ∑ i, ((Q.toFun S.1 i) *  (Q.toFun S.2 i) +
+    (- 2 * ((U.toFun S.1 i) *  (U.toFun S.2 i))) +
+    (((D.toFun S.1 i) *  (D.toFun S.2 i)))
+    + (- ((L.toFun S.1 i) * (L.toFun S.2 i)))  +
+    (((E.toFun S.1 i) * (E.toFun S.2 i))))
+  map_smul₁ a S T := by
+    simp
+    rw [Finset.mul_sum]
+    apply Fintype.sum_congr
+    intro i
     erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul]
     simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
-    repeat rw [Finset.sum_add_distrib]
-    repeat rw [Finset.sum_neg_distrib]
-    repeat rw [← Finset.mul_sum]
-    ring_nf
-    repeat rw [← Finset.mul_sum]
+    ring
+  map_smul₂ a S T := by
+    simp
+    rw [Finset.mul_sum]
+    apply Fintype.sum_congr
+    intro i
+    erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul]
+    simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
+    ring
+  map_add₁ S T L := by
+    simp
+    rw [← Finset.sum_add_distrib]
+    apply Fintype.sum_congr
+    intro i
+    ring
+  map_add₂ S T L := by
+    simp
+    rw [← Finset.sum_add_distrib]
+    apply Fintype.sum_congr
+    intro i
+    ring
+  swap S L := by
+    simp
+    apply Fintype.sum_congr
+    intro i
+    ring
+/-- The anomaly cancelation condition for Y anomaly. -/
+@[simp]
+def accQuad {n : ℕ} : HomogeneousQuadratic (SMRHNPlusU1Charges n).charges :=
+   (@accQuadBiLinear n).toHomogeneousQuad
 
 lemma accQuad_eq_of_sum_sq_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}
     (hQ : ∑ i, ((fun a => a^2) ∘ (Q.toFun S)) i = ∑ i, ((fun a => a^2) ∘ (Q.toFun T)) i)
@@ -281,26 +311,93 @@ lemma accQuad_eq_of_sum_sq_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}
   repeat erw [Finset.sum_add_distrib]
   repeat erw [Finset.sum_neg_distrib]
   repeat erw [← Finset.mul_sum]
+  ring_nf
   erw [hQ, hU, hD, hL, hE]
   rfl
 
 @[simp]
-def accCube {n : ℕ} : HomogeneousCubic (SMRHNPlusU1Charges n).charges where
-  toFun S := ∑ i, (6 * (Q.toFun S i)^3 + 3 * (U.toFun S i)^3 + 3 * (D.toFun S i)^3
-    + 2 * (L.toFun S i)^3 + (E.toFun S i)^3 + (N.toFun S i)^3)
-  map_smul' a S := by
-    simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
-    erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul, N.map_smul]
-    simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
-    repeat rw [Finset.sum_add_distrib]
-    repeat rw [Finset.sum_neg_distrib]
-    repeat rw [← Finset.mul_sum]
-    ring_nf
-    repeat rw [← Finset.mul_sum]
+def accCubeTriLinToFun {n : ℕ}
+    (S : (SMRHNPlusU1Charges n).charges × (SMRHNPlusU1Charges n).charges ×
+    (SMRHNPlusU1Charges n).charges) : ℚ :=
+   ∑ i, (6 * ((Q.toFun S.1 i) * (Q.toFun S.2.1 i) * (Q.toFun S.2.2 i))
+    + 3 * ((U.toFun S.1 i) * (U.toFun S.2.1 i) * (U.toFun S.2.2 i))
+    + 3 * ((D.toFun S.1 i) * (D.toFun S.2.1 i) * (D.toFun S.2.2 i))
+    + 2 * ((L.toFun S.1 i) * (L.toFun S.2.1 i) * (L.toFun S.2.2 i))
+    +  ((E.toFun S.1 i) * (E.toFun S.2.1 i) * (E.toFun S.2.2 i))
+    +  ((N.toFun S.1 i) * (N.toFun S.2.1 i) * (N.toFun S.2.2 i)))
 
---def accCubeTriLin {n : ℕ} : TriLinear (SMRHNPlusU1Charges n).charges where
---  toFun S := ∑ i, (6 * (Q.toFun S.1 i) * (Q.toFun S.2.1 i) * (Q.toFun S.2.2 i)
---   + 3 * (U.toFun S i)^3 + 3 * (D.toFun S i)^3  + 2 * (L.toFun S i)^3 + (E.toFun S i)^3 + (N.toFun S i)^3)
+lemma accCubeTriLinToFun_map_smul₁ {n : ℕ} (a : ℚ)  (S T R : (SMRHNPlusU1Charges n).charges) :
+    accCubeTriLinToFun (a • S, T, R) = a * accCubeTriLinToFun (S, T, R) := by
+  simp only [accCubeTriLinToFun, SMRHNPlusU1Charges_charges, SMRHNPlusU1Species_charges,
+    AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
+  rw [Finset.mul_sum]
+  apply Fintype.sum_congr
+  intro i
+  erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul, N.map_smul]
+  simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
+  ring
+
+lemma accCubeTriLinToFun_map_smul₂ {n : ℕ} (a : ℚ)  (S T R : (SMRHNPlusU1Charges n).charges) :
+    accCubeTriLinToFun (S, a • T, R) = a * accCubeTriLinToFun (S, T, R) := by
+  simp only [accCubeTriLinToFun, SMRHNPlusU1Charges_charges, SMRHNPlusU1Species_charges,
+    AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
+  rw [Finset.mul_sum]
+  apply Fintype.sum_congr
+  intro i
+  erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul, N.map_smul]
+  simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
+  ring
+
+lemma accCubeTriLinToFun_map_smul₃ {n : ℕ} (a : ℚ)  (S T R : (SMRHNPlusU1Charges n).charges) :
+    accCubeTriLinToFun (S, T, a •  R) = a * accCubeTriLinToFun (S, T, R) := by
+  simp only [accCubeTriLinToFun, SMRHNPlusU1Charges_charges, SMRHNPlusU1Species_charges,
+    AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
+  rw [Finset.mul_sum]
+  apply Fintype.sum_congr
+  intro i
+  erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul, N.map_smul]
+  simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
+  ring
+
+@[simps!]
+def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (SMRHNPlusU1Charges n).charges where
+  toFun S := accCubeTriLinToFun S
+  map_smul₁ := accCubeTriLinToFun_map_smul₁
+  map_smul₂ := accCubeTriLinToFun_map_smul₂
+  map_smul₃ := accCubeTriLinToFun_map_smul₃
+  map_add₁ S L T R := by
+    simp
+    rw [← Finset.sum_add_distrib]
+    apply Fintype.sum_congr
+    intro i
+    ring
+  map_add₂ S L T R := by
+    simp
+    rw [← Finset.sum_add_distrib]
+    apply Fintype.sum_congr
+    intro i
+    ring
+  map_add₃ S L T R := by
+    simp
+    rw [← Finset.sum_add_distrib]
+    apply Fintype.sum_congr
+    intro i
+    ring
+  swap₁ S L T := by
+    simp
+    apply Fintype.sum_congr
+    intro i
+    ring
+  swap₂ S L T := by
+    simp
+    apply Fintype.sum_congr
+    intro i
+    ring
+
+@[simp]
+def accCube {n : ℕ} : HomogeneousCubic (SMRHNPlusU1Charges n).charges :=
+  (@accCubeTriLinSymm n).toHomogeneousCubic
+
 
 lemma accCube_eq_of_sum_cube_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}
     (hQ : ∑ i, ((fun a => a^3) ∘ (Q.toFun S)) i = ∑ i, ((fun a => a^3) ∘ (Q.toFun T)) i)
@@ -314,6 +411,7 @@ lemma accCube_eq_of_sum_cube_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}
   repeat erw [Finset.sum_add_distrib]
   repeat erw [Finset.sum_neg_distrib]
   repeat erw [← Finset.mul_sum]
+  ring_nf
   erw [hQ, hU, hD, hL, hE, hN]
   rfl
 

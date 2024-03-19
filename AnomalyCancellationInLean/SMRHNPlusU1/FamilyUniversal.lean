@@ -93,8 +93,8 @@ lemma familyUniversalCharges_YY {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
 
 lemma familyUniversalCharges_Quad {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
     accQuad.toFun (familyUniversalCharges n S.val) = 0 := by
-  simp only [SMRHNPlusU1Charges_charges, accQuad, SMRHNPlusU1Species_charges, SMRHNPlusU1_charges,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  rw [accQuad, BiLinearSymm.toHomogeneousQuad, accQuadBiLinear]
+  simp only
   apply Fintype.sum_eq_zero
   intro i
   erw [mkFromSpecies_Q, mkFromSpecies_U, mkFromSpecies_D, mkFromSpecies_L, mkFromSpecies_E]
@@ -105,8 +105,8 @@ lemma familyUniversalCharges_Quad {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
 
 lemma familyUniversalCharges_Cubic {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
     accCube.toFun (familyUniversalCharges n S.val) = 0 := by
-  simp only [SMRHNPlusU1Charges_charges, accCube, SMRHNPlusU1Species_charges, SMRHNPlusU1_charges,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  rw [accCube, TriLinearSymm.toHomogeneousCubic, accCubeTriLinSymm]
+  simp only
   apply Fintype.sum_eq_zero
   intro i
   erw [mkFromSpecies_Q, mkFromSpecies_U, mkFromSpecies_D, mkFromSpecies_L, mkFromSpecies_E,
