@@ -135,6 +135,17 @@ def accYY :  ThreeFamilyChargesRHN.charges →ₗ[ℚ] ℚ where
     ring
 
 
+/-- The anomaly cancelation condition for Y anomaly. -/
+@[simp]
+def accQuad : HomogeneousQuadratic ThreeFamilyChargesRHN.charges where
+ toFun S := (∑ i, ((S.Q i)^2  + (- 2 * (S.U i)^2) + (S.D i)^2 + (- (S.L i)^2)  + (S.E i)^2))
+ map_smul' a S:= by
+  simp [toFamilyMaps, HSMul.hSMul, SMul.smul]
+  repeat erw [Finset.sum_add_distrib]
+  repeat erw [Finset.sum_neg_distrib]
+  repeat erw [← Finset.mul_sum]
+  ring_nf
+  repeat erw [← Finset.mul_sum]
 
 
 

@@ -125,14 +125,6 @@ instance chargesModule (χ : ACCSystemCharges) : Module ℚ χ.charges where
     simp [χ.equiv.right_inv]
     exact χ.chargesFunModule.add_smul _ _ _
 
-structure Hom (χ η : ACCSystemCharges) where
-  charges : χ.charges →ₗ[ℚ] η.charges
-
-
-
-def Hom.comp {χ η ε : ACCSystemCharges} (g : Hom η ε) (f : Hom χ η) : Hom χ ε where
-  charges := LinearMap.comp g.charges f.charges
-
 
 
 end ACCSystemCharges
@@ -212,26 +204,20 @@ def anomalyFreeLinearIncl  (χ : ACCSystemLinear) :
 
 end ACCSystemLinear
 
-@[simps!]
-instance sqAction : MulAction ℚ ℚ where
-  smul a b := a^2 * b
-  mul_smul a b c:= by
-   simp [HSMul.hSMul]
-   ring
-  one_smul a := by
-   simp [HSMul.hSMul]
-
-@[simps!]
-instance sqActionSMUL : SMul ℚ ℚ := sqAction.toSMul
+structure HomogeneousQuadratic (charges : Type) [AddCommMonoid charges]
+    [Module ℚ charges] where
+  toFun : charges → ℚ
+  map_smul' : ∀ a S,  toFun (a • S) = a ^ 2 * toFun S
 
 structure ACCSystemQuad extends ACCSystemLinear where
   numberQuadratic : ℕ
-  quadraticACCs : Fin numberQuadratic → (@MulActionHom ℚ charges _ ℚ sqActionSMUL)
+  quadraticACCs : Fin numberQuadratic → HomogeneousQuadratic charges
+
 
 namespace ACCSystemQuad
 
 structure AnomalyFreeQuad (χ : ACCSystemQuad) extends χ.AnomalyFreeLinear where
-  quadSol : ∀ i : Fin χ.numberQuadratic, χ.quadraticACCs i val = 0
+  quadSol : ∀ i : Fin χ.numberQuadratic, (χ.quadraticACCs i).toFun val = 0
 
 @[ext]
 lemma AnomalyFreeQuad.ext {χ : ACCSystemQuad} {S T : χ.AnomalyFreeQuad} (h : S.val = T.val) :
@@ -244,7 +230,7 @@ lemma AnomalyFreeQuad.ext {χ : ACCSystemQuad} {S T : χ.AnomalyFreeQuad} (h : S
 instance AnomalyFreeQuadMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.AnomalyFreeQuad where
   smul a S :=  ⟨a • S.toAnomalyFreeLinear , by
     intro i
-    erw [(χ.quadraticACCs i).map_smul]
+    erw [(χ.quadraticACCs i).map_smul']
     rw [S.quadSol i]
     simp
     ⟩
@@ -272,25 +258,58 @@ def AnomalyFreeQuadIncl (χ : ACCSystemQuad) :
 
 end ACCSystemQuad
 
-@[simps!]
-instance cubeAction : MulAction ℚ ℚ where
-  smul a b := a^3 * b
-  mul_smul a b c:= by
-   simp [HSMul.hSMul]
-   ring
-  one_smul a := by
-   simp [HSMul.hSMul]
+structure HomogeneousCubic (charges : Type) [AddCommMonoid charges]
+    [Module ℚ charges] where
+  toFun : charges → ℚ
+  map_smul' : ∀ a S,  toFun (a • S) = a ^ 3 * toFun S
+
+structure TriLinear (charges : Type) [AddCommMonoid charges] [Module ℚ charges] where
+  toFun : charges × charges × charges → ℚ
+  map_smul₁ : ∀ a S T L, toFun (a • S, T, L) = a * toFun (S, T, L)
+  map_smul₂ : ∀ a S T L, toFun (S, a • T, L) = a * toFun (S, T, L)
+  map_smul₃ : ∀ a S T L, toFun (S, T, a • L) = a * toFun (S, T, L)
+  map_add₁ : ∀ S1 S2 T L, toFun (S1 + S2, T, L) = toFun (S1, T, L) + toFun (S2, T, L)
+  map_add₂ : ∀ S T1 T2 L, toFun (S, T1 + T2, L) = toFun (S, T1, L) + toFun (S, T2, L)
+  map_add₃ : ∀ S T L1 L2, toFun (S, T, L1 + L2) = toFun (S, T, L1) + toFun (S, T, L2)
+
+structure TriLinearSymm (charges : Type) [AddCommMonoid charges] [Module ℚ charges] extends
+    TriLinear charges where
+  swap₁ : ∀ S T L, toFun (S, T, L) = toFun (T, S, L)
+  swap₂ : ∀ S T L, toFun (S, T, L) = toFun (S, L, T)
+
+
+namespace TriLinearSymm
 
 @[simps!]
-instance cubeActionSMUL : SMul ℚ ℚ := cubeAction.toSMul
+def toHomogeneousCubic {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
+    (τ : TriLinearSymm charges) : HomogeneousCubic charges where
+  toFun S := τ.toFun (S, S, S)
+  map_smul' a S := by
+    simp
+    rw [τ.map_smul₁, τ.map_smul₂, τ.map_smul₃]
+    ring
+
+def toHomogeneousCubic_add {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
+    (τ : TriLinearSymm charges) (S T : charges) :
+    τ.toHomogeneousCubic.toFun (S + T) = τ.toHomogeneousCubic.toFun S +
+    τ.toHomogeneousCubic.toFun T + 3 * τ.toFun (S, S, T) + 3 * τ.toFun (T, T, S) := by
+  simp
+  rw [τ.map_add₁, τ.map_add₂, τ.map_add₂, τ.map_add₃, τ.map_add₃, τ.map_add₃, τ.map_add₃]
+  rw [τ.swap₂ S T S, τ.swap₁ T S S, τ.swap₂ S T S, τ.swap₂ T S T, τ.swap₁ S T T, τ.swap₂ T S T]
+  ring
+
+
+
+end TriLinearSymm
 
 structure ACCSystem extends ACCSystemQuad where
-  cubicACC : (@MulActionHom ℚ charges _ ℚ cubeActionSMUL)
+  cubicACC : HomogeneousCubic charges
+
 
 namespace ACCSystem
 
 structure AnomalyFree (χ : ACCSystem) extends χ.AnomalyFreeQuad where
-  cubicSol : χ.cubicACC val = 0
+  cubicSol : χ.cubicACC.toFun val = 0
 
 
 lemma AnomalyFree.ext {χ : ACCSystem} {S T : χ.AnomalyFree} (h : S.val = T.val) :
@@ -302,7 +321,7 @@ lemma AnomalyFree.ext {χ : ACCSystem} {S T : χ.AnomalyFree} (h : S.val = T.val
 /-- The scalar multiple of any solution to the linear + quadratic equations is still a solution. -/
 instance AnomalyFreeMulAction (χ : ACCSystem) : MulAction ℚ χ.AnomalyFree where
   smul a S :=  ⟨a • S.toAnomalyFreeQuad , by
-    erw [(χ.cubicACC).map_smul]
+    erw [(χ.cubicACC).map_smul']
     rw [S.cubicSol]
     simp
     ⟩
@@ -327,6 +346,20 @@ def AnomalyFreeInclLinear (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.
 /-- The inclusion of anomaly free solutions into all charges. -/
 def AnomalyFreeIncl (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.charges :=
   MulActionHom.comp χ.AnomalyFreeQuadIncl χ.AnomalyFreeInclQuad
+
+structure Hom (χ η : ACCSystem) where
+  charges : χ.charges →ₗ[ℚ] η.charges
+  anomalyFree : χ.AnomalyFree → η.AnomalyFree
+  commute : charges ∘ χ.AnomalyFreeIncl = η.AnomalyFreeIncl ∘ anomalyFree
+
+def Hom.comp {χ η ε : ACCSystem} (g : Hom η ε) (f : Hom χ η) : Hom χ ε where
+  charges := LinearMap.comp g.charges f.charges
+  anomalyFree := g.anomalyFree ∘ f.anomalyFree
+  commute := by
+    simp
+    rw [Function.comp.assoc]
+    rw [f.commute, ← Function.comp.assoc, g.commute, Function.comp.assoc]
+
 
 
 end ACCSystem

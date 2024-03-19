@@ -34,7 +34,7 @@ def accGrav (n : ℕ) : ((PureU1Charges n).charges →ₗ[ℚ] ℚ) where
 
 open BigOperators in
 @[simp]
-def accCube (n : ℕ)  : @MulActionHom ℚ (PureU1Charges n).charges _ ℚ cubeActionSMUL where
+def accCube (n : ℕ)  : HomogeneousCubic ((PureU1Charges n).charges) where
   toFun S := ∑ i : Fin n, ((fun a => a^3) ∘ S) i
   map_smul' a S := by
    simp [HSMul.hSMul, SMul.smul]
