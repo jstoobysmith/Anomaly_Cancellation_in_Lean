@@ -277,6 +277,10 @@ instance AnomalyFreeLinearAddCommModule  (χ : ACCSystemLinear) : Module ℚ χ.
     apply AnomalyFreeLinear.ext
     exact χ.chargesModule.add_smul _ _ _
 
+instance AnomalyFreeLinearAddCommGroup (χ : ACCSystemLinear) :
+    AddCommGroup χ.AnomalyFreeLinear :=
+  Module.addCommMonoidToAddCommGroup ℚ
+
 /-- The linear map reperesenting the
  inclusion of charges satisfying the linear anomaly free equations into all charges. -/
 def anomalyFreeLinearIncl  (χ : ACCSystemLinear) :

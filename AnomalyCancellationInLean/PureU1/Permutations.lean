@@ -6,6 +6,8 @@ Authors: Joseph Tooby-Smith
 import AnomalyCancellationInLean.PureU1.Basic
 import Mathlib.Tactic.Polyrith
 import Mathlib.RepresentationTheory.Basic
+import Mathlib.Data.Fin.Tuple.Sort
+import AnomalyCancellationInLean.GroupActions
 
 universe v u
 
@@ -23,95 +25,70 @@ instance {n : ℕ} : Group (permGroup n) := by
 
 section Charges
 @[simps!]
-def chargeMap {n : ℕ} (f : Fin n → Fin n) :
-    Charges n →ₗ[ℚ] Charges n where
-  toFun S := ⟨S.x ∘ f⟩
+def chargeMap {n : ℕ} (f : permGroup n) :
+    (PureU1 n).charges  →ₗ[ℚ] (PureU1 n).charges where
+  toFun S := S ∘ f.toFun
   map_add' S T := by
-    apply Charges.ext
+    funext i
     simp
   map_smul' a S := by
-    apply Charges.ext
-    intro i
+    funext i
     simp [HSMul.hSMul]
-    apply Or.inl
     rfl
 
+open PureU1Charges in
 @[simps!]
-def permCharges {n : ℕ} : Representation ℚ (permGroup n) (Charges n) where
-  toFun f := chargeMap f.2
+def permCharges {n : ℕ} : Representation ℚ (permGroup n) (PureU1 n).charges where
+  toFun f := chargeMap f⁻¹
   map_mul' f g :=by
+    simp
     apply LinearMap.ext
     intro S
-    simp [chargeMap]
-    repeat rw [Function.comp.assoc]
+    funext i
     rfl
   map_one' := by
-    simp [chargeMap]
+    apply LinearMap.ext
+    intro S
+    funext i
     rfl
+
+lemma accGrav_invariant {n : ℕ} (f : (permGroup n)) (S : (PureU1 n).charges) :
+    PureU1.accGrav n (permCharges f S) = accGrav n S := by
+  simp [accGrav, permCharges]
+  apply (Equiv.Perm.sum_comp _ _ _ ?_)
+  simp
+
+open BigOperators
+lemma accCube_invariant {n : ℕ} (f : (permGroup n)) (S : (PureU1 n).charges) :
+    (accCube n).toFun (permCharges f S) = (accCube n).toFun S := by
+  simp [accGrav, permCharges]
+  change  ∑ i : Fin n, ((((fun a => a^3) ∘ S) (f.symm i))) = _
+  apply (Equiv.Perm.sum_comp _ _ _ ?_)
+  simp
+
 end Charges
 
-section Linear
-
-open BigOperators in
-lemma accGrav_perm_inv {n : ℕ} (f : permGroup n) (S : Charges n) :
-    accGrav (permCharges f S) = accGrav S := by
-  simp [accGrav, permCharges]
-  apply (Equiv.Perm.sum_comp _ _ _ ?_)
-  simp
-
-def anomalyFreeLinearMap {n : ℕ} (f : permGroup n) :
-    AnomalyFreeLinear n →ₗ[ℚ] AnomalyFreeLinear n where
-  toFun S := ⟨permCharges f S.val, by rw [accGrav_perm_inv, S.Grav]⟩
-  map_add' S T := by
-    apply AnomalyFreeLinear.ext
-    exact (chargeMap f.2).map_add' _ _
-  map_smul' a S := by
-    apply AnomalyFreeLinear.ext
-    exact (chargeMap f.2).map_smul' _ _
-
 @[simps!]
-def permAnomalyFreeLinear {n : ℕ} : Representation ℚ (permGroup n) (AnomalyFreeLinear n) where
-  toFun f := anomalyFreeLinearMap f
-  map_mul' f g := by
-    apply LinearMap.ext
-    intro S
-    apply AnomalyFreeLinear.ext
-    change (permCharges.toFun (f * g)) S.val = _
-    rw [permCharges.map_mul']
-    rfl
-  map_one' := by
-    apply LinearMap.ext
-    intro S
-    apply AnomalyFreeLinear.ext
-    change (permCharges.toFun 1) S.val = _
-    rw [permCharges.map_one']
-    rfl
+def FamilyPermutations (n : ℕ) : ACCSystemGroupAction (PureU1 n) where
+  group := permGroup n
+  groupInst := inferInstance
+  rep := permCharges
+  linearInvariant := by
+    intro i
+    simp at i
+    match i with
+    | 0 => exact accGrav_invariant
+  quadInvariant := by
+    intro i
+    simp at i
+    exact Fin.elim0 i
+  cubicInvariant := accCube_invariant
 
 
-open BigOperators in
-lemma accCube_perm_inv {n : ℕ} (f : permGroup n) (S : Charges n) : accCube (permCharges f S) = accCube S := by
-  simp [accGrav, permCharges]
-  change  ∑ i : Fin n, ((((fun a => a^3) ∘ S.x) (f.symm i))) = _
-  apply (Equiv.Perm.sum_comp _ _ _ ?_)
-  simp
+lemma FamilyPermutations_charges_apply (S : (PureU1 n).charges)
+    (i : Fin n) (f : (FamilyPermutations n).group) :
+    ((FamilyPermutations n).rep f S) i = S (f.invFun i) := by
+  rfl
 
-/-- The group action of the permutation group on the solutions to the
- anomaly free equations. -/
-def permAnomalyFree {n : ℕ} : MulAction (permGroup n) (AnomalyFree n) where
-  smul f S := ⟨permAnomalyFreeLinear f S.val, by
-    change accCube (permCharges f S.val.val) = _
-    rw [accCube_perm_inv, S.Cube]
-  ⟩
-  mul_smul f1 f2 S := by
-    apply AnomalyFree.ext
-    change (permCharges.toFun (f1 * f2)) S.val.val = _
-    rw [permCharges.map_mul']
-    rfl
-  one_smul S := by
-    apply AnomalyFree.ext
-    change (permCharges.toFun 1) S.val.val = _
-    rw [permCharges.map_one']
-    rfl
 
-end Linear
 end PureU1
