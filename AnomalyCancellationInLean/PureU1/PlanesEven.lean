@@ -317,7 +317,7 @@ lemma sum_on_last (f : Fin n → ℚ) :  P f (Fin.last (2 * n.succ -1))
      = 0 := by
   rw [P, sum_of_charges]
   simp [HSMul.hSMul, SMul.smul]
-  have h : (Fin.cast (n_cond₂ n) (Fin.natAdd 1 (Fin.natAdd ( n + n) 0)))
+  have h : (Fin.cast (n_cond₂ n) (Fin.natAdd 1 (Fin.natAdd (n + n) 0)))
    =  (Fin.last (2 * n.succ -1)) := by
     rw [Fin.ext_iff]
     simp
@@ -474,7 +474,6 @@ lemma lineInCubic_p1_p1_p2 (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
     accCubeTriLinSymm.toFun (plane₁.P g, plane₁.P g, plane₂.P f) = 0 := by
   intro g f h
   exact line_in_cubic_p1_p1_p2 g f (hS g f h )
-
 
 
 def lineInCubicPerm (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) : Prop :=
@@ -805,9 +804,32 @@ section permutation
 -- (2 * S.val v_i3 + S.val v_i1 + S.val v_i2)
 namespace appendixCond
 
-def cond (S : (PureU1 ((2 * n.succ) + 1 + 1)).AnomalyFreeLinear) : Prop :=
-  ∀ (i1 i2 i3 : Fin ((2 * n.succ) + 1 + 1)) (_ : i1 ≠ i2) (_ : i2 ≠ i3) (_ : i1 ≠ i3),
+def cond (S : (PureU1 (n)).AnomalyFreeLinear) : Prop :=
+  ∀ (i1 i2 i3 : Fin (n)) (_ : i1 ≠ i2) (_ : i2 ≠ i3) (_ : i1 ≠ i3),
   S.val i1 = S.val i2 ∨ S.val i1 = - S.val i2 ∨ 2 * S.val i3 + S.val i1 + S.val i2 = 0
+
+lemma cond_implies {S : (PureU1 (n.succ.succ)).AnomalyFreeLinear} (hS : cond S)
+   (h : ¬ (S.val ((Fin.last n).castSucc))^2 = (S.val ((Fin.last n).succ))^2 ) :
+    (2 - n) * S.val (Fin.last (n + 1)) =
+    - (2 - n)* S.val (Fin.castSucc (Fin.last n)) := by
+  erw [sq_eq_sq_iff_eq_or_eq_neg] at h
+  simp [not_or] at h
+  have h1 (i : Fin n) : S.val i.castSucc.castSucc =
+      - (S.val ((Fin.last n).castSucc) +  (S.val ((Fin.last n).succ))) / 2 := by
+    have h1S := hS (Fin.last n).castSucc ((Fin.last n).succ) i.castSucc.castSucc
+      (by simp; rw [Fin.ext_iff]; simp; omega)
+      (by simp; rw [Fin.ext_iff]; simp; omega)
+      (by simp; rw [Fin.ext_iff]; simp; omega)
+    simp_all
+    field_simp
+    linear_combination h1S
+  have h2 := pureU1_last S
+  rw [Fin.sum_univ_castSucc] at h2
+  simp [h1] at h2
+  field_simp at h2
+  linear_combination h2
+
+
 
 
 lemma test_six₁ (S : (PureU1 ((2 * n.succ) + 1 + 1)).AnomalyFreeLinear) :

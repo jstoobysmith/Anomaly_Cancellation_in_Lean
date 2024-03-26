@@ -33,8 +33,39 @@ lemma sort_perm {n : ℕ} (S : (PureU1 n).charges) (M :(FamilyPermutations n).gr
     sort ((FamilyPermutations n).rep M S) = sort S :=
   @Tuple.comp_perm_comp_sort_eq_comp_sort n ℚ _ S M⁻¹
 
+lemma sort_apply {n : ℕ} (S : (PureU1 n).charges) (j : Fin n) :
+    sort S j = S ((Tuple.sort S) j) := by
+  rfl
+
+
+lemma sort_zero {n : ℕ} (S : (PureU1 n).charges)  (hS : sort S = 0) : S = 0 := by
+  funext i
+  have hj : ∀ j, sort S j = 0 := by
+    rw [hS]
+    simp
+  have hi := hj ((Tuple.sort S).invFun i)
+  rw [sort_apply] at hi
+  simp at hi
+  rw [hi]
+  rfl
+
+
 lemma sort_projection {n : ℕ} (S : (PureU1 n).charges) : sort (sort S) = sort S :=
   sort_perm S (Tuple.sort S).symm
 
+def sortAFL  {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) : (PureU1 n).AnomalyFreeLinear :=
+  ((FamilyPermutations n).repAnomalyFreeLinear (Tuple.sort S.val).symm S)
+
+lemma sortAFL_val {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) :  (sortAFL S).val = sort S.val := by
+  rfl
+
+
+lemma sortAFL_zero {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear)  (hS : sortAFL S = 0) : S = 0 := by
+  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  have h1 : sort S.val = 0 := by
+    rw [← sortAFL_val]
+    rw [hS]
+    rfl
+  exact sort_zero S.val h1
 
 end PureU1

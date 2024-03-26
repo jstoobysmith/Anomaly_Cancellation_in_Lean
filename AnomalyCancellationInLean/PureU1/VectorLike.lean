@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.PureU1.Sort
 import AnomalyCancellationInLean.PureU1.BasisLinear
+import Mathlib.Logic.Equiv.Fin
 universe v u
 
 open Nat
@@ -56,6 +57,9 @@ lemma sum_δ₁_δ₂  (S : Fin (2 * n.succ) → ℚ) :
   rw [h1]
   rw [Fin.sum_univ_add, Finset.sum_add_distrib]
   rfl
+
+
+
 
 lemma sum_δ!₁_δ!₂  (S : Fin (2 * n.succ) → ℚ) :
     ∑ i, S i = S δ!₃ + S δ!₄ + ∑ i : Fin n,  ((S ∘ δ!₁) i + (S ∘ δ!₂) i) := by
@@ -140,6 +144,17 @@ lemma basis_on_δ₁_other {k j : Fin n.succ} (h : k ≠ j) :
   simp at h2
   omega
   rfl
+
+lemma basis_on_other {k : Fin n.succ} {j : Fin (2 * n.succ)} (h1 : j ≠ δ₁ k)  (h2 : j ≠ δ₂ k) :
+    basisAsCharges k j = 0 := by
+  simp [basisAsCharges]
+  simp_all only [ne_eq, ↓reduceIte]
+
+lemma basis!_on_other {k : Fin n} {j : Fin (2 * n.succ)} (h1 : j ≠ δ!₁ k)  (h2 : j ≠ δ!₂ k) :
+    basis!AsCharges k j = 0 := by
+  simp [basis!AsCharges]
+  simp_all only [ne_eq, ↓reduceIte]
+
 
 lemma basis!_on_δ!₁_other {k j : Fin n} (h : k ≠ j) :
     basis!AsCharges k (δ!₁ j) = 0 := by
@@ -284,6 +299,25 @@ def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).AnomalyFreeLinea
   match i with
   | .inl i => basis i
   | .inr i => basis! i
+
+/-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
+lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
+    (hS : ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
+    (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
+    S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
+  funext i
+  rw [← hS, FamilyPermutations_anomalyFreeLinear_apply]
+  by_cases  hi : i = δ!₁ j
+  subst hi
+  simp [basis!_on_δ!₁_self, pairSwap_inv_fst]
+  by_cases hi2 : i = δ!₂ j
+  subst hi2
+  simp [basis!_on_δ!₂_self, pairSwap_inv_snd]
+  simp
+  rw [basis!_on_other hi hi2]
+  change  S.val ((pairSwap (δ!₁ j) (δ!₂ j)).invFun i) =_
+  erw [pairSwap_inv_other (Ne.symm hi) (Ne.symm hi2)]
+  simp
 
 def P (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).charges := ∑ i, f i • basisAsCharges i
 
@@ -529,6 +563,73 @@ noncomputable def basisaAsBasis :
     Basis (Fin (succ n) ⊕ Fin n) ℚ (PureU1 (2 * succ n)).AnomalyFreeLinear :=
   basisOfLinearIndependentOfCardEqFinrank (@basisa_linear_independent n) basisa_card
 
+
+lemma span_basis (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) :
+      ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ), S.val = P g + P! f  := by
+  have h := (mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
+  obtain ⟨f, hf⟩ := h
+  simp [basisaAsBasis] at hf
+  change P' _ + P!' _ = S at hf
+  use f ∘ Sum.inl
+  use f ∘ Sum.inr
+  rw [← hf]
+  simp [P'_val, P!'_val]
+  rfl
+
+lemma P!_in_span (f : Fin n → ℚ) : P! f ∈ Submodule.span ℚ (Set.range basis!AsCharges) := by
+     rw [(mem_span_range_iff_exists_fun ℚ)]
+     use f
+     rfl
+
+lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).AnomalyFreeLinear) (j : Fin n) :
+    (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j ∈
+    Submodule.span ℚ (Set.range basis!AsCharges) := by
+  apply Submodule.smul_mem
+  apply SetLike.mem_of_subset
+  apply Submodule.subset_span
+  simp_all only [Set.mem_range, exists_apply_eq_apply]
+
+lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
+    (hS : ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
+    (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
+     (h : S.val = P g + P! f):
+    ∃
+    (g' : Fin n.succ → ℚ) (f' : Fin n → ℚ) ,
+     S'.val = P g' + P! f' ∧ P! f' = P! f +
+    (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j ∧ g' = g := by
+  let X := P! f + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j
+  have hX : X ∈  Submodule.span ℚ (Set.range (basis!AsCharges)) := by
+    apply Submodule.add_mem
+    exact (P!_in_span f)
+    exact (smul_basis!AsCharges_in_span S j)
+  have hXsum := (mem_span_range_iff_exists_fun ℚ).mp hX
+  obtain ⟨f', hf'⟩ := hXsum
+  use g
+  use f'
+  change P! f' = _ at hf'
+  erw [hf']
+  simp
+  change S'.val = P g + (P! f + _)
+  rw [← add_assoc, ← h]
+  apply swap!_as_add at hS
+  exact hS
+
+lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
+    (hS : vectorLikeEven S.val) :
+   ∃ (M : (FamilyPermutations (2 * n.succ)).group),
+    (FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M S
+    ∈ Submodule.span ℚ (Set.range basis) := by
+  use (Tuple.sort S.val).symm
+  change sortAFL S ∈ Submodule.span ℚ (Set.range basis)
+  rw [mem_span_range_iff_exists_fun ℚ]
+  let f : Fin n.succ → ℚ := fun i => S.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i))
+  use f
+  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  rw [sortAFL_val]
+  erw [P'_val]
+  sorry
+
+
 end VectorLikeEvenPlane
 
 namespace VectorLikeEvenPlaneCompletion
@@ -544,6 +645,8 @@ def split_odd! (n : ℕ) : (1 + n) + n = 2 * n +1 := by
 
 def split_adda (n : ℕ) : ((1+n)+1) + n.succ = 2 * n.succ + 1 := by
   omega
+
+section theDeltas
 
 def δ₁ (j : Fin n) : Fin (2 * n + 1) :=
   Fin.cast (split_odd n) (Fin.castAdd n (Fin.castAdd 1 j))
@@ -644,6 +747,9 @@ lemma sum_δ!  (S : Fin (2 * n + 1) → ℚ) :
   rw [Finset.sum_add_distrib]
   rfl
 
+end theDeltas
+
+section theBasisVectors
 
 def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).charges :=
   fun i =>
@@ -670,7 +776,6 @@ lemma basis_on_δ₁_self (j : Fin n) : basisAsCharges j (δ₁ j) = 1 := by
 
 lemma basis!_on_δ!₁_self (j : Fin n) : basis!AsCharges j (δ!₁ j) = 1 := by
   simp [basis!AsCharges]
-
 
 lemma basis_on_δ₁_other {k j : Fin n} (h : k ≠ j) :
     basisAsCharges k (δ₁ j) = 0 := by
@@ -707,6 +812,16 @@ lemma basis!_on_δ!₁_other {k j : Fin n} (h : k ≠ j) :
   simp at h2
   omega
   rfl
+
+lemma basis_on_other {k : Fin n} {j : Fin (2 * n + 1)} (h1 : j ≠ δ₁ k)  (h2 : j ≠ δ₂ k) :
+    basisAsCharges k j = 0 := by
+  simp [basisAsCharges]
+  simp_all only [ne_eq, ↓reduceIte]
+
+lemma basis!_on_other {k : Fin n} {j : Fin (2 * n + 1)} (h1 : j ≠ δ!₁ k)  (h2 : j ≠ δ!₂ k) :
+    basis!AsCharges k j = 0 := by
+  simp [basis!AsCharges]
+  simp_all only [ne_eq, ↓reduceIte]
 
 lemma basis_δ₂_eq_minus_δ₁ (j i : Fin n) :
     basisAsCharges j (δ₂ i) = - basisAsCharges j (δ₁ i) := by
@@ -778,6 +893,63 @@ lemma basis!_on_δ!₃ (j : Fin n) : basis!AsCharges j δ!₃ = 0 := by
   omega
   rfl
 
+lemma basis_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basisAsCharges j) = 0 := by
+  rw [accGrav]
+  simp
+  erw [sum_δ]
+  simp [basis_δ₂_eq_minus_δ₁, basis_on_δ₃]
+
+lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basis!AsCharges j) = 0 := by
+  rw [accGrav]
+  simp
+  rw [sum_δ!, basis!_on_δ!₃]
+  simp [basis!_δ!₂_eq_minus_δ!₁]
+
+
+@[simps!]
+def basis (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+  ⟨basisAsCharges j, by
+    intro i
+    simp at i
+    match i with
+    | 0 =>
+    exact basis_linearACC j⟩
+
+@[simps!]
+def basis! (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+  ⟨basis!AsCharges j, by
+    intro i
+    simp at i
+    match i with
+    | 0 =>
+    exact basis!_linearACC j⟩
+
+def basisa : Fin n ⊕ Fin n → (PureU1 (2 * n + 1)).AnomalyFreeLinear := fun i =>
+  match i with
+  | .inl i => basis i
+  | .inr i => basis! i
+
+end theBasisVectors
+
+/-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
+lemma swap!_as_add {S S' : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (j : Fin n)
+    (hS : ((FamilyPermutations (2 * n + 1)).repAnomalyFreeLinear
+    (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
+    S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
+  funext i
+  rw [← hS, FamilyPermutations_anomalyFreeLinear_apply]
+  by_cases  hi : i = δ!₁ j
+  subst hi
+  simp [basis!_on_δ!₁_self, pairSwap_inv_fst]
+  by_cases hi2 : i = δ!₂ j
+  subst hi2
+  simp [basis!_on_δ!₂_self, pairSwap_inv_snd]
+  simp
+  rw [basis!_on_other hi hi2]
+  change  S.val ((pairSwap (δ!₁ j) (δ!₂ j)).invFun i) =_
+  erw [pairSwap_inv_other (Ne.symm hi) (Ne.symm hi2)]
+  simp
+
 def P (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).charges := ∑ i, f i • basisAsCharges i
 
 def P! (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).charges := ∑ i, f i • basis!AsCharges i
@@ -835,6 +1007,231 @@ lemma P_δ₃ (f : Fin n → ℚ) : P f (δ₃) = 0 := by
 lemma P!_δ!₃ (f : Fin n → ℚ) : P! f (δ!₃) = 0 := by
   rw [P!, sum_of_charges]
   simp [HSMul.hSMul, SMul.smul, basis!_on_δ!₃]
+
+lemma Pa_δa₁ (f g : Fin n.succ → ℚ) : Pa f g δa₁ = f 0 := by
+  rw [Pa]
+  simp
+  nth_rewrite 1 [δa₁_δ₁]
+  rw [δa₁_δ!₃]
+  rw [P_δ₁, P!_δ!₃]
+  simp
+
+lemma Pa_δa₂ (f g : Fin n.succ → ℚ)  (j : Fin n) : Pa f g (δa₂ j) = f j.succ + g j.castSucc := by
+  rw [Pa]
+  simp
+  nth_rewrite 1 [δa₂_δ₁]
+  rw [δa₂_δ!₁]
+  rw [P_δ₁, P!_δ!₁]
+
+lemma Pa_δa₃ (f g : Fin n.succ → ℚ)  : Pa f g (δa₃) = g (Fin.last n) := by
+  rw [Pa]
+  simp
+  nth_rewrite 1 [δa₃_δ₃]
+  rw [δa₃_δ!₁]
+  rw [P_δ₃, P!_δ!₁]
+  simp
+
+lemma Pa_δa₄ (f g : Fin n.succ → ℚ) (j : Fin n.succ) : Pa f g (δa₄ j) = - f j - g j := by
+  rw [Pa]
+  simp
+  nth_rewrite 1 [δa₄_δ₂]
+  rw [δa₄_δ!₂]
+  rw [P_δ₂, P!_δ!₂]
+  ring
+
+lemma P_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P f) = 0 := by
+  rw [accGrav]
+  simp
+  rw [sum_δ]
+  simp [P_δ₂, P_δ₁, P_δ₃]
+
+lemma P!_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P! f) = 0 := by
+  rw [accGrav]
+  simp
+  rw [sum_δ!]
+  simp [P!_δ!₂, P!_δ!₁, P!_δ!₃]
+
+lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
+    accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j)
+    = (P g (δ!₁ j))^2 - (g j)^2 := by
+  simp [accCubeTriLinSymm]
+  rw [sum_δ!, basis!_on_δ!₃]
+  simp
+  rw [Finset.sum_eq_single j, basis!_on_δ!₁_self, basis!_on_δ!₂_self]
+  rw [← δ₂_δ!₂, P_δ₂]
+  ring
+  intro k _ hkj
+  erw [basis!_on_δ!₁_other hkj.symm, basis!_on_δ!₂_other hkj.symm]
+  simp
+  simp
+
+
+
+
+
+
+
+
+
+
+
+
+lemma P_zero (f : Fin n → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
+  intro i
+  erw [← P_δ₁ f]
+  rw [h]
+  rfl
+
+lemma P!_zero (f : Fin n → ℚ) (h : P! f = 0) : ∀ i, f i = 0 := by
+  intro i
+  rw [← P!_δ!₁ f]
+  rw [h]
+  rfl
+
+lemma Pa_zero (f g : Fin n.succ → ℚ)  (h : Pa f g = 0) :
+    ∀ i, f i = 0 := by
+  have h₃ := Pa_δa₁ f g
+  rw [h] at h₃
+  simp at h₃
+  intro i
+  have hinduc (iv : ℕ) (hiv : iv < n.succ) : f ⟨iv, hiv⟩ = 0 := by
+    induction iv
+    exact h₃.symm
+    rename_i iv hi
+    have hivi : iv < n.succ := by omega
+    have hi2 := hi hivi
+    have h1 := Pa_δa₄ f g ⟨iv, hivi⟩
+    rw [h, hi2] at h1
+    simp at h1
+    have h2 := Pa_δa₂ f g ⟨iv, by omega⟩
+    simp [h, h1] at h2
+    exact h2.symm
+  exact hinduc i.val i.prop
+
+lemma Pa_zero! (f g : Fin n.succ → ℚ) (h : Pa f g = 0) :
+    ∀ i, g i = 0 := by
+  have hf := Pa_zero f g h
+  rw [Pa, P] at h
+  simp [hf] at h
+  exact P!_zero g h
+
+def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear := ∑ i, f i • basis i
+
+def P!' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear := ∑ i, f i • basis! i
+
+def Pa' (f : (Fin n) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+    ∑ i, f i • basisa i
+
+lemma Pa'_P'_P!' (f : (Fin n) ⊕ (Fin n) → ℚ) :
+    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr):= by
+  exact Fintype.sum_sum_type _
+
+lemma P'_val (f : Fin n → ℚ) : (P' f).val = P f := by
+  simp [P', P]
+  funext i
+  rw [sum_of_anomaly_free_linear, sum_of_charges]
+  simp [HSMul.hSMul]
+
+lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
+  simp [P!', P!]
+  funext i
+  rw [sum_of_anomaly_free_linear, sum_of_charges]
+  simp [HSMul.hSMul]
+
+theorem basis_linear_independent : LinearIndependent ℚ (@basis n) := by
+  apply Fintype.linearIndependent_iff.mpr
+  intro f h
+  change P' f = 0 at h
+  have h1 : (P' f).val = 0 := by
+    simp [h]
+    rfl
+  rw [P'_val] at h1
+  exact P_zero f h1
+
+theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
+  apply Fintype.linearIndependent_iff.mpr
+  intro f h
+  change P!' f = 0 at h
+  have h1 : (P!' f).val = 0 := by
+    simp [h]
+    rfl
+  rw [P!'_val] at h1
+  exact P!_zero f h1
+
+
+theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n.succ) := by
+  apply Fintype.linearIndependent_iff.mpr
+  intro f h
+  change Pa' f = 0 at h
+  have h1 : (Pa' f).val = 0 := by
+    simp [h]
+    rfl
+  rw [Pa'_P'_P!'] at h1
+  change (P' (f ∘ Sum.inl)).val + (P!' (f ∘ Sum.inr)).val = 0 at h1
+  rw [P!'_val, P'_val] at h1
+  change Pa (f ∘ Sum.inl) (f ∘ Sum.inr) = 0 at h1
+  have hf := Pa_zero (f ∘ Sum.inl) (f ∘ Sum.inr) h1
+  have hg := Pa_zero! (f ∘ Sum.inl) (f ∘ Sum.inr) h1
+  intro i
+  simp_all
+  cases i
+  simp_all
+  simp_all
+
+lemma basisa_card :  Fintype.card ((Fin n.succ) ⊕ (Fin n.succ)) =
+    FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear := by
+  erw [BasisLinear.finrank_AnomalyFreeLinear]
+  simp
+  omega
+
+noncomputable def basisaAsBasis :
+    Basis (Fin n.succ ⊕ Fin n.succ) ℚ (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear :=
+  basisOfLinearIndependentOfCardEqFinrank (@basisa_linear_independent n) basisa_card
+
+lemma span_basis (S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear) :
+      ∃ (g f : Fin n.succ → ℚ) , S.val = P g + P! f  := by
+  have h := (mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
+  obtain ⟨f, hf⟩ := h
+  simp [basisaAsBasis] at hf
+  change P' _ + P!' _ = S at hf
+  use f ∘ Sum.inl
+  use f ∘ Sum.inr
+  rw [← hf]
+  simp [P'_val, P!'_val]
+  rfl
+
+lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear} (j : Fin n.succ)
+    (hS : ((FamilyPermutations (2 * n.succ + 1)).repAnomalyFreeLinear
+    (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g f : Fin n.succ → ℚ) (hS1 : S.val = P g + P! f):
+    ∃ (g' f' : Fin n.succ → ℚ),
+     S'.val = P g' + P! f' ∧ P! f' = P! f +
+    (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j ∧ g' = g := by
+  let X := P! f + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j
+  have hf : P! f ∈ Submodule.span ℚ (Set.range basis!AsCharges) := by
+     rw [(mem_span_range_iff_exists_fun ℚ)]
+     use f
+     rfl
+  have hP : (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j ∈
+      Submodule.span ℚ (Set.range basis!AsCharges) := by
+    apply Submodule.smul_mem
+    apply SetLike.mem_of_subset
+    apply Submodule.subset_span
+    simp_all only [Set.mem_range, exists_apply_eq_apply]
+  have hX : X ∈  Submodule.span ℚ (Set.range (basis!AsCharges)) := by
+    apply Submodule.add_mem
+    exact hf
+    exact hP
+  have hXsum := (mem_span_range_iff_exists_fun ℚ).mp hX
+  obtain ⟨f', hf'⟩ := hXsum
+  use g
+  use f'
+  change P! f' = _ at hf'
+  erw [hf']
+  simp
+  change S'.val = P g + (P! f + _)
+  rw [← add_assoc, ← hS1]
+  apply swap!_as_add at hS
+  exact hS
 
 
 end VectorLikeOddPlane
