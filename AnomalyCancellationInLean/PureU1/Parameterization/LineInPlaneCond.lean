@@ -102,6 +102,71 @@ theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).Anomaly
   simp at hij
   rw [hij]
 
+lemma linesInPlane_four (S : (PureU1 4).AnomalyFree) (hS : lineInPlaneCond S.1.1) :
+     constAbsProp (S.val 0, S.val 1)  := by
+  simp [constAbsProp]
+  by_contra hn
+  have hLin := pureU1_linear S.1.1
+  have hcube := pureU1_cube S
+  rw [Fin.sum_univ_four] at hLin hcube
+  rw [sq_eq_sq_iff_eq_or_eq_neg] at hn
+  simp [not_or] at hn
+  have l012 := hS 0 1 2 (by simp) (by simp) (by simp)
+  have l013 := hS 0 1 3 (by simp) (by simp) (by simp)
+  have l023 := hS 0 2 3 (by simp) (by simp) (by simp)
+  simp_all [lineInPlaneProp]
+  have h1 : S.val 2 = S.val 3 := by
+    linear_combination l012 / 2 + -1 * l013 / 2
+  by_cases h2 : S.val 0 = S.val 2
+  simp_all
+  have h3 : S.val 1 = - 3 * S.val 2 := by
+    linear_combination l012 + 3 * h1
+  rw [← h1, h3] at hcube
+  have h4 : S.val 2 ^ 3 = 0 := by
+    linear_combination -1 * hcube / 24
+  simp at h4
+  simp_all
+  by_cases h3 : S.val 0 = - S.val 2
+  simp_all
+  have h4 : S.val 1 = - S.val 2 := by
+    linear_combination l012 + h1
+  simp_all
+  simp_all
+  have h4 : S.val 0 = - 3 * S.val 3 := by
+    linear_combination l023
+  have h5 : S.val 1 = S.val 3 := by
+    linear_combination l013 - 1 * h4
+  rw [h4, h5] at hcube
+  have h6 : S.val 3 ^ 3 = 0 := by
+    linear_combination -1 * hcube / 24
+  simp at h6
+  simp_all
+
+
+lemma linesInPlane_eq_sq_four {S : (PureU1 4).AnomalyFree}
+    (hS : lineInPlaneCond S.1.1) : ∀ (i j : Fin 4) (_ : i ≠ j),
+    constAbsProp (S.val i, S.val j) := by
+  refine Prop_two constAbsProp (by simp : (0 : Fin 4) ≠ 1) ?_
+  intro M
+  let S' := (FamilyPermutations 4).actionAnomalyFree.toFun S M
+  have hS' :  lineInPlaneCond S'.1.1 :=
+    (lineInPlaneCond_perm hS M)
+  exact linesInPlane_four S' hS'
+
+
+lemma linesInPlane_constAbs_four (S : (PureU1 4).AnomalyFree)
+      (hS : lineInPlaneCond S.1.1) : constAbs S.val := by
+  intro i j
+  by_cases hij : i ≠ j
+  exact linesInPlane_eq_sq_four hS i j hij
+  simp at hij
+  rw [hij]
+
+theorem linesInPlane_constAbs_AF (S : (PureU1 (n.succ.succ.succ.succ)).AnomalyFree)
+      (hS : lineInPlaneCond S.1.1) : constAbs S.val := by
+  induction n
+  exact linesInPlane_constAbs_four S hS
+  exact linesInPlane_constAbs hS
 
 
 end PureU1

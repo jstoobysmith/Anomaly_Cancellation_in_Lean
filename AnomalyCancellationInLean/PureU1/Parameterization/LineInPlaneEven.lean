@@ -19,15 +19,20 @@ open BigOperators
 
 variable {n : ℕ}
 open VectorLikeEvenPlane
-
-/-- The line from P to P! through S is within the cubic. -/
+/-- A line in the cubic. -/
 def lineInCubic (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ) ,
   (PureU1.accCube (2 * n.succ)).toFun (a • P g + b • P! f) = 0
 
+/--
+ This lemma states that for a given `S` of type `(PureU1 (2 * n.succ)).AnomalyFreeLinear` and
+ a proof `h` that the line through `S` lies on a cubic curve,
+ for any functions `g : Fin n.succ → ℚ` and `f : Fin n → ℚ`, if `S.val = P g + P! f`,
+ then `accCubeTriLinSymm.toFun (P g, P g, P! f) = 0`.
+-/
 lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : lineInCubic S) :
-    ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val =  P g + P! f),
-    accCubeTriLinSymm.toFun (P g, P g, P! f) = 0 := by
+  ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val =  P g + P! f),
+  accCubeTriLinSymm.toFun (P g, P g, P! f) = 0 := by
   intro g f hS
   rw [lineInCubic] at h
   let h := h g f hS
@@ -52,7 +57,7 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : li
     zero_mul, one_pow, one_mul, zero_add, mul_zero, add_zero] at h4
   linear_combination h3 / 6 + -1 * h4 / 6
 
-/-- The line from P to P! through S is within the cubic for all permutations of S. -/
+
 def lineInCubicPerm (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) : Prop :=
   ∀ (M : (FamilyPermutations (2 * n.succ)).group ),
     lineInCubic ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M S)
@@ -145,13 +150,20 @@ lemma lineInCubicPerm_last_perm  {S : (PureU1 (2 * n.succ.succ)).AnomalyFreeLine
   intro M
   exact lineInCubicPerm_last_cond (lineInCubicPerm_permute LIC M)
 
+lemma lineInCubicPerm_constAbs  {S : (PureU1 (2 * n.succ.succ)).AnomalyFree}
+    (LIC : lineInCubicPerm S.1.1) : constAbs S.val :=
+  linesInPlane_constAbs_AF S (lineInCubicPerm_last_perm LIC)
 
-lemma lineInCubicPerm_constAbs  {S : (PureU1 (2 * n.succ.succ.succ)).AnomalyFreeLinear}
-    (LIC : lineInCubicPerm S) : constAbs S.val :=
-  linesInPlane_constAbs (lineInCubicPerm_last_perm LIC)
+theorem  lineInCubicPerm_vectorLike  {S : (PureU1 (2 * n.succ.succ)).AnomalyFree}
+    (LIC : lineInCubicPerm S.1.1) : vectorLikeEven S.val :=
+  ConstAbs.boundary_value_even S.1.1 (lineInCubicPerm_constAbs LIC)
 
-theorem  lineInCubicPerm_vectorLike  {S : (PureU1 (2 * n.succ.succ.succ)).AnomalyFreeLinear}
-    (LIC : lineInCubicPerm S) : vectorLikeEven S.val :=
-  ConstAbs.boundary_value_even S (lineInCubicPerm_constAbs LIC)
+theorem lineInCubicPerm_in_plane  (S : (PureU1 (2 * n.succ.succ)).AnomalyFree)
+    (LIC : lineInCubicPerm S.1.1) : ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
+    (FamilyPermutations (2 * n.succ.succ)).repAnomalyFreeLinear M S.1.1
+    ∈ Submodule.span ℚ (Set.range basis) :=
+  vectorLikeEven_in_span S.1.1 (lineInCubicPerm_vectorLike LIC)
+
+
 
 end PureU1

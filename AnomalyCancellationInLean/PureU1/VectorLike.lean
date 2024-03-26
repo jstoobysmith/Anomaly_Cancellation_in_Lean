@@ -16,6 +16,9 @@ namespace PureU1
 
 variable {n : ℕ}
 
+/--
+  Given a natural number `n`, this lemma proves that `n + n` is equal to `2 * n`.
+-/
 lemma split_equal (n : ℕ) : n + n = 2 * n := (Nat.two_mul n).symm
 
 
@@ -46,6 +49,25 @@ def δ!₃ : Fin (2 * n.succ) := (Fin.cast (n_cond₂ n) (Fin.castAdd ((n + n) +
 
 def δ!₄ : Fin (2 * n.succ) := (Fin.cast (n_cond₂ n) (Fin.natAdd 1 (Fin.natAdd (n + n) 0)))
 
+lemma ext_δ (S T : Fin (2 * n.succ) → ℚ) (h1 : ∀ i, S (δ₁ i) = T (δ₁ i))
+  (h2 : ∀ i, S (δ₂ i) = T (δ₂ i))  : S = T := by
+  funext i
+  by_cases hi : i.val < n.succ
+  let j : Fin n.succ := ⟨i, hi⟩
+  have h2 := h1 j
+  have h3 : δ₁ j = i := by
+    simp [δ₁, Fin.ext_iff]
+  rw [h3] at h2
+  exact h2
+  let j : Fin n.succ := ⟨i - n.succ, by omega⟩
+  have h2 := h2 j
+  have h3 : δ₂ j = i := by
+    simp [δ₂, Fin.ext_iff]
+    omega
+  rw [h3] at h2
+  exact h2
+
+
 lemma sum_δ₁_δ₂  (S : Fin (2 * n.succ) → ℚ) :
     ∑ i, S i = ∑ i : Fin n.succ, ((S ∘ δ₁) i + (S ∘ δ₂) i) := by
   have h1 : ∑ i, S i = ∑ i : Fin (n.succ + n.succ), S (Fin.cast (split_equal n.succ) i) := by
@@ -58,8 +80,17 @@ lemma sum_δ₁_δ₂  (S : Fin (2 * n.succ) → ℚ) :
   rw [Fin.sum_univ_add, Finset.sum_add_distrib]
   rfl
 
-
-
+lemma sum_δ₁_δ₂'  (S : Fin (2 * n.succ) → ℚ) :
+    ∑ i, S i = ∑ i : Fin n.succ, ((S ∘ δ₁) i + (S ∘ δ₂) i) := by
+  have h1 : ∑ i, S i = ∑ i : Fin (n.succ + n.succ), S (Fin.cast (split_equal n.succ) i) := by
+    rw [Finset.sum_equiv (Fin.castIso (split_equal n.succ)).symm.toEquiv]
+    intro i
+    simp
+    intro i
+    simp
+  rw [h1]
+  rw [Fin.sum_univ_add, Finset.sum_add_distrib]
+  rfl
 
 lemma sum_δ!₁_δ!₂  (S : Fin (2 * n.succ) → ℚ) :
     ∑ i, S i = S δ!₃ + S δ!₄ + ∑ i : Fin n,  ((S ∘ δ!₁) i + (S ∘ δ!₂) i) := by
@@ -420,6 +451,15 @@ lemma P_accCube (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).cubicACC.toFun 
   simp [P_δ₁, P_δ₂]
   ring
 
+lemma P!_accCube (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).cubicACC.toFun (P! f) = 0 := by
+  simp
+  rw [sum_δ!₁_δ!₂, P!_δ!₃, P!_δ!₄]
+  simp
+  apply Finset.sum_eq_zero
+  intro i _
+  simp [P!_δ!₁, P!_δ!₂]
+  ring
+
 lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
@@ -534,6 +574,7 @@ theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
   rw [P!'_val] at h1
   exact P!_zero f h1
 
+
 theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
@@ -552,6 +593,64 @@ theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n) := by
   cases i
   simp_all
   simp_all
+
+lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n) → ℚ)  : Pa' f = Pa' f' ↔ f = f' := by
+  apply Iff.intro
+  intro h
+  funext i
+  rw [Pa', Pa'] at h
+  have h1 : ∑ i : Fin (succ n) ⊕ Fin n, (f i + (- f' i)) • basisa i = 0 := by
+    simp only [(PureU1 _).AnomalyFreeLinearAddCommModule.add_smul, neg_smul]
+    rw [Finset.sum_add_distrib]
+    rw [h]
+    rw [← Finset.sum_add_distrib]
+    simp
+  have h2 : ∀ i, (f i + (- f' i)) = 0 := by
+    exact Fintype.linearIndependent_iff.mp (@basisa_linear_independent (n))
+     (fun i => f i + -f' i) h1
+  have h2i := h2 i
+  linarith
+  intro h
+  rw [h]
+
+def join (g : Fin n.succ → ℚ) (f : Fin n → ℚ) :  (Fin n.succ) ⊕ (Fin n) → ℚ := fun i =>
+  match i with
+  | .inl i => g i
+  | .inr i => f i
+
+lemma join_ext (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
+    join g f = join g' f' ↔ g = g' ∧ f = f' := by
+  apply Iff.intro
+  intro h
+  apply And.intro
+  funext i
+  exact congr_fun h (Sum.inl i)
+  funext i
+  exact congr_fun h (Sum.inr i)
+  intro h
+  rw [h.left, h.right]
+
+lemma join_Pa (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
+      Pa' (join g f) = Pa' (join g' f') ↔ Pa g f = Pa g' f' := by
+  apply Iff.intro
+  intro h
+  rw [Pa'_eq] at h
+  rw [join_ext] at h
+  rw [h.left, h.right]
+  intro h
+  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  rw [Pa'_P'_P!', Pa'_P'_P!']
+  simp [P'_val, P!'_val]
+  exact h
+
+lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
+    Pa g f = Pa g' f' ↔ g = g' ∧ f = f' := by
+  rw [← join_Pa]
+  rw [← join_ext]
+  exact Pa'_eq _ _
+
+
+
 
 lemma basisa_card :  Fintype.card ((Fin n.succ) ⊕ (Fin n)) =
     FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ)).AnomalyFreeLinear := by
@@ -622,12 +721,25 @@ lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
   use (Tuple.sort S.val).symm
   change sortAFL S ∈ Submodule.span ℚ (Set.range basis)
   rw [mem_span_range_iff_exists_fun ℚ]
-  let f : Fin n.succ → ℚ := fun i => S.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i))
+  let f : Fin n.succ → ℚ := fun i => (sortAFL S).val (δ₁ i)
   use f
   apply ACCSystemLinear.AnomalyFreeLinear.ext
   rw [sortAFL_val]
   erw [P'_val]
-  sorry
+  apply ext_δ
+  intro i
+  rw [P_δ₁]
+  rfl
+  intro i
+  rw [P_δ₂]
+  have ht := hS i
+  change sort S.val (δ₁ i) = - sort S.val (δ₂ i) at ht
+  have h : sort S.val (δ₂ i) = - sort S.val (δ₁ i) := by
+    rw [ht]
+    ring
+  rw [h]
+  simp
+  rfl
 
 
 end VectorLikeEvenPlane
@@ -1051,6 +1163,24 @@ lemma P!_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P! f) = 0 := by
   rw [sum_δ!]
   simp [P!_δ!₂, P!_δ!₁, P!_δ!₃]
 
+lemma P_accCube (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).cubicACC.toFun (P f) = 0 := by
+  simp
+  rw [sum_δ, P_δ₃]
+  simp
+  apply Finset.sum_eq_zero
+  intro i _
+  simp [P_δ₁, P_δ₂]
+  ring
+
+lemma P!_accCube (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).cubicACC.toFun (P! f) = 0 := by
+  simp
+  rw [sum_δ!, P!_δ!₃]
+  simp
+  apply Finset.sum_eq_zero
+  intro i _
+  simp [P!_δ!₁, P!_δ!₂]
+  ring
+
 lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
     accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j)
     = (P g (δ!₁ j))^2 - (g j)^2 := by
@@ -1177,6 +1307,63 @@ theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n.succ) := by
   cases i
   simp_all
   simp_all
+
+lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n.succ) → ℚ)  : Pa' f = Pa' f' ↔ f = f' := by
+  apply Iff.intro
+  intro h
+  funext i
+  rw [Pa', Pa'] at h
+  have h1 : ∑ i : Fin n.succ ⊕ Fin n.succ, (f i + (- f' i)) • basisa i = 0 := by
+    simp only [(PureU1 _).AnomalyFreeLinearAddCommModule.add_smul, neg_smul]
+    rw [Finset.sum_add_distrib]
+    rw [h]
+    rw [← Finset.sum_add_distrib]
+    simp
+  have h2 : ∀ i, (f i + (- f' i)) = 0 := by
+    exact Fintype.linearIndependent_iff.mp (@basisa_linear_independent (n))
+     (fun i => f i + -f' i) h1
+  have h2i := h2 i
+  linarith
+  intro h
+  rw [h]
+
+def join (g f : Fin n → ℚ) :  Fin n ⊕ Fin n → ℚ := fun i =>
+  match i with
+  | .inl i => g i
+  | .inr i => f i
+
+lemma join_ext (g g' : Fin n → ℚ) (f f' : Fin n → ℚ) :
+    join g f = join g' f' ↔ g = g' ∧ f = f' := by
+  apply Iff.intro
+  intro h
+  apply And.intro
+  funext i
+  exact congr_fun h (Sum.inl i)
+  funext i
+  exact congr_fun h (Sum.inr i)
+  intro h
+  rw [h.left, h.right]
+
+lemma join_Pa (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
+      Pa' (join g f) = Pa' (join g' f') ↔ Pa g f = Pa g' f' := by
+  apply Iff.intro
+  intro h
+  rw [Pa'_eq] at h
+  rw [join_ext] at h
+  rw [h.left, h.right]
+  intro h
+  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  rw [Pa'_P'_P!', Pa'_P'_P!']
+  simp [P'_val, P!'_val]
+  exact h
+
+lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
+    Pa g f = Pa g' f' ↔ g = g' ∧ f = f' := by
+  rw [← join_Pa]
+  rw [← join_ext]
+  exact Pa'_eq _ _
+
+
 
 lemma basisa_card :  Fintype.card ((Fin n.succ) ⊕ (Fin n.succ)) =
     FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear := by

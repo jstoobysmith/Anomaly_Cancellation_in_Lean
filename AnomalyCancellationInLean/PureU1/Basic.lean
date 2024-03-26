@@ -144,6 +144,13 @@ lemma pureU1_linear {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
   simp at hS
   exact hS 0
 
+lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).AnomalyFree) :
+    ∑ i, (S.val i) ^ 3 = 0 := by
+  have hS := S.cubicSol
+  simp at hS
+  exact hS
+
+
 lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
     S.val (Fin.last n) = - ∑ i : Fin n, S.val i.castSucc := by
   have hS := pureU1_linear S
