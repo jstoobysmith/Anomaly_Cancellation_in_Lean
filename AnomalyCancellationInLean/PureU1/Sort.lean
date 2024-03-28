@@ -54,7 +54,7 @@ lemma sort_projection {n : ℕ} (S : (PureU1 n).charges) : sort (sort S) = sort 
   sort_perm S (Tuple.sort S).symm
 
 def sortAFL  {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) : (PureU1 n).AnomalyFreeLinear :=
-  ((FamilyPermutations n).repAnomalyFreeLinear (Tuple.sort S.val).symm S)
+  ((FamilyPermutations n).repAFL (Tuple.sort S.val).symm S)
 
 lemma sortAFL_val {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) :  (sortAFL S).val = sort S.val := by
   rfl

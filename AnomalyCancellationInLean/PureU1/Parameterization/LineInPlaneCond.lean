@@ -28,7 +28,7 @@ def lineInPlaneCond (S : (PureU1 (n)).AnomalyFreeLinear) : Prop :=
 
 lemma lineInPlaneCond_perm {S : (PureU1 (n)).AnomalyFreeLinear} (hS : lineInPlaneCond S)
     (M : (FamilyPermutations n).group) :
-    lineInPlaneCond ((FamilyPermutations n).repAnomalyFreeLinear M S) := by
+    lineInPlaneCond ((FamilyPermutations n).repAFL M S) := by
   intro i1 i2 i3 h1 h2 h3
   rw [FamilyPermutations_anomalyFreeLinear_apply, FamilyPermutations_anomalyFreeLinear_apply,
     FamilyPermutations_anomalyFreeLinear_apply]

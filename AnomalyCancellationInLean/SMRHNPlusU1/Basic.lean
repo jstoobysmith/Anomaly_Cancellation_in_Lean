@@ -262,7 +262,7 @@ def accQuadBiLinear {n : ℕ} : BiLinearSymm (SMRHNPlusU1Charges n).charges wher
     (((D.toFun S.1 i) *  (D.toFun S.2 i)))
     + (- ((L.toFun S.1 i) * (L.toFun S.2 i)))  +
     (((E.toFun S.1 i) * (E.toFun S.2 i))))
-  map_smul₁ a S T := by
+  map_smul₁' a S T := by
     simp
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
@@ -270,7 +270,7 @@ def accQuadBiLinear {n : ℕ} : BiLinearSymm (SMRHNPlusU1Charges n).charges wher
     erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul]
     simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
     ring
-  map_smul₂ a S T := by
+  map_smul₂' a S T := by
     simp
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
@@ -278,23 +278,25 @@ def accQuadBiLinear {n : ℕ} : BiLinearSymm (SMRHNPlusU1Charges n).charges wher
     erw [Q.map_smul, U.map_smul, D.map_smul, L.map_smul, E.map_smul]
     simp [toSpeciesMaps, HSMul.hSMul, SMul.smul]
     ring
-  map_add₁ S T L := by
+  map_add₁' S T L := by
     simp
     rw [← Finset.sum_add_distrib]
     apply Fintype.sum_congr
     intro i
     ring
-  map_add₂ S T L := by
+  map_add₂' S T L := by
     simp
     rw [← Finset.sum_add_distrib]
     apply Fintype.sum_congr
     intro i
     ring
-  swap S L := by
+  swap' S L := by
     simp
     apply Fintype.sum_congr
     intro i
     ring
+
+    
 /-- The anomaly cancelation condition for Y anomaly. -/
 @[simp]
 def accQuad {n : ℕ} : HomogeneousQuadratic (SMRHNPlusU1Charges n).charges :=
@@ -396,7 +398,7 @@ def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (SMRHNPlusU1Charges n).charges w
 
 @[simp]
 def accCube {n : ℕ} : HomogeneousCubic (SMRHNPlusU1Charges n).charges :=
-  (@accCubeTriLinSymm n).toHomogeneousCubic
+  (@accCubeTriLinSymm n).toCubic
 
 
 lemma accCube_eq_of_sum_cube_eq {n : ℕ} {S T : (SMRHNPlusU1Charges n).charges}

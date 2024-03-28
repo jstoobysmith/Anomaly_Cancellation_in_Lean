@@ -4,13 +4,12 @@ Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.PureU1.Basic
-import AnomalyCancellationInLean.PureU1.Permutations
-import AnomalyCancellationInLean.PureU1.VectorLike
 import AnomalyCancellationInLean.PureU1.ConstAbs
 import AnomalyCancellationInLean.PureU1.Parameterization.LineInPlaneCond
 import AnomalyCancellationInLean.PureU1.Parameterization.LineInPlaneEven
-import Mathlib.Tactic.Polyrith
+import AnomalyCancellationInLean.PureU1.Permutations
 import Mathlib.RepresentationTheory.Basic
+import Mathlib.Tactic.Polyrith
 
 -- https://arxiv.org/pdf/1912.04804.pdf
 
@@ -21,13 +20,17 @@ open BigOperators
 variable {n : ℕ}
 open VectorLikeEvenPlane
 
+/-- Given coefficents `g` of a point in `P` and `f` of a point in `P!`, and a rational, we get a
+rational `a ∈ ℚ`, we get a
+point in `(PureU1 (2 * n.succ)).AnomalyFreeLinear`, which we will later show extends to an anomaly
+free point. -/
 def parameterizationAsLinear (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
-  (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
+    (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
   a • ((accCubeTriLinSymm.toFun (P! f, P! f, P g)) • P' g +
   (- accCubeTriLinSymm.toFun (P g, P g, P! f)) • P!' f)
 
 lemma parameterizationAsLinear_val (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
-  (parameterizationAsLinear g f a).val =
+    (parameterizationAsLinear g f a).val =
     a • ((accCubeTriLinSymm.toFun (P! f, P! f, P g)) • P g +
     (- accCubeTriLinSymm.toFun (P g, P g, P! f)) • P! f) := by
   rw [parameterizationAsLinear]
@@ -36,19 +39,16 @@ lemma parameterizationAsLinear_val (g : Fin n.succ → ℚ) (f : Fin n → ℚ) 
 
 lemma parameterizationCharge_cube (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ):
     (accCube (2* n.succ)).toFun (parameterizationAsLinear g f a).val = 0 := by
-  rw [accCube_from_tri]
-  rw [parameterizationAsLinear_val]
-  rw [HomogeneousCubic.map_smul']
-  rw [TriLinearSymm.toHomogeneousCubic_add]
-  rw [HomogeneousCubic.map_smul', HomogeneousCubic.map_smul']
-  rw [← accCube_from_tri]
-  erw [P_accCube]
-  erw [P!_accCube]
+  rw [accCube_from_tri, parameterizationAsLinear_val, HomogeneousCubic.map_smul',
+    TriLinearSymm.toHomogeneousCubic_add, HomogeneousCubic.map_smul', HomogeneousCubic.map_smul',
+    ← accCube_from_tri]
+  erw [P_accCube, P!_accCube]
   rw [accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂,
    accCubeTriLinSymm.map_smul₃, accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂,
    accCubeTriLinSymm.map_smul₃]
   ring
 
+/-- Given  -/
 def parameterization (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
     (PureU1 (2 * n.succ)).AnomalyFree :=
   ⟨⟨parameterizationAsLinear g f a, by intro i; simp at i; exact Fin.elim0 i⟩,
@@ -124,15 +124,11 @@ theorem generic_case {S : (PureU1 (2 * n.succ)).AnomalyFree} (h : genericCase S)
 
 
 lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).AnomalyFree}
-    (h : specialCase S) :
-      lineInCubic S.1.1 := by
+    (h : specialCase S) : lineInCubic S.1.1 := by
   intro g f hS a b
-  rw [accCube_from_tri]
-  rw [TriLinearSymm.toHomogeneousCubic_add]
-  rw [HomogeneousCubic.map_smul', HomogeneousCubic.map_smul']
-  rw [← accCube_from_tri]
-  erw [P_accCube]
-  erw [P!_accCube]
+  rw [accCube_from_tri, TriLinearSymm.toHomogeneousCubic_add, HomogeneousCubic.map_smul',
+    HomogeneousCubic.map_smul', ← accCube_from_tri]
+  erw [P_accCube, P!_accCube]
   have h := h g f hS
   rw [accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂,
    accCubeTriLinSymm.map_smul₃, accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂,
@@ -144,21 +140,21 @@ lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).AnomalyFree}
   erw [h]
   simp
 
+
 lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).AnomalyFree}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ)).group),
     specialCase ((FamilyPermutations (2 * n.succ)).actionAnomalyFree.toFun S M)) :
     lineInCubicPerm S.1.1 := by
   intro M
-  have hM := special_case_lineInCubic (h M)
-  exact hM
+  exact special_case_lineInCubic (h M)
 
-theorem special_case {S : (PureU1 (2 * n.succ.succ.succ)).AnomalyFree}
-    (h : ∀ (M : (FamilyPermutations (2 * n.succ.succ.succ)).group),
-    specialCase ((FamilyPermutations (2 * n.succ.succ.succ)).actionAnomalyFree.toFun S M)) :
-     ∃ (M : (FamilyPermutations (2 * n.succ.succ.succ)).group),
-    ((FamilyPermutations (2 * n.succ.succ.succ)).actionAnomalyFree.toFun S M).1.1
-    ∈ Submodule.span ℚ (Set.range basis):= by
-  have ht :=  special_case_lineInCubic_perm h
-  exact lineInCubicPerm_in_plane ht
+
+theorem special_case {S : (PureU1 (2 * n.succ.succ)).AnomalyFree}
+    (h : ∀ (M : (FamilyPermutations (2 * n.succ.succ)).group),
+    specialCase ((FamilyPermutations (2 * n.succ.succ)).actionAnomalyFree.toFun S M)) :
+    ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
+    ((FamilyPermutations (2 * n.succ.succ)).actionAnomalyFree.toFun S M).1.1
+    ∈ Submodule.span ℚ (Set.range basis) :=
+  lineInCubicPerm_in_plane S (special_case_lineInCubic_perm h)
 
 end PureU1

@@ -8,6 +8,7 @@ import AnomalyCancellationInLean.PureU1.Permutations
 import AnomalyCancellationInLean.PureU1.VectorLike
 import AnomalyCancellationInLean.PureU1.ConstAbs
 import AnomalyCancellationInLean.PureU1.Parameterization.LineInPlaneCond
+import AnomalyCancellationInLean.PureU1.Parameterization.OddPlanes
 import Mathlib.Tactic.Polyrith
 import Mathlib.RepresentationTheory.Basic
 

@@ -4,12 +4,12 @@ Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.PureU1.Basic
-import AnomalyCancellationInLean.PureU1.Permutations
-import AnomalyCancellationInLean.PureU1.VectorLike
 import AnomalyCancellationInLean.PureU1.ConstAbs
+import AnomalyCancellationInLean.PureU1.Parameterization.EvenPlanes
 import AnomalyCancellationInLean.PureU1.Parameterization.LineInPlaneCond
-import Mathlib.Tactic.Polyrith
+import AnomalyCancellationInLean.PureU1.Permutations
 import Mathlib.RepresentationTheory.Basic
+import Mathlib.Tactic.Polyrith
 
 -- https://arxiv.org/pdf/1912.04804.pdf
 
@@ -19,6 +19,7 @@ open BigOperators
 
 variable {n : ℕ}
 open VectorLikeEvenPlane
+
 /-- A line in the cubic. -/
 def lineInCubic (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ) ,
@@ -36,7 +37,7 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : li
   intro g f hS
   rw [lineInCubic] at h
   let h := h g f hS
-  rw [accCube_from_tri] at h
+  rw [accCubetoCubic_add
   simp only [TriLinearSymm.toHomogeneousCubic_add] at h
   simp only [HomogeneousCubic.map_smul',
    accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h
@@ -59,8 +60,8 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : li
 
 
 def lineInCubicPerm (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) : Prop :=
-  ∀ (M : (FamilyPermutations (2 * n.succ)).group ),
-    lineInCubic ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M S)
+  ∀ (M : (FamilyPermutations (2 * n.succ)).group ),repAFL
+  lineInCubic ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M S)
 
 /-- If `lineInCubicPerm S` then `lineInCubic S`.  -/
 lemma lineInCubicPerm_self {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear}
@@ -68,14 +69,14 @@ lemma lineInCubicPerm_self {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear}
 
 /-- If `lineInCubicPerm S` then `lineInCubicPerm (M S)` for all permutations `M`. -/
 lemma lineInCubicPerm_permute {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear}
-    (hS : lineInCubicPerm S) (M' : (FamilyPermutations (2 * n.succ)).group) :
+    (hS : lineInCubicPerm S) (M' : (FamilyPermutations repAFL :
     lineInCubicPerm ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M' S) := by
   rw [lineInCubicPerm]
-  intro M
-  have ht : (((ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * Nat.succ n))) M)
-    (((ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * Nat.succ n))) M') S))
+  intro MrepAFL
+  have repAFLeeLinear (FamilyPermutations (2 * Nat.succ n))) M)
+    (((repAFL (FamilyPermutations (2 * Nat.succ n))) M') S))
     = (ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * Nat.succ n))) (M * M') S
-      := by
+      := byrepAFL
     simp [(FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear.map_mul']
   rw [ht]
   exact hS (M * M')
@@ -85,9 +86,9 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear}
     ∀ (j : Fin n) (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) ,
       (S.val (δ!₂ j) - S.val (δ!₁ j))
       * accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j) = 0 := by
-  intro j g f h
+  intro j g f hrepAFL
   let S' :=  (FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
-    (pairSwap (δ!₁ j) (δ!₂ j)) S
+    (pairSwap (δ!₁ j) (δ!₂ j)) SrepAFL
   have hSS' : ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S' := rfl
   obtain ⟨g', f', hall⟩ := span_basis_swap! j hSS' g f h
@@ -160,7 +161,7 @@ theorem  lineInCubicPerm_vectorLike  {S : (PureU1 (2 * n.succ.succ)).AnomalyFree
 
 theorem lineInCubicPerm_in_plane  (S : (PureU1 (2 * n.succ.succ)).AnomalyFree)
     (LIC : lineInCubicPerm S.1.1) : ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
-    (FamilyPermutations (2 * n.succ.succ)).repAnomalyFreeLinear M S.1.1
+    (FamilyPermutations (2 * n.succ.succ)).repAnrepAFL1.1
     ∈ Submodule.span ℚ (Set.range basis) :=
   vectorLikeEven_in_span S.1.1 (lineInCubicPerm_vectorLike LIC)
 

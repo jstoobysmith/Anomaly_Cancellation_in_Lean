@@ -105,7 +105,7 @@ lemma familyUniversalCharges_Quad {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
 
 lemma familyUniversalCharges_Cubic {n : ℕ} (S : (SMRHNPlusU1 1).AnomalyFree) :
     accCube.toFun (familyUniversalCharges n S.val) = 0 := by
-  rw [accCube, TriLinearSymm.toHomogeneousCubic, accCubeTriLinSymm]
+  rw [accCube, toCubic, accCubeTriLinSymm]
   simp only
   apply Fintype.sum_eq_zero
   intro i

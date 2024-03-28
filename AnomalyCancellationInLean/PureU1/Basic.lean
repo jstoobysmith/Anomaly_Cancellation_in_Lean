@@ -104,8 +104,8 @@ def accCube (n : ℕ)  : HomogeneousCubic ((PureU1Charges n).charges) where
    rw [Finset.mul_sum]
    ring_nf
 
-lemma accCube_from_tri (n : ℕ) : accCube n = (accCubeTriLinSymm).toHomogeneousCubic := by
-  simp [accCubeTriLinSymm, TriLinearSymm.toHomogeneousCubic]
+lemma accCube_from_tri (n : ℕ) : accCube n = (accCubeTriLinSymm).toCubic := by
+  simp [accCubeTriLinSymm, toCubic]
   funext S
   apply Finset.sum_congr
   simp
@@ -149,7 +149,6 @@ lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).AnomalyFree) :
   have hS := S.cubicSol
   simp at hS
   exact hS
-
 
 lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
     S.val (Fin.last n) = - ∑ i : Fin n, S.val i.castSucc := by

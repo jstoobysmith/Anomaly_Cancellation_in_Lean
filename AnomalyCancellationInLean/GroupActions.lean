@@ -33,15 +33,15 @@ def anomalyFreeLinearMap {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.g
     exact (G.rep g).map_smul' _ _
 
 @[simps!]
-def repAnomalyFreeLinear {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+def repAFL {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     Representation ℚ G.group χ.AnomalyFreeLinear where
   toFun := G.anomalyFreeLinearMap
   map_mul' g1 g2 := by
     apply LinearMap.ext
     intro S
     apply ACCSystemLinear.AnomalyFreeLinear.ext
-    change (G.rep.toFun (g1 * g2)) S.val = _
-    rw [G.rep.map_mul']
+    change (G.rep (g1 * g2)) S.val = _
+    rw [G.rep.map_mul]
     rfl
   map_one' := by
     apply LinearMap.ext
@@ -51,14 +51,14 @@ def repAnomalyFreeLinear {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     rw [G.rep.map_one']
     rfl
 
-lemma rep_repAnomalyFreeLinear_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFreeLinear) : χ.anomalyFreeLinearIncl (G.repAnomalyFreeLinear g S) =
+lemma rep_repAFL_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+    (S : χ.AnomalyFreeLinear) : χ.anomalyFreeLinearIncl (G.repAFL g S) =
     G.rep g (χ.anomalyFreeLinearIncl S) := rfl
 
 
 instance actionAnomalyFreeQuad {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.AnomalyFreeQuad where
-  smul f S := ⟨G.repAnomalyFreeLinear f S.1, by
+  smul f S := ⟨G.repAFL f S.1, by
    intro i
    simp
    rw [G.quadInvariant, S.quadSol]
@@ -77,7 +77,7 @@ instance actionAnomalyFreeQuad {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
 lemma repAnomalyFreeLinear_actionAnomalyFreeQuad_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.AnomalyFreeQuad) :  χ.AnomalyFreeQuadInclLinear (G.actionAnomalyFreeQuad.toFun S g) =
-    G.repAnomalyFreeLinear g (χ.AnomalyFreeQuadInclLinear S) := rfl
+    G.repAFL g (χ.AnomalyFreeQuadInclLinear S) := rfl
 
 lemma rep_actionAnomalyFreeQuad_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
@@ -110,7 +110,7 @@ lemma actionAnomalyFreeQuad_actionAnomalyFree_commute {χ : ACCSystem}
 lemma repAnomalyFreeLinear_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.AnomalyFree) :  χ.AnomalyFreeInclLinear (G.actionAnomalyFree.toFun S g) =
-    G.repAnomalyFreeLinear g (χ.AnomalyFreeInclLinear S) := rfl
+    G.repAFL g (χ.AnomalyFreeInclLinear S) := rfl
 
 lemma rep_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
