@@ -24,6 +24,7 @@ def ACCSystemChargesMk (n : ℕ) : ACCSystemCharges where
 
 namespace ACCSystemCharges
 
+/-- The charges as functions from `Fin χ.numberCharges → ℚ`. -/
 def chargesFun (χ : ACCSystemCharges) : Type := Fin χ.numberCharges → ℚ
 
 @[simps!]

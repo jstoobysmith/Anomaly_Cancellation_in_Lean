@@ -148,7 +148,7 @@ lemma linesInPlane_eq_sq_four {S : (PureU1 4).AnomalyFree}
     constAbsProp (S.val i, S.val j) := by
   refine Prop_two constAbsProp (by simp : (0 : Fin 4) ≠ 1) ?_
   intro M
-  let S' := (FamilyPermutations 4).actionAnomalyFree.toFun S M
+  let S' := (FamilyPermutations 4).actionAF.toFun S M
   have hS' :  lineInPlaneCond S'.1.1 :=
     (lineInPlaneCond_perm hS M)
   exact linesInPlane_four S' hS'

@@ -11,8 +11,8 @@ structure ACCSystemGroupAction (χ : ACCSystem) where
   groupInst : Group group
   rep : Representation ℚ group χ.charges
   linearInvariant : ∀ i g S, χ.linearACCs i (rep g S) = χ.linearACCs i S
-  quadInvariant : ∀ i g S, (χ.quadraticACCs i).toFun (rep g S) = (χ.quadraticACCs i).toFun S
-  cubicInvariant : ∀ g S, χ.cubicACC.toFun (rep g S) = χ.cubicACC.toFun S
+  quadInvariant : ∀ i g S, (χ.quadraticACCs i) (rep g S) = (χ.quadraticACCs i) S
+  cubicInvariant : ∀ g S, χ.cubicACC (rep g S) = χ.cubicACC S
 
 namespace ACCSystemGroupAction
 
@@ -56,7 +56,7 @@ lemma rep_repAFL_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.g
     G.rep g (χ.anomalyFreeLinearIncl S) := rfl
 
 
-instance actionAnomalyFreeQuad {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+instance actionAFQ {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.AnomalyFreeQuad where
   smul f S := ⟨G.repAFL f S.1, by
    intro i
@@ -76,19 +76,19 @@ instance actionAnomalyFreeQuad {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
 
 lemma repAnomalyFreeLinear_actionAnomalyFreeQuad_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFreeQuad) :  χ.AnomalyFreeQuadInclLinear (G.actionAnomalyFreeQuad.toFun S g) =
+    (S : χ.AnomalyFreeQuad) :  χ.AnomalyFreeQuadInclLinear (G.actionAFQ.toFun S g) =
     G.repAFL g (χ.AnomalyFreeQuadInclLinear S) := rfl
 
 lemma rep_actionAnomalyFreeQuad_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFreeQuad) :  χ.AnomalyFreeQuadIncl (G.actionAnomalyFreeQuad.toFun S g) =
+    (S : χ.AnomalyFreeQuad) :  χ.AnomalyFreeQuadIncl (G.actionAFQ.toFun S g) =
     G.rep g (χ.AnomalyFreeQuadIncl S) := rfl
 
-instance actionAnomalyFree {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+instance actionAF {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.AnomalyFree where
-  smul g S := ⟨G.actionAnomalyFreeQuad.toFun S.1 g, by
+  smul g S := ⟨G.actionAFQ.toFun S.1 g, by
    simp
-   change χ.cubicACC.toFun (G.rep g S.val) = 0
+   change χ.cubicACC (G.rep g S.val) = 0
    rw [G.cubicInvariant, S.cubicSol]
   ⟩
   mul_smul f1 f2 S := by
@@ -104,17 +104,17 @@ instance actionAnomalyFree {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
 
 lemma actionAnomalyFreeQuad_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFree) :  χ.AnomalyFreeInclQuad (G.actionAnomalyFree.toFun S g) =
-    G.actionAnomalyFreeQuad.toFun (χ.AnomalyFreeInclQuad S) g := rfl
+    (S : χ.AnomalyFree) :  χ.AnomalyFreeInclQuad (G.actionAF.toFun S g) =
+    G.actionAFQ.toFun (χ.AnomalyFreeInclQuad S) g := rfl
 
 lemma repAnomalyFreeLinear_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFree) :  χ.AnomalyFreeInclLinear (G.actionAnomalyFree.toFun S g) =
+    (S : χ.AnomalyFree) :  χ.AnomalyFreeInclLinear (G.actionAF.toFun S g) =
     G.repAFL g (χ.AnomalyFreeInclLinear S) := rfl
 
 lemma rep_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.AnomalyFree) :  χ.AnomalyFreeIncl (G.actionAnomalyFree.toFun S g) =
+    (S : χ.AnomalyFree) :  χ.AnomalyFreeIncl (G.actionAF.toFun S g) =
     G.rep g (χ.AnomalyFreeIncl S) := rfl
 
 end ACCSystemGroupAction
