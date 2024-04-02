@@ -43,6 +43,19 @@ instance chargesFunAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.char
   add_zero S := by
     funext i
     exact Rat.add_zero _
+  nsmul n S := fun i => (n : ℚ) * S i
+  nsmul_zero n := by
+    funext i
+    simp
+    rfl
+  nsmul_succ n S := by
+    funext i
+    simp
+    change _ = (fun i => ↑n * S i) i + S i
+    simp
+    ring
+
+
 
 @[simps!]
 instance chargesAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.charges where
@@ -68,6 +81,17 @@ instance chargesAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.charges
     simp [χ.equiv.left_inv]
     erw [χ.chargesFunAddCommMonoid.add_zero]
     simp
+  nsmul n S := χ.equiv.invFun (n • χ.equiv.toFun S)
+  nsmul_zero n := by
+    simp
+    rfl
+  nsmul_succ n S := by
+    simp only
+    apply congrArg
+    simp only [Equiv.toFun_as_coe, Equiv.invFun_as_coe, Equiv.apply_symm_apply]
+    rfl
+
+
 
 @[simps!]
 instance chargesFunModule (χ : ACCSystemCharges) : Module ℚ χ.chargesFun where
@@ -171,6 +195,16 @@ instance AnomalyFreeLinearAddCommMonoid (χ : ACCSystemLinear) :
   add_zero S := by
     apply AnomalyFreeLinear.ext
     exact χ.chargesAddCommMonoid.add_zero _
+  nsmul n S := ⟨n  • S.val, by
+    intro i
+    rw [nsmul_eq_smul_cast ℚ]
+    erw [(χ.linearACCs i).map_smul, S.linearSol i]
+    simp⟩
+  nsmul_zero n := by
+    rfl
+  nsmul_succ n S := by
+    apply AnomalyFreeLinear.ext
+    exact χ.chargesAddCommMonoid.nsmul_succ _ _
 
 @[simps!]
 instance AnomalyFreeLinearAddCommModule  (χ : ACCSystemLinear) : Module ℚ χ.AnomalyFreeLinear where

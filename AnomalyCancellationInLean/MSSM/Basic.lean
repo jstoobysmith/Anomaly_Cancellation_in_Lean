@@ -259,7 +259,6 @@ def quadBiLin  : BiLinearSymm MSSMCharges.charges where
     simp [HSMul.hSMul, SMul.smul]
     ring
     simp
-    rw [show Rat.cast a = a from rfl]
     ring
   map_add₁' S T R := by
     simp only
@@ -332,7 +331,6 @@ lemma cubeTriLinToFun_map_smul₁ (a : ℚ)  (S T R : MSSMCharges.charges) :
   simp [HSMul.hSMul, SMul.smul]
   ring
   simp
-  rw [show Rat.cast a = a from rfl]
   ring
 
 

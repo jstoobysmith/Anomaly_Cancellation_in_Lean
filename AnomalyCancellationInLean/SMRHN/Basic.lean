@@ -272,7 +272,7 @@ lemma accQuad_ext {S T : (SMνCharges n).charges}
     ∑ i, ((fun a => a^2) ∘ toSpecies j T) i) :
     accQuad S = accQuad T := by
   rw [accQuad_decomp, accQuad_decomp]
-  repeat erw [h]
+  erw [h 0, h 1, h 2, h 3, h 4]
   rfl
 
 @[simps!]

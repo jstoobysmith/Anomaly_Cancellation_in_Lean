@@ -237,7 +237,7 @@ lemma accQuad_ext {S T : (SMCharges n).charges}
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
   ring_nf
-  repeat erw [h]
+  erw [h 0, h 1, h 2, h 3, h 4]
   rfl
 
 @[simps!]
