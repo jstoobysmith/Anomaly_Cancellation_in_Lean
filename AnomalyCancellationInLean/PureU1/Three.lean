@@ -38,7 +38,8 @@ def solOfLinear (S : (PureU1 3).AnomalyFreeLinear)
     (hS : S.val 0 = 0 ∨ S.val 1 = 0 ∨ S.val 2 = 0) : (PureU1 3).AnomalyFree :=
   ⟨⟨S, by intro i; simp at i; exact Fin.elim0 i⟩, by
   simp
-  rw [Fin.sum_univ_three]
+  change accCube _ _ = _
+  rw [accCube_explicit, Fin.sum_univ_three]
   have hLin := pureU1_linear S
   rw [Fin.sum_univ_three] at hLin
   cases hS <;> rename_i hS

@@ -278,18 +278,16 @@ lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basis!AsCharges j) 
   simp [basis!_δ!₂_eq_minus_δ!₁]
 
 lemma basis_accCube (j : Fin n.succ) :
-    (PureU1 (2 * n.succ)).cubicACC.toFun (basisAsCharges j) = 0 := by
-  simp
-  rw [sum_δ₁_δ₂]
+    accCube (2 * n.succ) (basisAsCharges j) = 0 := by
+  rw [accCube_explicit, sum_δ₁_δ₂]
   apply Finset.sum_eq_zero
   intro i _
   simp [basis_δ₂_eq_minus_δ₁]
   ring
 
 lemma basis!_accCube (j : Fin n) :
-    (PureU1 (2 * n.succ)).cubicACC.toFun (basis!AsCharges j) = 0 := by
-  simp
-  rw [sum_δ!₁_δ!₂]
+    accCube (2 * n.succ) (basis!AsCharges j) = 0 := by
+  rw [accCube_explicit, sum_δ!₁_δ!₂]
   rw [basis!_on_δ!₄, basis!_on_δ!₃]
   simp
   apply Finset.sum_eq_zero
@@ -323,7 +321,7 @@ def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).AnomalyFreeLinea
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
 lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
+    (hS : ((FamilyPermutations (2 * n.succ)).repAFL
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
   funext i
@@ -433,17 +431,15 @@ lemma P_linearACC (f : Fin n.succ → ℚ) : (accGrav (2 * n.succ)) (P f) = 0 :=
   rw [sum_δ₁_δ₂]
   simp [P_δ₂, P_δ₁]
 
-lemma P_accCube (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).cubicACC.toFun (P f) = 0 := by
-  simp
-  rw [sum_δ₁_δ₂]
+lemma P_accCube (f : Fin n.succ → ℚ) : accCube (2 * n.succ) (P f) = 0 := by
+  rw [accCube_explicit, sum_δ₁_δ₂]
   apply Finset.sum_eq_zero
   intro i _
   simp [P_δ₁, P_δ₂]
   ring
 
-lemma P!_accCube (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).cubicACC.toFun (P! f) = 0 := by
-  simp
-  rw [sum_δ!₁_δ!₂, P!_δ!₃, P!_δ!₄]
+lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n.succ) (P! f) = 0 := by
+  rw [accCube_explicit, sum_δ!₁_δ!₂, P!_δ!₃, P!_δ!₄]
   simp
   apply Finset.sum_eq_zero
   intro i _
@@ -677,7 +673,7 @@ lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).AnomalyFreeLinear
   simp_all only [Set.mem_range, exists_apply_eq_apply]
 
 lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear
+    (hS : ((FamilyPermutations (2 * n.succ)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
      (h : S.val = P g + P! f):
     ∃
@@ -704,7 +700,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
 lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
     (hS : vectorLikeEven S.val) :
    ∃ (M : (FamilyPermutations (2 * n.succ)).group),
-    (FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear M S
+    (FamilyPermutations (2 * n.succ)).repAFL M S
     ∈ Submodule.span ℚ (Set.range basis) := by
   use (Tuple.sort S.val).symm
   change sortAFL S ∈ Submodule.span ℚ (Set.range basis)

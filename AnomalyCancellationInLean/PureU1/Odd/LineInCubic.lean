@@ -7,14 +7,15 @@ import AnomalyCancellationInLean.PureU1.Basic
 import AnomalyCancellationInLean.PureU1.Permutations
 import AnomalyCancellationInLean.PureU1.VectorLike
 import AnomalyCancellationInLean.PureU1.ConstAbs
-import AnomalyCancellationInLean.PureU1.Parameterization.LineInPlaneCond
-import AnomalyCancellationInLean.PureU1.Parameterization.OddPlanes
+import AnomalyCancellationInLean.PureU1.LineInPlaneCond
+import AnomalyCancellationInLean.PureU1.Odd.BasisLinear
 import Mathlib.Tactic.Polyrith
 import Mathlib.RepresentationTheory.Basic
 
 -- https://arxiv.org/pdf/1912.04804.pdf
 
 namespace PureU1
+namespace Odd
 
 open BigOperators
 
@@ -24,40 +25,37 @@ open VectorLikeOddPlane
 /-- The line from P to P! through S is within the cubic. -/
 def lineInCubic (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) : Prop :=
   ∀ (g f : Fin n → ℚ)  (_ : S.val = Pa g f) (a b : ℚ) ,
-  (PureU1.accCube (2 * n + 1)).toFun (a • P g + b • P! f) = 0
+  accCube (2 * n + 1) (a • P g + b • P! f) = 0
+
+lemma lineInCubic_expand {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lineInCubic S) :
+    ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f) (a b : ℚ) ,
+    3 * a * b * (a * accCubeTriLinSymm (P g, P g, P! f)
+    + b * accCubeTriLinSymm (P! f, P! f, P g)) = 0 := by
+  intro g f hS a b
+  have h1 := h g f hS a b
+  change accCubeTriLinSymm.toCubic (a • P g + b • P! f) = 0 at h1
+  simp only [TriLinearSymm.toCubic_add] at h1
+  simp only [HomogeneousCubic.map_smul,
+   accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h1
+  erw [P_accCube, P!_accCube] at h1
+  rw [← h1]
+  ring
+
 
 lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lineInCubic S) :
     ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val =  P g + P! f),
-    accCubeTriLinSymm.toFun (P g, P g, P! f) = 0 := by
+    accCubeTriLinSymm (P g, P g, P! f) = 0 := by
   intro g f hS
-  rw [lineInCubic] at h
-  let h := h g f hS
-  rw [accCube_from_tri] at h
-  simp only [TriLinearSymm.toHomogeneousCubic_add] at h
-  simp only [HomogeneousCubic.map_smul',
-   accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h
-  have h1 := h 0 1
-  simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, PureU1Charges_charges,
-    zero_mul, one_pow, one_mul, zero_add, accCubeTriLinSymm_toFun, mul_zero, add_zero] at h1
-  rw [h1] at h
-  have h2 := h 1 0
-  simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, PureU1Charges_charges,
-    zero_mul, one_pow, one_mul, zero_add, accCubeTriLinSymm_toFun, mul_zero, add_zero] at h2
-  rw [h2] at h
-  simp only [mul_zero, add_zero, zero_add] at h
-  have h3 := h 1 1
-  simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, PureU1Charges_charges,
-    zero_mul, one_pow, one_mul, zero_add, mul_zero, add_zero] at h3
-  have h4 := h 1 (-1)
-  simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, PureU1Charges_charges,
-    zero_mul, one_pow, one_mul, zero_add, mul_zero, add_zero] at h4
-  linear_combination h3 / 6 + -1 * h4 / 6
+  linear_combination 2 / 3 * (lineInCubic_expand h g f hS 1 1 ) -
+     (lineInCubic_expand h g f hS 1 2 ) / 6
+
+
 
 
 /-- The line from P to P! through S is within the cubic for all permutations of S. -/
 def lineInCubicPerm (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) : Prop :=
   ∀ (M : (FamilyPermutations (2 * n + 1)).group ),
-    lineInCubic ((FamilyPermutations (2 * n + 1)).repAnomalyFreeLinear M S)
+    lineInCubic ((FamilyPermutations (2 * n + 1)).repAFL M S)
 
 /-- If `lineInCubicPerm S` then `lineInCubic S`.  -/
 lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (hS : lineInCubicPerm S) :
@@ -66,14 +64,14 @@ lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (hS : li
 /-- If `lineInCubicPerm S` then `lineInCubicPerm (M S)` for all permutations `M`. -/
 lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear}
     (hS : lineInCubicPerm S) (M' : (FamilyPermutations (2 * n + 1)).group) :
-    lineInCubicPerm ((FamilyPermutations (2 * n + 1)).repAnomalyFreeLinear M' S) := by
+    lineInCubicPerm ((FamilyPermutations (2 * n + 1)).repAFL M' S) := by
   rw [lineInCubicPerm]
   intro M
-  have ht : (((ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * n + 1))) M)
-    (((ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * n + 1))) M') S))
-    = (ACCSystemGroupAction.repAnomalyFreeLinear (FamilyPermutations (2 * n + 1))) (M * M') S
+  have ht : (((ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) M)
+    (((ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) M') S))
+    = (ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) (M * M') S
       := by
-    simp [(FamilyPermutations (2 * n.succ)).repAnomalyFreeLinear.map_mul']
+    simp [(FamilyPermutations (2 * n.succ)).repAFL.map_mul']
   rw [ht]
   exact hS (M * M')
 
@@ -84,9 +82,9 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear}
       (S.val (δ!₂ j) - S.val (δ!₁ j))
       * accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j) = 0 := by
   intro j g f h
-  let S' :=  (FamilyPermutations (2 * n.succ + 1)).repAnomalyFreeLinear
+  let S' :=  (FamilyPermutations (2 * n.succ + 1)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j)) S
-  have hSS' : ((FamilyPermutations (2 * n.succ + 1)).repAnomalyFreeLinear
+  have hSS' : ((FamilyPermutations (2 * n.succ + 1)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S' := rfl
   obtain ⟨g', f', hall⟩ := span_basis_swap! j hSS' g f h
   have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h
@@ -160,4 +158,5 @@ theorem  lineInCubicPerm_zero {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLin
     (LIC : lineInCubicPerm S) : S = 0 :=
   ConstAbs.boundary_value_odd S (lineInCubicPerm_constAbs LIC)
 
+end Odd
 end PureU1

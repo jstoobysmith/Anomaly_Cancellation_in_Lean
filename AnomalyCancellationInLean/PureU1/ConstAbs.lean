@@ -38,266 +38,221 @@ lemma constAbs_sort {S : (PureU1 n).charges} (CA : constAbs S) : constAbs (sort 
   rw [sort]
   exact (constAbs_perm S _).mpr CA
 
-namespace ConstAbs
+def constAbsSorted (S : (PureU1 n).charges) : Prop := constAbs S ∧ sorted S
 
-lemma sorted_lt_eq {S : (PureU1 n).charges}
-    (hS : sorted S) (h : constAbs S) {k : Fin n}
-    (hk : S k ≤ 0) : ∀ i ≤ k, S i = S k := by
-  intro i hik
-  have hSS := hS i k hik
-  have ht := h i k
+namespace constAbsSorted
+section charges
+
+variable {S : (PureU1 n.succ).charges} {A : (PureU1 n.succ).AnomalyFreeLinear}
+variable (hS : constAbsSorted S) (hA : constAbsSorted A.val)
+
+lemma lt_eq  {k i : Fin n.succ} (hk : S k ≤ 0) (hik : i ≤ k) : S i = S k := by
+  have hSS := hS.2 i k hik
+  have ht := hS.1 i k
   rw [sq_eq_sq_iff_eq_or_eq_neg] at ht
   cases ht <;> rename_i h
   exact h
   linarith
 
-lemma sorted_gt_eq {S : (PureU1 n).charges}
-    (hS : sorted S) (h : constAbs S) {k : Fin n}
-    (hk : 0 ≤ S k ) : ∀ (i : Fin n) (_ : k ≤ i), S i = S k := by
-  intro i hik
-  have hSS := hS k i hik
-  have ht := h i k
+lemma val_le_zero  {i : Fin n.succ} (hi : S i ≤ 0) : S i = S 0 := by
+  symm
+  apply lt_eq hS hi
+  simp
+
+lemma gt_eq {k i: Fin n.succ} (hk : 0 ≤ S k) (hik : k ≤ i) : S i = S k := by
+  have hSS := hS.2 k i hik
+  have ht := hS.1 i k
   rw [sq_eq_sq_iff_eq_or_eq_neg] at ht
   cases ht <;> rename_i h
   exact h
   linarith
 
+lemma zero_gt (h0 : 0 ≤ S 0) (i : Fin n.succ) : S 0 = S i := by
+  symm
+  refine gt_eq hS h0 ?_
+  simp
 
-
-lemma sorted_at_zero {S : (PureU1 (n.succ)).AnomalyFreeLinear}
-    (hS : sorted S.val) (h : constAbs S.val) : S.val 0 ≤ 0 := by
-  by_contra hi
-  simp at hi
-  have ht : 0 ≤ S.val 0 := by
-     linarith
-  have hall (i : Fin (n.succ)) : S.val i = S.val 0 := by
-    refine sorted_gt_eq hS h ht i ?_
-    simp
-  have hl := pureU1_linear S
-  simp [hall] at hl
-  cases hl <;> rename_i h
-  simp at h
-  linarith
+lemma opposite_signs_eq_neg {i j : Fin n.succ} (hi : S i ≤ 0) (hj : 0 ≤ S j) : S i = - S j := by
+  have hSS := hS.1 i j
+  rw [sq_eq_sq_iff_eq_or_eq_neg] at hSS
+  cases' hSS with h h
   simp_all
-
-lemma sorted_at_last {S : (PureU1 (n.succ)).AnomalyFreeLinear}
-    (hS : sorted S.val) (h : constAbs S.val) : 0 ≤ S.val (Fin.last n) := by
-  by_contra hi
-  have ht :  S.val ((Fin.last (n))) ≤ 0 := by
-     linarith
-  have hall (i : Fin n.succ) := sorted_lt_eq hS h ht i (by rw [Fin.le_def]; simp; omega)
-  have hl := pureU1_linear S
-  simp [hall] at hl
-  cases hl <;> rename_i h
-  simp at h
   linarith
-  simp_all
+  exact h
 
-lemma boundary_exists {S : (PureU1 (n.succ)).AnomalyFreeLinear}
-    (hS : sorted S.val) (h : constAbs S.val)  (h0 : S.val 0 ≠ 0) :
-    ∃ (k : Fin n), S.val k.castSucc < 0 ∧ 0 < S.val k.succ := by
-  by_contra hk
-  simp at hk
-  have hzero (i : ℕ) (hi : i < n.succ) : S.val ⟨i, hi⟩ < 0 := by
-    induction i
-    have ht := sorted_at_zero hS h
-    simp
-    rw [lt_iff_le_and_ne]
-    simp_all
-    rename_i i hii
-    have hi2 : i < n := by
-      linarith
-    have hi3 :  i < n.succ := by
-      linarith
-    let is : Fin (n) := ⟨i, hi2⟩
-    have hk2 := hk is (hii hi3)
-    rw [lt_iff_le_and_ne]
-    have hl : (is.succ) = ⟨i.succ, hi⟩ := by
-      rfl
-    rw [← hl]
-    have ht := h 0 ⟨i.succ, hi⟩
-    have h0 : S.val ⟨i.succ, hi⟩ ≠ 0 := by
-      rw [sq_eq_sq_iff_eq_or_eq_neg] at ht
-      by_contra h0n
-      rw [h0n] at ht
-      simp at ht
-      simp_all
-    simp_all
-  have hlast : 0 < S.val (Fin.last n) := by
-    rw [lt_iff_le_and_ne]
-    have ht := h 0 (Fin.last n)
-    have h0 : 0 ≠  S.val (Fin.last n)  := by
-      symm
-      rw [sq_eq_sq_iff_eq_or_eq_neg] at ht
-      by_contra h0n
-      rw [h0n] at ht
-      simp at ht
-      simp_all
-    simp_all
-    exact sorted_at_last hS h
-  let iv := n
-  have hiv : iv < n.succ := by omega
-  have hlast2 := hzero iv hiv
-  have ht : ⟨iv, hiv⟩ = Fin.last n := by
-    rw [Fin.ext_iff]
-    simp
-  rw [ht] at hlast2
-  exact lt_irrefl _ (hlast2.trans hlast)
+lemma is_zero (h0 : S 0 = 0) : S = 0 := by
+  funext i
+  have ht := hS.1 i 0
+  rw [h0] at ht
+  simp at ht
+  exact ht
 
-lemma k_sum_cast (k : Fin  n) : k.succ.val + (n.succ - k.succ.val) = n.succ := by
+@[simp]
+def boundary (S : (PureU1 n.succ).charges) (k : Fin n) : Prop := S k.castSucc < 0 ∧ 0 < S k.succ
+
+lemma boundary_castSucc {k : Fin n} (hk : boundary S k) : S k.castSucc = S 0 :=
+  (lt_eq hS (le_of_lt hk.left) (by simp : 0 ≤ k.castSucc)).symm
+
+lemma boundary_succ {k : Fin n} (hk : boundary S k) : S k.succ = - S 0 := by
+  have hn := boundary_castSucc hS hk
+  rw [opposite_signs_eq_neg hS (le_of_lt hk.left) (le_of_lt hk.right)] at hn
+  linear_combination -(1 * hn)
+
+lemma boundary_split (k : Fin n) :  k.succ.val + (n.succ - k.succ.val) = n.succ := by
   omega
 
-lemma sum_with_boundary {S : (PureU1 n.succ).charges}
-    (hS : sorted S) (hij : constAbs S) (k : Fin n)
-    (hk1 : S k.castSucc < 0) (hk2 : 0 < S k.succ) :
-    (accGrav (n.succ)) S = (2 * ↑↑k + 1 - ↑n) * S 0  := by
+lemma boundary_accGrav' (k : Fin n) : accGrav n.succ S =
+    ∑ i : Fin (k.succ.val + (n.succ - k.succ.val)), S (Fin.cast (boundary_split k) i) := by
   simp [accGrav]
-  have h : ∑ i : Fin (n.succ), S i  =
-    ∑ i : Fin (k.succ.val + (n.succ - k.succ.val)), S (Fin.cast (k_sum_cast k) i):= by
-    erw [Finset.sum_equiv (Fin.castIso (k_sum_cast k)).toEquiv]
-    intro i
-    simp
-    intro i
-    simp
-    rfl
-  rw [h]
+  erw [Finset.sum_equiv (Fin.castIso (boundary_split k)).toEquiv]
+  intro i
+  simp
+  intro i
+  simp
+  rfl
+
+lemma boundary_accGrav'' (k : Fin n) (hk : boundary S k) :
+    accGrav n.succ S = (2 * ↑↑k + 1 - ↑n) * S 0 := by
+  rw [boundary_accGrav' k]
   rw [Fin.sum_univ_add]
   have hfst (i : Fin k.succ.val) :
-      S (Fin.cast (k_sum_cast k) (Fin.castAdd (n.succ - k.succ.val) i)) = S k.castSucc := by
-    apply sorted_lt_eq hS hij
-    simp_all
-    rw [le_iff_eq_or_lt]
-    simp_all
-    rw [Fin.le_def]
-    simp
-    omega
+      S (Fin.cast (boundary_split k) (Fin.castAdd (n.succ - k.succ.val) i)) = S k.castSucc := by
+    apply lt_eq hS (le_of_lt hk.left) (by rw [Fin.le_def]; simp; omega)
   have hsnd (i : Fin (n.succ - k.succ.val)) :
-      S (Fin.cast (k_sum_cast k)  (Fin.natAdd (k.succ.val) i)) = S k.succ := by
-    apply sorted_gt_eq hS hij
-    rw [le_iff_eq_or_lt]
-    simp_all
-    rw [Fin.le_def]
-    simp
+      S (Fin.cast (boundary_split k)  (Fin.natAdd (k.succ.val) i)) = S k.succ := by
+    apply gt_eq hS (le_of_lt hk.right) (by rw [Fin.le_def]; simp)
   simp only [hfst, hsnd]
   simp
-  have h0 : S k.castSucc = S 0 := by
-    symm
-    apply sorted_lt_eq hS hij
-    rw [le_iff_eq_or_lt]
-    simp_all
-    simp
-  have hn : S k.succ = - S 0 := by
-    have hsq := hij 0 k.succ
-    rw [sq_eq_sq_iff_eq_or_eq_neg] at hsq
-    have ht :  S 0 ≠ S k.succ := by
-      have hl : S 0 < 0 := by
-        rw [← h0]
-        exact hk1
-      by_contra  hn
-      rw [hn] at hl
-      exact lt_irrefl _ (hl.trans hk2)
-    simp_all
-  erw [h0, hn]
+  rw [boundary_castSucc hS hk, boundary_succ hS hk]
   ring
 
-lemma boundary_value_odd_sorted (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (hS : sorted S.val)
-    (hij : constAbs S.val) :
-    S = 0 := by
-  by_cases h0 : S.val 0 ≠ 0
-  obtain ⟨k, hk⟩ := boundary_exists hS hij h0
-  have hgrav := pureU1_linear S
-  change (accGrav (2 * n + 1)) S.val = 0 at hgrav
-  have hk2 := sum_with_boundary hS hij k hk.1 hk.2
-  rw [hgrav] at hk2
-  simp at hk2
-  cases hk2 <;> rename_i h
+@[simp]
+def hasBoundary (S : (PureU1 n.succ).charges) : Prop :=
+  ∃ (k : Fin n), boundary S k
+
+lemma not_hasBoundary_zero_le (hnot : ¬ (hasBoundary S)) (h0 : S 0 < 0) :
+    ∀ i, S 0 = S i := by
+  intro ⟨i, hi⟩
+  simp at hnot
+  induction i
+  rfl
+  rename_i i hii
+  have hnott := hnot ⟨i, by omega⟩
+  have hii := hii (by omega)
+  erw [← hii] at hnott
+  exact (val_le_zero hS (hnott h0)).symm
+
+lemma not_hasBoundry_zero (hnot : ¬ (hasBoundary S)) (i : Fin n.succ) : S 0 = S i := by
+  by_cases hi : S 0 < 0
+  exact not_hasBoundary_zero_le hS hnot hi i
+  simp at hi
+  exact zero_gt hS hi i
+
+lemma not_hasBoundary_grav (hnot :  ¬ (hasBoundary S)) :
+    accGrav n.succ S = n.succ * S 0 := by
+  simp [accGrav, ← not_hasBoundry_zero hS hnot]
+
+
+lemma AFL_hasBoundary (h : A.val 0 ≠ 0) : hasBoundary A.val := by
+  by_contra hn
+  have h0 := not_hasBoundary_grav hA hn
+  simp [accGrav, pureU1_linear A] at h0
+  cases' h0
+  linarith
+  simp_all
+
+lemma AFL_odd_noBoundary {A : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+  (hA : A.val 0 ≠ 0) :
+    ¬ hasBoundary A.val := by
+  by_contra hn
+  obtain ⟨k, hk⟩ := hn
+  have h0 := boundary_accGrav'' h k hk
+  simp [accGrav, pureU1_linear A, hA] at h0
   have h1 : 2 * n = 2 * k.val + 1 := by
     rw [← @Nat.cast_inj ℚ]
     simp
-    linear_combination -(1 * h)
+    linear_combination - h0
   omega
+
+lemma AFL_odd_zero {A : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : constAbsSorted A.val) :
+    A.val 0 = 0 := by
+  by_contra hn
+  exact (AFL_odd_noBoundary h hn ) (AFL_hasBoundary h hn)
+
+theorem AFL_odd (A : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (h : constAbsSorted A.val) :
+    A = 0 := by
   apply ACCSystemLinear.AnomalyFreeLinear.ext
-  funext i
-  have hi := hij i 0
-  rw [h] at hi
-  simp at hi
-  rw [hi]
-  rfl
-  simp at h0
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
-  funext i
-  have hi := hij i 0
-  rw [h0] at hi
-  simp at hi
-  rw [hi]
-  rfl
+  exact  is_zero h (AFL_odd_zero h)
 
+lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+    (hA : A.val 0 ≠ 0) {k : Fin (2 * n + 1)} (hk : boundary A.val k) : k.val = n := by
+  have h0 := boundary_accGrav'' h k hk
+  change ∑ i : Fin (succ (Nat.mul 2 n + 1)), A.val i = _ at h0
+  rw [pureU1_linear A] at h0
+  simp [hA] at h0
+  rw [← @Nat.cast_inj ℚ]
+  linear_combination h0 / 2
 
-theorem boundary_value_odd (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (hij : constAbs S.val) :
-    S = 0 :=
-  have hS := constAbs_sort hij
-  have hsor := sort_sorted S.val
-  sortAFL_zero S (boundary_value_odd_sorted (sortAFL S) hsor hS)
-
-
-lemma n_plus_n_eq_2n (n : ℕ) : n.succ + n.succ = 2 * n.succ := (Nat.two_mul n.succ).symm
-
-lemma boundary_value_even_sorted (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
-    (hS : sorted S.val) (hij : constAbs S.val) :
-    ∀ i, S.val (Fin.cast (n_plus_n_eq_2n n)  (Fin.castAdd n.succ i)) = S.val 0
-    ∧ S.val (Fin.cast (n_plus_n_eq_2n n)  (Fin.natAdd n.succ i)) = - S.val 0 := by
-  by_cases h0 : S.val 0 ≠ 0
-  obtain ⟨k, hk⟩ := boundary_exists hS hij h0
-  have hk2 := sum_with_boundary hS hij k hk.1 hk.2
-  have hgrav := pureU1_linear S
-  change (accGrav (2 * n.succ)) S.val = 0 at hgrav
-  erw [hgrav] at hk2
-  simp at hk2
-  simp_all
-  have ht : (k.val : ℚ)  = n := by
-    linear_combination hk2 / 2
-  have hl : k.val = n := by
-    simp_all only [sub_self, Nat.cast_inj]
-  have hc1 (i : Fin n.succ) :
-      S.val (Fin.cast (n_plus_n_eq_2n n)  (Fin.castAdd n.succ i)) = S.val 0 := by
-    have hc11 := sorted_lt_eq hS hij (le_of_lt hk.left) 0 (by simp)
-    have hc12 := sorted_lt_eq hS hij (le_of_lt hk.left)
-       (Fin.cast (n_plus_n_eq_2n n)  (Fin.castAdd n.succ i))
-      (by rw [Fin.le_def]; simp; rw [hl]; omega)
-    rw [hc11, hc12]
-  have hc2  (i : Fin n.succ) :
-      S.val (Fin.cast (n_plus_n_eq_2n n)  (Fin.natAdd n.succ i)) = - S.val 0 := by
-    have hc11 := sorted_gt_eq hS hij
-      (le_of_lt hk.right)
-      (Fin.cast (n_plus_n_eq_2n n)  (Fin.natAdd n.succ i))
-      (by rw [Fin.le_def]; simp; rw [hl]; omega)
-    rw [hc11]
-    have hijt := hij (k.succ) 0
-    rw [sq_eq_sq_iff_eq_or_eq_neg] at hijt
-    by_contra hn
-    simp_all
-    have hc13 := sorted_lt_eq hS hij (le_of_lt hk.left) 0 (by simp)
-    rw [← hc13] at hk
-    exact lt_irrefl _ (hk.left.trans hk.right)
-  intro i
-  exact And.intro (hc1 i) (hc2 i)
-  simp at h0
-  intro i
-  have h1 := hij (Fin.cast (n_plus_n_eq_2n n)  (Fin.castAdd (succ n) i)) 0
-  have h2 := hij (Fin.cast (n_plus_n_eq_2n n)  (Fin.natAdd (succ n) i)) 0
-  rw [h0] at h1 h2
-  simp at h1 h2
-  rw [h1, h2, h0]
+lemma AFL_even_below' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+    (hA : A.val 0 ≠ 0) (i : Fin n.succ)  :
+    A.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i)) = A.val 0 := by
+  obtain ⟨k, hk⟩ := AFL_hasBoundary h hA
+  rw [← boundary_castSucc h hk]
+  apply lt_eq h (le_of_lt hk.left)
+  rw [Fin.le_def]
   simp
+  rw [AFL_even_Boundary h hA hk]
+  omega
 
-theorem boundary_value_even (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (hij : constAbs S.val) :
+lemma AFL_even_below (A : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (h : constAbsSorted A.val)
+    (i : Fin n.succ) :
+     A.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i)) = A.val 0 := by
+  by_cases hA : A.val 0 = 0
+  rw [is_zero h hA]
+  simp
+  exact AFL_even_below' h hA i
+
+lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+    (hA : A.val 0 ≠ 0) (i : Fin n.succ)  :
+    A.val (Fin.cast (split_equal n.succ)  (Fin.natAdd n.succ i)) = - A.val 0 := by
+  obtain ⟨k, hk⟩ := AFL_hasBoundary h hA
+  rw [← boundary_succ h hk]
+  apply gt_eq h (le_of_lt hk.right)
+  rw [Fin.le_def]
+  simp
+  rw [AFL_even_Boundary h hA hk]
+  omega
+
+lemma AFL_even_above (A : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (h : constAbsSorted A.val)
+    (i : Fin n.succ) :
+    A.val (Fin.cast (split_equal n.succ)  (Fin.natAdd n.succ i)) = - A.val 0 := by
+  by_cases hA : A.val 0 = 0
+  rw [is_zero h hA]
+  simp
+  exact AFL_even_above' h hA i
+
+
+end charges
+
+end constAbsSorted
+
+
+namespace ConstAbs
+
+theorem boundary_value_odd (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (hs : constAbs S.val) :
+    S = 0 :=
+  have hS := And.intro (constAbs_sort hs) (sort_sorted S.val)
+  sortAFL_zero S (constAbsSorted.AFL_odd (sortAFL S) hS)
+
+
+theorem boundary_value_even (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (hs : constAbs S.val) :
     vectorLikeEven S.val := by
-  have hS := constAbs_sort hij
-  have hsor := sort_sorted S.val
-  have h1 := boundary_value_even_sorted (sortAFL S) hsor hS
+  have hS := And.intro (constAbs_sort hs) (sort_sorted S.val)
   intro i
-  rw [sortAFL_val] at h1
-  erw [(h1 i).left, (h1 i).right]
+  have h1 := constAbsSorted.AFL_even_below (sortAFL S) hS
+  have h2 := constAbsSorted.AFL_even_above (sortAFL S) hS
+  rw [sortAFL_val] at h1 h2
+  rw [h1, h2]
   simp
 
 end ConstAbs

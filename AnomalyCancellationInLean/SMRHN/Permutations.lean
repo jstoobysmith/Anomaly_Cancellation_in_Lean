@@ -128,4 +128,6 @@ lemma accCube_invariant (f : permGroup n) (S : (SMνCharges n).charges)  :
   accCube_ext
     (by simpa using toSpecies_sum_invariant 3 f S)
 
+
+
 end SMRHN

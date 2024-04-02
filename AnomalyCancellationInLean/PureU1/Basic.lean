@@ -38,48 +38,24 @@ def accGrav (n : ℕ) : ((PureU1Charges n).charges →ₗ[ℚ] ℚ) where
 @[simps!]
 def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (PureU1Charges n).charges where
   toFun S := ∑ i, S.1 i * S.2.1 i * S.2.2 i
-  map_smul₁ a S L T := by
+  map_smul₁' a S L T := by
     simp
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
     intro i
     ring
-  map_smul₂ a S L T  := by
-    simp
-    rw [Finset.mul_sum]
-    apply Fintype.sum_congr
-    intro i
-    ring
-  map_smul₃ a S L T := by
-    simp
-    rw [Finset.mul_sum]
-    apply Fintype.sum_congr
-    intro i
-    ring
-  map_add₁ S L T R := by
+  map_add₁' S L T R := by
     simp
     rw [← Finset.sum_add_distrib]
     apply Fintype.sum_congr
     intro i
     ring
-  map_add₂ S L T R := by
-    simp
-    rw [← Finset.sum_add_distrib]
-    apply Fintype.sum_congr
-    intro i
-    ring
-  map_add₃ S L T R := by
-    simp
-    rw [← Finset.sum_add_distrib]
-    apply Fintype.sum_congr
-    intro i
-    ring
-  swap₁ S L T := by
+  swap₁' S L T := by
     simp
     apply Fintype.sum_congr
     intro i
     ring
-  swap₂ S L T := by
+  swap₂' S L T := by
     simp
     apply Fintype.sum_congr
     intro i
@@ -87,8 +63,9 @@ def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (PureU1Charges n).charges where
 
 lemma accCubeTriLinSymm_cast {n m : ℕ} (h : m = n)
     (S :  (PureU1Charges n).charges × (PureU1Charges n).charges × (PureU1Charges n).charges) :
-    accCubeTriLinSymm.toFun S = ∑ i : Fin m,
+    accCubeTriLinSymm S = ∑ i : Fin m,
       S.1 (Fin.cast h i) * S.2.1 (Fin.cast h i) * S.2.2 (Fin.cast h i) := by
+  rw [← accCubeTriLinSymm.toFun_eq_coe, accCubeTriLinSymm]
   simp
   rw [Finset.sum_equiv (Fin.castIso h).symm.toEquiv]
   intro i
@@ -97,19 +74,18 @@ lemma accCubeTriLinSymm_cast {n m : ℕ} (h : m = n)
   simp
 
 @[simp]
-def accCube (n : ℕ)  : HomogeneousCubic ((PureU1Charges n).charges) where
-  toFun S := ∑ i : Fin n, ((fun a => a^3) ∘ S) i
-  map_smul' a S := by
-   simp [HSMul.hSMul, SMul.smul]
-   rw [Finset.mul_sum]
-   ring_nf
+def accCube (n : ℕ)  : HomogeneousCubic ((PureU1Charges n).charges) :=
+  (accCubeTriLinSymm).toCubic
 
-lemma accCube_from_tri (n : ℕ) : accCube n = (accCubeTriLinSymm).toCubic := by
-  simp [accCubeTriLinSymm, toCubic]
-  funext S
+
+lemma accCube_explicit (n : ℕ) (S : (PureU1Charges n).charges) :
+    accCube n S = ∑ i : Fin n, S i ^ 3:= by
+  rw [accCube, TriLinearSymm.toCubic]
+  change  accCubeTriLinSymm.toFun (S, S, S) = _
+  rw [accCubeTriLinSymm]
+  simp
   apply Finset.sum_congr
   simp
-  intro i
   ring_nf
   simp
 
@@ -147,7 +123,7 @@ lemma pureU1_linear {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
 lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).AnomalyFree) :
     ∑ i, (S.val i) ^ 3 = 0 := by
   have hS := S.cubicSol
-  simp at hS
+  erw [PureU1.accCube_explicit] at hS
   exact hS
 
 lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :

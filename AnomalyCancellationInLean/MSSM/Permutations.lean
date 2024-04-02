@@ -146,13 +146,13 @@ lemma accYY_invariant (f : permGroup) (S : MSSMCharges.charges)  :
     (Hu_invariant f S)
 
 lemma accQuad_invariant (f : permGroup) (S : MSSMCharges.charges)  :
-    accQuad (repCharges f S) = accQuad S :=
+    accQuad (repCharges f S) = accQuad S :=  
   accQuad_ext
-    (by simpa using toSpecies_sum_invariant 2 f S)
+    (toSpecies_sum_invariant 2 f S)
     (Hd_invariant f S)
     (Hu_invariant f S)
 
-lemmma accCube_invariant (f : permGroup) (S : MSSMCharges.charges)  :
+lemma accCube_invariant (f : permGroup) (S : MSSMCharges.charges)  :
     accCube (repCharges f S) = accCube S :=
   accCube_ext
     (by simpa using toSpecies_sum_invariant 3 f S)

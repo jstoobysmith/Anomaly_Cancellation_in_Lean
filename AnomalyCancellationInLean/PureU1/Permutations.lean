@@ -60,8 +60,8 @@ lemma accGrav_invariant {n : ℕ} (f : (permGroup n)) (S : (PureU1 n).charges) :
 
 open BigOperators
 lemma accCube_invariant {n : ℕ} (f : (permGroup n)) (S : (PureU1 n).charges) :
-    (accCube n).toFun (permCharges f S) = (accCube n).toFun S := by
-  simp [accGrav, permCharges]
+    accCube n (permCharges f S) = accCube n S := by
+  rw [accCube_explicit, accCube_explicit]
   change  ∑ i : Fin n, ((((fun a => a^3) ∘ S) (f.symm i))) = _
   apply (Equiv.Perm.sum_comp _ _ _ ?_)
   simp

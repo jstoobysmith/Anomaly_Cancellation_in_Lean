@@ -313,7 +313,7 @@ end theBasisVectors
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
 lemma swap!_as_add {S S' : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n + 1)).repAnomalyFreeLinear
+    (hS : ((FamilyPermutations (2 * n + 1)).repAFL
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
   funext i
@@ -431,18 +431,16 @@ lemma P!_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P! f) = 0 := by
   rw [sum_δ!]
   simp [P!_δ!₂, P!_δ!₁, P!_δ!₃]
 
-lemma P_accCube (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).cubicACC.toFun (P f) = 0 := by
-  simp
-  rw [sum_δ, P_δ₃]
+lemma P_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P f) = 0 := by
+  rw [accCube_explicit, sum_δ, P_δ₃]
   simp
   apply Finset.sum_eq_zero
   intro i _
   simp [P_δ₁, P_δ₂]
   ring
 
-lemma P!_accCube (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).cubicACC.toFun (P! f) = 0 := by
-  simp
-  rw [sum_δ!, P!_δ!₃]
+lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P! f) = 0 := by
+  rw [accCube_explicit, sum_δ!, P!_δ!₃]
   simp
   apply Finset.sum_eq_zero
   intro i _
@@ -462,16 +460,6 @@ lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
   erw [basis!_on_δ!₁_other hkj.symm, basis!_on_δ!₂_other hkj.symm]
   simp
   simp
-
-
-
-
-
-
-
-
-
-
 
 
 lemma P_zero (f : Fin n → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
@@ -656,7 +644,7 @@ lemma span_basis (S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear) :
   rfl
 
 lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear} (j : Fin n.succ)
-    (hS : ((FamilyPermutations (2 * n.succ + 1)).repAnomalyFreeLinear
+    (hS : ((FamilyPermutations (2 * n.succ + 1)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g f : Fin n.succ → ℚ) (hS1 : S.val = P g + P! f):
     ∃ (g' f' : Fin n.succ → ℚ),
      S'.val = P g' + P! f' ∧ P! f' = P! f +

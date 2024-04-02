@@ -463,7 +463,6 @@ def AnomalyFreeQuadMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 
     | 0 => exact hquad
     ⟩
 
-
 @[simp]
 def AnomalyFreeMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 0)
     (hcube : accCube S.val = 0) : MSSMACC.AnomalyFree :=
