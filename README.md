@@ -9,6 +9,12 @@ As a proof-of-concept of the use of lean 4 in high energy physics, we create a l
 
 See: https://leanprover-community.github.io/get_started.html
 
-### Installing Anomaly cancellation in lean
+### Quick installation 
 
 1. Clone this repository. 
+2. Open a terminal in the cloned directory. 
+2. Run `lake -Kenv=dev update`.
+
+Depending on how upto date this directory is compared to MathLib4 this may lead to errors.
+
+`  

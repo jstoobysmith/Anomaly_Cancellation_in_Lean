@@ -62,8 +62,9 @@ lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.AnomalyFreeLinear) (a b c : ℚ) :
   apply congrArg
   rw [← add_assoc, ← MulAction.mul_smul, ← Module.add_smul]
   apply congrArg
-  simp
-  rw [mul_comm, MulAction.mul_smul]
+  simp only [HSMul.hSMul, SMul.smul, MSSMACC_numberCharges, Fin.isValue, Fin.reduceFinMk]
+  funext i
+  linarith
 
 
 

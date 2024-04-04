@@ -57,7 +57,7 @@ lemma toSMSpecies_toSpecies_inv (i : Fin 6) (f :  (Fin 6 → Fin n → ℚ) ) :
   simp
 
 lemma toSpecies_one  (S : (SMνCharges 1).charges) (j : Fin 6) :
-    toSpecies j S 0 = S j := by
+    toSpecies j S ⟨0, by simp⟩ = S j := by
   match j with
   | 0 => rfl
   | 1 => rfl
@@ -89,7 +89,7 @@ def accGrav : (SMνCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMνSpecies_charges, Pi.add_apply, mul_add]
+    simp  [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -100,6 +100,7 @@ def accGrav : (SMνCharges n).charges →ₗ[ℚ] ℚ where
     repeat erw [← Finset.mul_sum]
     rw [show Rat.cast a = a from rfl]
     ring
+
 
 lemma accGrav_decomp (S : (SMνCharges n).charges) :
     accGrav S = 6 * ∑ i, Q S i + 3 * ∑ i, U S i + 3 * ∑ i, D S i + 2 * ∑ i, L S i + ∑ i, E S i +
@@ -123,7 +124,7 @@ def accSU2 : (SMνCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMνSpecies_charges, Pi.add_apply, mul_add]
+    simp  [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -155,7 +156,7 @@ def accSU3 : (SMνCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMνSpecies_charges, Pi.add_apply, mul_add]
+    simp  [ Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -188,7 +189,7 @@ def accYY : (SMνCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMνSpecies_charges, SMνCharges_charges, Pi.add_apply, mul_add]
+    simp  [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -246,7 +247,6 @@ def quadBiLin : BiLinearSymm (SMνCharges n).charges where
 lemma quadBiLin_decomp (S T : (SMνCharges n).charges) :
     quadBiLin (S, T) = ∑ i, Q S i * Q T i  - 2 *  ∑ i, U S i * U T i +
        ∑ i, D S i * D T i -  ∑ i, L S i * L T i +  ∑ i, E S i * E T i := by
-  simp
   erw [← quadBiLin.toFun_eq_coe]
   rw [quadBiLin]
   simp only
@@ -314,13 +314,12 @@ lemma cubeTriLin_decomp (S T R : (SMνCharges n).charges) :
     cubeTriLin (S, T, R) = 6 * ∑ i, (Q S i * Q T i * Q R i) + 3 * ∑ i,  (U S i * U T i * U R i) +
       3 * ∑ i,  (D S i * D T i * D R i) + 2 * ∑ i, (L S i * L T i * L R i) +
       ∑ i, (E S i * E T i * E R i) + ∑ i, (N S i * N T i * N R i) := by
-  simp
   erw [← cubeTriLin.toFun_eq_coe]
   rw [cubeTriLin]
   simp only
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
-  simp
+
 
 @[simp]
 def accCube : HomogeneousCubic (SMνCharges n).charges := cubeTriLin.toCubic

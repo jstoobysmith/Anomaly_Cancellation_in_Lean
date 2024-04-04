@@ -328,11 +328,11 @@ lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
   rw [← hS, FamilyPermutations_anomalyFreeLinear_apply]
   by_cases  hi : i = δ!₁ j
   subst hi
-  simp [basis!_on_δ!₁_self, pairSwap_inv_fst]
+  simp [HSMul.hSMul, basis!_on_δ!₁_self, pairSwap_inv_fst]
   by_cases hi2 : i = δ!₂ j
   subst hi2
-  simp [basis!_on_δ!₂_self, pairSwap_inv_snd]
-  simp
+  simp [HSMul.hSMul, basis!_on_δ!₂_self, pairSwap_inv_snd]
+  simp [HSMul.hSMul]
   rw [basis!_on_other hi hi2]
   change  S.val ((pairSwap (δ!₁ j) (δ!₂ j)).invFun i) =_
   erw [pairSwap_inv_other (Ne.symm hi) (Ne.symm hi2)]
@@ -491,7 +491,7 @@ lemma Pa_zero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
     ∀ i, f i = 0 := by
   have h₃ := Pa_δ!₃ f g
   rw [h] at h₃
-  simp at h₃
+  change 0 = f 0 at h₃
   intro i
   have hinduc (iv : ℕ) (hiv : iv < n.succ) : f ⟨iv, hiv⟩ = 0 := by
     induction iv
@@ -504,6 +504,7 @@ lemma Pa_zero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
     rw [h] at h1 h2
     simp at h1 h2
     erw [hi2] at h2
+    change 0 = _ at h2
     simp at h2
     rw [h2] at h1
     simp at h1

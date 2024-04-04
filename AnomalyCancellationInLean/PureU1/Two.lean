@@ -20,10 +20,10 @@ namespace Two
 def equiv : (PureU1 2).AnomalyFreeLinear ≃ (PureU1 2).AnomalyFree where
   toFun S := ⟨⟨S, by intro i; simp at i; exact Fin.elim0 i⟩, by
     have hLin := pureU1_linear S
-    rw [Fin.sum_univ_two] at hLin
+    simp at hLin
     erw [accCube_explicit]
     simp
-    rw [show S.val 0 = - S.val 1 by linear_combination hLin]
+    rw [show S.val (0 : Fin 2) = - S.val (1 : Fin 2) by linear_combination hLin]
     ring⟩
   invFun S := S.1.1
   left_inv S := rfl

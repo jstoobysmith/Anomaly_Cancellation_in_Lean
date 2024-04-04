@@ -71,20 +71,24 @@ def chargeMap (f : permGroup) : MSSMCharges.charges →ₗ[ℚ] MSSMCharges.char
     rfl
     rfl
 
+lemma chargeMap_toSpecies (f : permGroup) (S : MSSMCharges.charges) (j : Fin 6) :
+    toSMSpecies j (chargeMap f S) = toSMSpecies j S ∘ f j := by
+  erw [toSMSpecies_toSpecies_inv]
+
 @[simps!]
 def repCharges : Representation ℚ (permGroup) (MSSMCharges).charges where
   toFun f := chargeMap f⁻¹
   map_mul' f g :=by
-    simp
+    simp only [permGroup, mul_inv_rev]
     apply LinearMap.ext
     intro S
     rw [charges_eq_toSpecies_eq]
     apply And.intro
     intro i
-    simp
-    repeat erw [toSMSpecies_toSpecies_inv]
-    simp
-    erw [toSMSpecies_toSpecies_inv]
+    simp only [ Pi.mul_apply, Pi.inv_apply, Equiv.Perm.coe_mul, LinearMap.mul_apply]
+    rw [chargeMap_toSpecies, chargeMap_toSpecies]
+    simp only [Pi.mul_apply, Pi.inv_apply]
+    rw [chargeMap_toSpecies]
     rfl
     apply And.intro
     rfl
@@ -146,7 +150,7 @@ lemma accYY_invariant (f : permGroup) (S : MSSMCharges.charges)  :
     (Hu_invariant f S)
 
 lemma accQuad_invariant (f : permGroup) (S : MSSMCharges.charges)  :
-    accQuad (repCharges f S) = accQuad S :=  
+    accQuad (repCharges f S) = accQuad S :=
   accQuad_ext
     (toSpecies_sum_invariant 2 f S)
     (Hd_invariant f S)

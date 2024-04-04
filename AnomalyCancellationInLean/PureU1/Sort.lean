@@ -42,7 +42,8 @@ lemma sort_zero {n : ℕ} (S : (PureU1 n).charges)  (hS : sort S = 0) : S = 0 :=
   funext i
   have hj : ∀ j, sort S j = 0 := by
     rw [hS]
-    simp
+    intro j
+    rfl
   have hi := hj ((Tuple.sort S).invFun i)
   rw [sort_apply] at hi
   simp at hi

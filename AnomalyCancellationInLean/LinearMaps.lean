@@ -15,7 +15,7 @@ namespace HomogeneousQuadratic
 
 variable {V : Type} [AddCommMonoid V] [Module ℚ V]
 
-instance HomogeneousQuadratic.instFun : FunLike (HomogeneousQuadratic V) V ℚ where
+instance instFun : FunLike (HomogeneousQuadratic V) V ℚ where
   coe f := f.toFun
   coe_injective' f g h := by
     cases f
@@ -59,7 +59,6 @@ lemma map_add₂ (f : BiLinear V) (S : V) (T1 T2 : V) : f (S, T1 + T2) = f (S, T
   f.map_add₂' S T1 T2
 
 end BiLinear
-
 
 structure BiLinearSymm (V : Type) [AddCommMonoid V] [Module ℚ V] where
   toFun : V × V → ℚ
@@ -145,7 +144,6 @@ lemma map_smul (f : HomogeneousCubic V) (a : ℚ) (S : V) : f (a • S) = a ^ 3 
 
 end HomogeneousCubic
 
-
 structure TriLinear (V : Type) [AddCommMonoid V] [Module ℚ V] where
   toFun : V × V × V → ℚ
   map_smul₁' : ∀ a S T L, toFun (a • S, T, L) = a * toFun (S, T, L)
@@ -168,14 +166,12 @@ instance instFun : FunLike (TriLinear V) (V × V × V) ℚ where
 
 end TriLinear
 
-
 structure TriLinearSymm (V : Type) [AddCommMonoid V] [Module ℚ V] where
   toFun : V × V × V → ℚ
   map_smul₁' : ∀ a S T L, toFun (a • S, T, L) = a * toFun (S, T, L)
   map_add₁' : ∀ S1 S2 T L, toFun (S1 + S2, T, L) = toFun (S1, T, L) + toFun (S2, T, L)
   swap₁' : ∀ S T L, toFun (S, T, L) = toFun (T, S, L)
   swap₂' : ∀ S T L, toFun (S, T, L) = toFun (S, L, T)
-
 
 namespace TriLinearSymm
 

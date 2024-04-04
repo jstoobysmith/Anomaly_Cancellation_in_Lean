@@ -49,7 +49,7 @@ lemma Y₃_val : Y₃.val = Y₃AsCharge := by
 lemma doublePoint_Y₃_Y₃ (R : MSSMACC.AnomalyFreeLinear) :
     cubeTriLin (Y₃.val, Y₃.val, R.val) = 0 := by
   rw [← TriLinearSymm.toFun_eq_coe]
-  simp only [cubeTriLin, cubeTriLinToFun]
+  simp only [cubeTriLin, cubeTriLinToFun, MSSMSpecies_numberCharges]
   rw [Fin.sum_univ_three]
   rw [Y₃_val]
   rw [Y₃AsCharge]
@@ -98,7 +98,7 @@ lemma B₃_val : B₃.val = B₃AsCharge := by
 lemma doublePoint_B₃_B₃ (R : MSSMACC.AnomalyFreeLinear) :
     cubeTriLin (B₃.val, B₃.val, R.val) = 0 := by
   rw [← TriLinearSymm.toFun_eq_coe]
-  simp only [cubeTriLin, cubeTriLinToFun]
+  simp only [cubeTriLin, cubeTriLinToFun, MSSMSpecies_numberCharges]
   rw [Fin.sum_univ_three]
   rw [B₃_val]
   rw [B₃AsCharge]
@@ -145,7 +145,7 @@ def lineY₃B₃ (a b : ℚ) : MSSMACC.AnomalyFree :=
 lemma doublePoint_Y₃_B₃ (R : MSSMACC.AnomalyFreeLinear) :
     cubeTriLin (Y₃.val, B₃.val, R.val) = 0 := by
   rw [← TriLinearSymm.toFun_eq_coe]
-  simp only [cubeTriLin, cubeTriLinToFun]
+  simp only [cubeTriLin, cubeTriLinToFun, MSSMSpecies_numberCharges]
   rw [Fin.sum_univ_three]
   rw [B₃_val, Y₃_val]
   rw [B₃AsCharge, Y₃AsCharge]

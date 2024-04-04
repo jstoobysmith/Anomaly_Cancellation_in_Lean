@@ -21,12 +21,12 @@ variable {n : ℕ}
 def BL₁ : (PlusU1 1).AnomalyFree where
   val := fun i =>
     match i with
-    | 0 => 1
-    | 1 => -1
-    | 2 => -1
-    | 3 => -3
-    | 4 => 3
-    | 5 => 3
+    | (0 : Fin 6) => 1
+    | (1 : Fin 6) => -1
+    | (2 : Fin 6) => -1
+    | (3 : Fin 6) => -3
+    | (4 : Fin 6) => 3
+    | (5 : Fin 6) => 3
   linearSol := by
     intro i
     simp at i

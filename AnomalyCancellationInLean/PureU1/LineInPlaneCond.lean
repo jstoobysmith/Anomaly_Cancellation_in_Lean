@@ -103,11 +103,12 @@ theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).Anomaly
   rw [hij]
 
 lemma linesInPlane_four (S : (PureU1 4).AnomalyFree) (hS : lineInPlaneCond S.1.1) :
-     constAbsProp (S.val 0, S.val 1)  := by
+     constAbsProp (S.val (0 : Fin 4), S.val (1 : Fin 4))  := by
   simp [constAbsProp]
   by_contra hn
   have hLin := pureU1_linear S.1.1
   have hcube := pureU1_cube S
+  simp at hLin hcube
   rw [Fin.sum_univ_four] at hLin hcube
   rw [sq_eq_sq_iff_eq_or_eq_neg] at hn
   simp [not_or] at hn
@@ -115,29 +116,29 @@ lemma linesInPlane_four (S : (PureU1 4).AnomalyFree) (hS : lineInPlaneCond S.1.1
   have l013 := hS 0 1 3 (by simp) (by simp) (by simp)
   have l023 := hS 0 2 3 (by simp) (by simp) (by simp)
   simp_all [lineInPlaneProp]
-  have h1 : S.val 2 = S.val 3 := by
+  have h1 : S.val (2 : Fin 4) = S.val (3 : Fin 4)  := by
     linear_combination l012 / 2 + -1 * l013 / 2
-  by_cases h2 : S.val 0 = S.val 2
+  by_cases h2 : S.val (0 : Fin 4) = S.val (2 : Fin 4)
   simp_all
-  have h3 : S.val 1 = - 3 * S.val 2 := by
+  have h3 : S.val (1 : Fin 4) = - 3 * S.val (2 : Fin 4) := by
     linear_combination l012 + 3 * h1
   rw [← h1, h3] at hcube
-  have h4 : S.val 2 ^ 3 = 0 := by
+  have h4 : S.val (2 : Fin 4) ^ 3 = 0 := by
     linear_combination -1 * hcube / 24
   simp at h4
   simp_all
-  by_cases h3 : S.val 0 = - S.val 2
+  by_cases h3 : S.val (0 : Fin 4) = - S.val (2 : Fin 4)
   simp_all
-  have h4 : S.val 1 = - S.val 2 := by
+  have h4 : S.val (1 : Fin 4) = - S.val (2 : Fin 4) := by
     linear_combination l012 + h1
   simp_all
   simp_all
-  have h4 : S.val 0 = - 3 * S.val 3 := by
+  have h4 : S.val (0 : Fin 4) = - 3 * S.val (3 : Fin 4) := by
     linear_combination l023
-  have h5 : S.val 1 = S.val 3 := by
+  have h5 : S.val (1 : Fin 4) = S.val (3 : Fin 4) := by
     linear_combination l013 - 1 * h4
   rw [h4, h5] at hcube
-  have h6 : S.val 3 ^ 3 = 0 := by
+  have h6 : S.val (3 : Fin 4) ^ 3 = 0 := by
     linear_combination -1 * hcube / 24
   simp at h6
   simp_all

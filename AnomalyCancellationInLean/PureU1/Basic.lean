@@ -39,7 +39,7 @@ def accGrav (n : ℕ) : ((PureU1Charges n).charges →ₗ[ℚ] ℚ) where
 def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (PureU1Charges n).charges where
   toFun S := ∑ i, S.1 i * S.2.1 i * S.2.2 i
   map_smul₁' a S L T := by
-    simp
+    simp [HSMul.hSMul]
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
     intro i
@@ -129,6 +129,7 @@ lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).AnomalyFree) :
 lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
     S.val (Fin.last n) = - ∑ i : Fin n, S.val i.castSucc := by
   have hS := pureU1_linear S
+  simp at hS
   rw [Fin.sum_univ_castSucc] at hS
   linear_combination hS
 
@@ -157,6 +158,7 @@ lemma sum_of_charges {n : ℕ} (f : Fin k → (PureU1 n).charges) (j : Fin n) :
     (∑ i : Fin k, (f i)) j = ∑ i : Fin k, (f i) j := by
   induction k
   simp
+  rfl
   rename_i k hl
   rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
   have hlt := hl (f ∘ Fin.castSucc)

@@ -80,7 +80,7 @@ def accGrav : (SMCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMSpecies_charges, SMCharges_charges, Pi.add_apply, mul_add]
+    simp  [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -109,7 +109,7 @@ def accSU2 : (SMCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMSpecies_charges, SMCharges_charges, Pi.add_apply, mul_add]
+    simp [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -138,7 +138,7 @@ def accSU3 : (SMCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMSpecies_charges, SMCharges_charges, Pi.add_apply, mul_add]
+    simp [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -168,7 +168,7 @@ def accYY : (SMCharges n).charges →ₗ[ℚ] ℚ where
   map_add' S T := by
     simp only
     repeat rw [map_add]
-    simp only [SMSpecies_charges, SMCharges_charges, Pi.add_apply, mul_add]
+    simp [Pi.add_apply, mul_add]
     repeat erw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
@@ -230,7 +230,7 @@ lemma accQuad_ext {S T : (SMCharges n).charges}
     (h : ∀ j, ∑ i, ((fun a => a^2) ∘ toSpecies j S) i =
     ∑ i, ((fun a => a^2) ∘ toSpecies j T) i) :
     accQuad S = accQuad T := by
-  simp
+  simp only [accQuad, BiLinearSymm.toHomogeneousQuad_toFun, Fin.isValue]
   erw [← quadBiLin.toFun_eq_coe]
   rw [quadBiLin]
   simp only
@@ -282,7 +282,7 @@ lemma accCube_ext {S T : (SMCharges n).charges}
     (h : ∀ j, ∑ i, ((fun a => a^3) ∘ toSpecies j S) i =
     ∑ i, ((fun a => a^3) ∘ toSpecies j T) i) :
     accCube S = accCube T := by
-  simp
+  simp only [accCube, TriLinearSymm.toCubic_toFun, Fin.isValue]
   erw [← cubeTriLin.toFun_eq_coe]
   rw [cubeTriLin]
   simp only

@@ -19,7 +19,8 @@ open SMACCs
 open BigOperators
 
 
-lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).AnomalyFree} : Q S.val 0 = 0 ↔ E S.val 0 = 0 := by
+lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).AnomalyFree} : Q S.val (0 : Fin 1) = 0 ↔
+    E S.val  (0 : Fin 1) = 0 := by
   let S' := linearParameters.bijection.symm S.1.1
   have hC := cubeSol S
   have hS' := congrArg (fun S => S.val) (linearParameters.bijection.right_inv S.1.1)
@@ -33,18 +34,21 @@ lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).AnomalyFree} : Q S.val 0 = 0 ↔ E S.v
 
 
 
-lemma accGrav_Q_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val 0 = 0) : accGrav S.val = 0 := by
+lemma accGrav_Q_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val  (0 : Fin 1) = 0) :
+    accGrav S.val = 0 := by
   rw [accGrav]
-  simp
+  simp only [SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+    Finset.sum_singleton, LinearMap.coe_mk, AddHom.coe_mk]
   erw [hQ, E_zero_iff_Q_zero.mp hQ]
   have h1 := SU2Sol S.1.1
   have h2 := SU3Sol S.1.1
-  simp at h1 h2
+  simp only [accSU2, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+     Finset.sum_singleton, LinearMap.coe_mk, AddHom.coe_mk, accSU3] at h1 h2
   erw [hQ] at h1 h2
   simp_all
   linear_combination 3 * h2
 
-lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val 0 ≠ 0) :
+lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val (0 : Fin 1) ≠ 0) :
     accGrav S.val = 0 := by
   have hE := E_zero_iff_Q_zero.mpr.mt hQ
   let S' := linearParametersQENeqZero.bijection.symm ⟨S.1.1, And.intro hQ hE⟩
@@ -58,7 +62,7 @@ lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val 0 ≠ 0) :
 
 /-- The result of https://arxiv.org/abs/1907.00514. -/
 theorem accGravSatisfied {S : (SMNoGrav 1).AnomalyFree} : accGrav S.val = 0 := by
-  by_cases hQ : Q S.val 0 = 0
+  by_cases hQ : Q S.val (0 : Fin 1)= 0
   exact accGrav_Q_zero hQ
   exact accGrav_Q_neq_zero hQ
 

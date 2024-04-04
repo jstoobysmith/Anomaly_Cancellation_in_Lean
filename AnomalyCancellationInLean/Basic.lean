@@ -11,145 +11,41 @@ import Mathlib.NumberTheory.FLT.Basic
 import Mathlib.Algebra.QuadraticDiscriminant
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Module.LinearMap.Basic
+/-!
+
+# Basic set up for anomaly cancellation conditions
+
+This file defines the basic structures for the anomaly cancellation conditions.
+
+It defines a module structure on the charges, and the solutions to the linear ACCs.
+
+## TODO
+
+In the future information about the fermionic representations, and the gauge algebra
+should lead to an ACCSystem.
+
+-/
 
 structure ACCSystemCharges where
-  charges : Type
   numberCharges : ℕ
-  equiv : charges ≃ (Fin numberCharges → ℚ)
+
 
 def ACCSystemChargesMk (n : ℕ) : ACCSystemCharges where
-  charges := Fin n → ℚ
   numberCharges := n
-  equiv := Equiv.refl _
+
 
 namespace ACCSystemCharges
 
 /-- The charges as functions from `Fin χ.numberCharges → ℚ`. -/
-def chargesFun (χ : ACCSystemCharges) : Type := Fin χ.numberCharges → ℚ
+def charges (χ : ACCSystemCharges) : Type := Fin χ.numberCharges → ℚ
 
 @[simps!]
-instance chargesFunAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.chargesFun where
-  add S T := fun i => S i + T i
-  add_assoc S T L := by
-    funext i
-    exact Rat.add_assoc _ _ _
-  add_comm S T := by
-    funext i
-    exact Rat.add_comm _ _
-  zero := fun _ => 0
-  zero_add S := by
-    funext i
-    exact Rat.zero_add _
-  add_zero S := by
-    funext i
-    exact Rat.add_zero _
-  nsmul n S := fun i => (n : ℚ) * S i
-  nsmul_zero n := by
-    funext i
-    simp
-    rfl
-  nsmul_succ n S := by
-    funext i
-    simp
-    change _ = (fun i => ↑n * S i) i + S i
-    simp
-    ring
-
-
+instance chargesAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.charges :=
+  Pi.addCommMonoid
 
 @[simps!]
-instance chargesAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.charges where
-  add S T := χ.equiv.invFun (χ.equiv.toFun S +  χ.equiv.toFun T)
-  zero := χ.equiv.invFun (χ.chargesFunAddCommMonoid.zero)
-  add_assoc S T L := by
-    change  χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    change (χ.equiv.toFun ∘ χ.equiv.invFun) _ + _ = _ + (χ.equiv.toFun ∘ χ.equiv.invFun) _
-    simp [χ.equiv.right_inv]
-    exact χ.chargesFunAddCommMonoid.add_assoc _ _ _
-  add_comm S T  := by
-    change  χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    exact χ.chargesFunAddCommMonoid.add_comm _ _
-  zero_add S := by
-    change  χ.equiv.invFun (χ.equiv.toFun (χ.equiv.invFun _) + _) = _
-    simp [χ.equiv.left_inv]
-    erw [χ.chargesFunAddCommMonoid.zero_add]
-    simp
-  add_zero S := by
-    change  χ.equiv.invFun (_ + χ.equiv.toFun (χ.equiv.invFun _) ) = _
-    simp [χ.equiv.left_inv]
-    erw [χ.chargesFunAddCommMonoid.add_zero]
-    simp
-  nsmul n S := χ.equiv.invFun (n • χ.equiv.toFun S)
-  nsmul_zero n := by
-    simp
-    rfl
-  nsmul_succ n S := by
-    simp only
-    apply congrArg
-    simp only [Equiv.toFun_as_coe, Equiv.invFun_as_coe, Equiv.apply_symm_apply]
-    rfl
-
-
-
-@[simps!]
-instance chargesFunModule (χ : ACCSystemCharges) : Module ℚ χ.chargesFun where
-  smul a S := fun i => a * S i
-  one_smul S := by
-    funext i
-    exact Rat.one_mul _
-  mul_smul a b c := by
-    funext i
-    exact Rat.mul_assoc _ _ _
-  smul_zero a := by
-    funext _
-    exact Rat.mul_zero _
-  zero_smul a := by
-    funext i
-    exact Rat.zero_mul _
-  smul_add a S T := by
-    funext i
-    exact Rat.mul_add _ _ _
-  add_smul a b T := by
-    funext i
-    exact Rat.add_mul _ _ _
-
-@[simps!]
-instance chargesModule (χ : ACCSystemCharges) : Module ℚ χ.charges where
-  smul a S :=  χ.equiv.symm (a • χ.equiv S)
-  one_smul S := by
-    change χ.equiv.invFun _ = _
-    rw [χ.chargesFunModule.one_smul]
-    simp
-  mul_smul a b S := by
-    change χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    rw [χ.chargesFunModule.mul_smul]
-    apply congrArg
-    change _ = χ.equiv.toFun (χ.equiv.invFun _)
-    simp [χ.equiv.left_inv]
-  smul_zero a := by
-    change χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    simp
-    exact χ.chargesFunModule.smul_zero _
-  zero_smul a := by
-    change χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    simp
-    rfl
-  smul_add a S T := by
-    change χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    change _ = χ.equiv.toFun (χ.equiv.invFun _) + χ.equiv.toFun (χ.equiv.invFun _)
-    simp [χ.equiv.right_inv]
-  add_smul a b T := by
-    change χ.equiv.invFun _ = χ.equiv.invFun _
-    apply congrArg
-    change _ = χ.equiv.toFun (χ.equiv.invFun _) + χ.equiv.toFun (χ.equiv.invFun _)
-    simp [χ.equiv.right_inv]
-    exact χ.chargesFunModule.add_smul _ _ _
+instance chargesModule (χ : ACCSystemCharges) : Module ℚ χ.charges :=
+  Pi.module _ _ _
 
 instance ChargesAddCommGroup (χ : ACCSystemCharges) :
     AddCommGroup χ.charges :=
@@ -157,9 +53,11 @@ instance ChargesAddCommGroup (χ : ACCSystemCharges) :
 
 end ACCSystemCharges
 
+
 structure ACCSystemLinear extends ACCSystemCharges where
   numberLinear : ℕ
-  linearACCs :  Fin numberLinear → (charges →ₗ[ℚ] ℚ)
+  linearACCs :  Fin numberLinear → (toACCSystemCharges.charges →ₗ[ℚ] ℚ)
+
 
 namespace ACCSystemLinear
 
@@ -249,7 +147,7 @@ end ACCSystemLinear
 
 structure ACCSystemQuad extends ACCSystemLinear where
   numberQuadratic : ℕ
-  quadraticACCs : Fin numberQuadratic → HomogeneousQuadratic charges
+  quadraticACCs : Fin numberQuadratic → HomogeneousQuadratic toACCSystemCharges.charges
 
 
 namespace ACCSystemQuad
@@ -297,7 +195,7 @@ def AnomalyFreeQuadIncl (χ : ACCSystemQuad) :
 end ACCSystemQuad
 
 structure ACCSystem extends ACCSystemQuad where
-  cubicACC : HomogeneousCubic charges
+  cubicACC : HomogeneousCubic toACCSystemCharges.charges
 
 
 namespace ACCSystem

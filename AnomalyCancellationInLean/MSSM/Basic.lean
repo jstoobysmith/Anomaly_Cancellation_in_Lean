@@ -74,13 +74,13 @@ abbrev N := toSMSpecies 5
 
 @[simps!]
 def Hd : MSSMCharges.charges →ₗ[ℚ] ℚ where
-  toFun S := S 18
+  toFun S := S ⟨18, by simp⟩
   map_add' _ _ := by aesop
   map_smul' _ _ := by aesop
 
 @[simps!]
 def Hu : MSSMCharges.charges →ₗ[ℚ] ℚ where
-  toFun S := S 19
+  toFun S := S ⟨19, by simp⟩
   map_add' _ _ := by aesop
   map_smul' _ _ := by aesop
 
@@ -142,11 +142,12 @@ lemma accGrav_ext {S T : MSSMCharges.charges}
     (hj : ∀ (j : Fin 6),  ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accGrav S = accGrav T := by
-  simp
+  simp only [accGrav, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
+    Fin.reduceFinMk, LinearMap.coe_mk, AddHom.coe_mk]
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
   repeat erw [hj]
-  erw [hd, hu]
+  rw [hd, hu]
   rfl
 
 /-- The anomaly cancelation condition for SU(2) anomaly. -/
@@ -174,11 +175,12 @@ lemma accSU2_ext {S T : MSSMCharges.charges}
     (hj : ∀ (j : Fin 6),  ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accSU2 S = accSU2 T := by
-  simp
+  simp only [accSU2, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
+    Fin.reduceFinMk, LinearMap.coe_mk, AddHom.coe_mk]
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
   repeat erw [hj]
-  erw [hd, hu]
+  rw [hd, hu]
   rfl
 
 /-- The anomaly cancelation condition for SU(3) anomaly. -/
@@ -235,11 +237,12 @@ lemma accYY_ext {S T : MSSMCharges.charges}
     (hj : ∀ (j : Fin 6),  ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accYY S = accYY T := by
-  simp
+  simp only [accYY, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
+    Fin.reduceFinMk, LinearMap.coe_mk, AddHom.coe_mk]
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
   repeat erw [hj]
-  erw [hd, hu]
+  rw [hd, hu]
   rfl
 
 
@@ -292,7 +295,7 @@ lemma accQuad_ext {S T : (MSSMCharges).charges}
     ∑ i, ((fun a => a^2) ∘ toSMSpecies j T) i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accQuad S = accQuad T := by
-  simp
+  simp only [accQuad, BiLinearSymm.toHomogeneousQuad_toFun]
   erw [← quadBiLin.toFun_eq_coe]
   rw [quadBiLin]
   simp only
@@ -488,7 +491,7 @@ def dot  : BiLinearSymm MSSMCharges.charges where
     D S.1 i *  D S.2 i + L S.1 i * L S.2 i  + E S.1 i * E S.2 i
     + N S.1 i * N S.2 i) + Hd S.1 * Hd S.2 + Hu S.1 * Hu S.2
   map_smul₁' a S T := by
-    simp only
+    simp only [MSSMSpecies_numberCharges]
     repeat rw [(toSMSpecies _).map_smul]
     rw [Hd.map_smul, Hu.map_smul]
     rw [Fin.sum_univ_three, Fin.sum_univ_three]

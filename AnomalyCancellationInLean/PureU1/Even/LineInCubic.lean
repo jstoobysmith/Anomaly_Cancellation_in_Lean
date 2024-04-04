@@ -100,7 +100,7 @@ lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ )).AnomalyFreeLinear}
   have h3 := Pa_δ!₂ f g (Fin.last n)
   simp at h1 h2 h3
   have hl : f (Fin.succ  (Fin.last (n ))) = - Pa f g δ!₄ := by
-    simp_all only [PureU1_charges, Fin.succ_last, neg_neg]
+    simp_all only [Fin.succ_last, neg_neg]
   erw [hl] at h2
   have hg : g (Fin.last n)  = Pa f g (δ!₁ (Fin.last n)) + Pa f g δ!₄ := by
     linear_combination -(1 * h2)

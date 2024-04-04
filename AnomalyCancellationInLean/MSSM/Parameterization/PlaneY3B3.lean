@@ -44,7 +44,7 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
   rw [planeY₃B₃_val, planeY₃B₃_val] at h
   have h1 := congrArg (fun S => dot (Y₃.val, S)) h
   have h2 := congrArg (fun S => dot (B₃.val, S)) h
-  simp at h1 h2
+  simp only [ Fin.isValue, ACCSystemCharges.chargesAddCommMonoid_add, Fin.reduceFinMk] at h1 h2
   erw [dot.map_add₂, dot.map_add₂] at h1 h2
   erw [dot.map_add₂ Y₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h1
   erw [dot.map_add₂ B₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h2
@@ -68,7 +68,6 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
     rw [h1]
     rw [← Module.add_smul]
     simp
-    rfl
   rw [← Module.add_smul] at h1i
   have hR : ∃ i, R.val i ≠ 0 := by
     by_contra h
@@ -79,7 +78,8 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
     exact hR' h0
   obtain ⟨i, hi⟩ := hR
   have h2 := congrArg (fun S => S i) h1i
-  simp at h2
+  change _ = 0 at h2
+  simp [HSMul.hSMul] at h2
   have hc :  c + -c' = 0 := by
     cases h2 <;> rename_i h2
     exact h2
@@ -146,9 +146,9 @@ lemma lineQuad_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
   rw [← planeY₃B₃_smul]
   rw [lineQuad_val]
   congr 2
-  ring
-  ring
-  ring
+  ring_nf
+
+
 
 
 
@@ -187,9 +187,7 @@ lemma lineCube_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
   rw [← planeY₃B₃_smul]
   change (planeY₃B₃ R _ _ _).val = (planeY₃B₃ R _ _ _).val
   congr 2
-  ring
-  ring
-  ring
+  ring_nf
 
 lemma lineCube_cube (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ) :
     accCube (lineCube R a₁ a₂ a₃).val = 0 := by

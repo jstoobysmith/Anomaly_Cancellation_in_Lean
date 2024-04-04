@@ -18,7 +18,7 @@ namespace BasisLinear
 @[simp]
 def asCharges (j : Fin n) : (PureU1 n.succ).charges :=
  (fun i =>
-  if i = j then
+  if i = j.castSucc then
     1
   else
     if i = Fin.last n then
@@ -55,7 +55,7 @@ def asAnomalyFreeLinear (j : Fin n) : (PureU1 n.succ).AnomalyFreeLinear :=
     simp at i
     match i with
     | 0 =>
-    simp only [PureU1_charges, Fin.isValue, PureU1_linearACCs, accGrav, PureU1Charges_charges,
+    simp only [ Fin.isValue, PureU1_linearACCs, accGrav,
       LinearMap.coe_mk, AddHom.coe_mk, Fin.coe_eq_castSucc]
     rw [Fin.sum_univ_castSucc]
     rw [Finset.sum_eq_single j]
@@ -105,10 +105,9 @@ def coordinateMap : ((PureU1 n.succ).AnomalyFreeLinear) ≃ₗ[ℚ] Fin n →₀
     apply pureU1_anomalyFree_ext
     intro j
     rw [sum_of_vectors]
-    simp only [HSMul.hSMul, SMul.smul, PureU1_charges, PureU1_numberCharges,
-      asAnomalyFreeLinear_val, Equiv.toFun_as_coe, PureU1_equiv_apply,
-      Fin.coe_eq_castSucc, mul_ite, mul_one, mul_neg, mul_zero, Equiv.invFun_as_coe,
-      PureU1_equiv_symm_apply]
+    simp only [HSMul.hSMul, SMul.smul,  PureU1_numberCharges,
+      asAnomalyFreeLinear_val, Equiv.toFun_as_coe,
+      Fin.coe_eq_castSucc, mul_ite, mul_one, mul_neg, mul_zero, Equiv.invFun_as_coe]
     rw [Finset.sum_eq_single j]
     simp
     intro k _ hkj
@@ -121,10 +120,9 @@ def coordinateMap : ((PureU1 n.succ).AnomalyFreeLinear) ≃ₗ[ℚ] Fin n →₀
     rename_i j
     simp
     rw [sum_of_vectors]
-    simp only [HSMul.hSMul, SMul.smul, PureU1_charges, PureU1_numberCharges,
-      asAnomalyFreeLinear_val, Equiv.toFun_as_coe, PureU1_equiv_apply,
-      Fin.coe_eq_castSucc, mul_ite, mul_one, mul_neg, mul_zero, Equiv.invFun_as_coe,
-      PureU1_equiv_symm_apply]
+    simp only [HSMul.hSMul, SMul.smul, PureU1_numberCharges,
+      asAnomalyFreeLinear_val, Equiv.toFun_as_coe,
+      Fin.coe_eq_castSucc, mul_ite, mul_one, mul_neg, mul_zero, Equiv.invFun_as_coe]
     rw [Finset.sum_eq_single j]
     simp
     intro k _ hkj

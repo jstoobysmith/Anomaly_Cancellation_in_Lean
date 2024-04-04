@@ -34,7 +34,8 @@ def chargeMap {n : ℕ} (f : permGroup n) :
   map_smul' a S := by
     funext i
     simp [HSMul.hSMul]
-    rfl
+    rw [show Rat.cast a = a from rfl]
+    simp
 
 open PureU1Charges in
 @[simps!]

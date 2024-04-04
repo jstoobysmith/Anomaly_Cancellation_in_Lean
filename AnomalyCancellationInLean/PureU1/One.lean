@@ -22,7 +22,8 @@ theorem solEqZero (S : (PureU1 1).AnomalyFreeLinear) : S = 0 := by
   have hLin := pureU1_linear S
   simp at hLin
   funext i
-  rw [show i = 0 by omega]
+  simp at i
+  rw [show i = (0 : Fin 1) by omega]
   exact hLin
 
 end One

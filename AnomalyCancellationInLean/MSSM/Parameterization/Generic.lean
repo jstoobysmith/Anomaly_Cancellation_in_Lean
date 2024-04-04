@@ -196,11 +196,12 @@ lemma case₁ProjCoeff_zero_Y₃_B₃ (T : MSSMACC.AnomalyFree) (h1 : case₁Pro
      quadBiLin (Y₃.val, (proj T.1.1).val) = 0 ∧
      quadBiLin (B₃.val, (proj T.1.1).val) = 0 := by
   rw [case₁ProjCoeff, mul_eq_zero] at h1
-  simp at h1
+  simp only [OfNat.ofNat_ne_zero,  Fin.isValue, Fin.reduceFinMk, false_or] at h1
   have h : quadBiLin (Y₃.val, (proj T.1.1).val) ^ 2 = 0 ∧
      quadBiLin (B₃.val, (proj T.1.1).val) ^ 2  = 0 :=
     (add_eq_zero_iff' (sq_nonneg _) (sq_nonneg _)).mp h1
-  simp at h
+  simp only [ Fin.isValue, Fin.reduceFinMk, ne_eq, OfNat.ofNat_ne_zero,
+    not_false_eq_true, pow_eq_zero_iff] at h
   exact h
 
 lemma case₁ProjCoeff_zero_Y₃ (T : MSSMACC.AnomalyFree) (h1 : case₁ProjCoeff T = 0) :
@@ -217,14 +218,16 @@ lemma case₁ProjCoeff_zero_T (T : MSSMACC.AnomalyFree) (h1 : case₁ProjCoeff T
     have h11 := case₁ProjCoeff_zero_Y₃ T h1
     rw [quad_Y₃_proj] at h11
     rw [show dot (Y₃.val, B₃.val) = 108 by rfl] at h11
-    simp at h11
+    simp only [ Fin.isValue, Fin.reduceFinMk, mul_eq_zero, OfNat.ofNat_ne_zero,
+      false_or] at h11
     erw [quadBiLin.swap] at h11
     exact h11
   have hB3 : quadBiLin (T.val, B₃.val) = 0 := by
     have h11 := case₁ProjCoeff_zero_B₃ T h1
     rw [quad_B₃_proj] at h11
     rw [show dot (Y₃.val, B₃.val) = 108 by rfl] at h11
-    simp at h11
+    simp only [ Fin.isValue, Fin.reduceFinMk, mul_eq_zero, OfNat.ofNat_ne_zero,
+      false_or] at h11
     erw [quadBiLin.swap] at h11
     exact h11
   rw [proj_val]
@@ -390,7 +393,8 @@ lemma case₂ProjCoeff_zero (T : MSSMACC.AnomalyFree) :
   intro h
   rw [case₃prop] at h
   rw [case₁ProjCoeff, case₂ProjCoeff]
-  simp_all
+  simp_all only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero,
+    mul_zero,  mul_eq_zero, pow_eq_zero_iff, false_or, true_and]
   erw [show dot (Y₃.val, B₃.val) = 108 by rfl]
   simp
   have h1' := cube_proj_proj_B₃ T.1.1
