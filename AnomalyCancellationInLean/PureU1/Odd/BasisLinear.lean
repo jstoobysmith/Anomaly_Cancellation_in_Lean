@@ -287,7 +287,7 @@ lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basis!AsCharges j) =
 
 
 @[simps!]
-def basis (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+def basis (j : Fin n) : (PureU1 (2 * n + 1)).LinSols :=
   ⟨basisAsCharges j, by
     intro i
     simp at i
@@ -296,7 +296,7 @@ def basis (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
     exact basis_linearACC j⟩
 
 @[simps!]
-def basis! (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+def basis! (j : Fin n) : (PureU1 (2 * n + 1)).LinSols :=
   ⟨basis!AsCharges j, by
     intro i
     simp at i
@@ -304,7 +304,7 @@ def basis! (j : Fin n) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
     | 0 =>
     exact basis!_linearACC j⟩
 
-def basisa : Fin n ⊕ Fin n → (PureU1 (2 * n + 1)).AnomalyFreeLinear := fun i =>
+def basisa : Fin n ⊕ Fin n → (PureU1 (2 * n + 1)).LinSols := fun i =>
   match i with
   | .inl i => basis i
   | .inr i => basis! i
@@ -312,7 +312,7 @@ def basisa : Fin n ⊕ Fin n → (PureU1 (2 * n + 1)).AnomalyFreeLinear := fun i
 end theBasisVectors
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
-lemma swap!_as_add {S S' : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (j : Fin n)
+lemma swap!_as_add {S S' : (PureU1 (2 * n + 1)).LinSols} (j : Fin n)
     (hS : ((FamilyPermutations (2 * n + 1)).repAFL
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
@@ -503,11 +503,11 @@ lemma Pa_zero! (f g : Fin n.succ → ℚ) (h : Pa f g = 0) :
   simp [hf] at h
   exact P!_zero g h
 
-def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear := ∑ i, f i • basis i
+def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis i
 
-def P!' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear := ∑ i, f i • basis! i
+def P!' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis! i
 
-def Pa' (f : (Fin n) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n + 1)).AnomalyFreeLinear :=
+def Pa' (f : (Fin n) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n + 1)).LinSols :=
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n) ⊕ (Fin n) → ℚ) :
@@ -624,16 +624,16 @@ lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
 
 
 lemma basisa_card :  Fintype.card ((Fin n.succ) ⊕ (Fin n.succ)) =
-    FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear := by
+    FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ + 1)).LinSols := by
   erw [BasisLinear.finrank_AnomalyFreeLinear]
   simp
   omega
 
 noncomputable def basisaAsBasis :
-    Basis (Fin n.succ ⊕ Fin n.succ) ℚ (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear :=
+    Basis (Fin n.succ ⊕ Fin n.succ) ℚ (PureU1 (2 * n.succ + 1)).LinSols :=
   basisOfLinearIndependentOfCardEqFinrank (@basisa_linear_independent n) basisa_card
 
-lemma span_basis (S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear) :
+lemma span_basis (S : (PureU1 (2 * n.succ + 1)).LinSols) :
       ∃ (g f : Fin n.succ → ℚ) , S.val = P g + P! f  := by
   have h := (mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
   obtain ⟨f, hf⟩ := h
@@ -645,7 +645,7 @@ lemma span_basis (S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear) :
   simp [P'_val, P!'_val]
   rfl
 
-lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear} (j : Fin n.succ)
+lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
     (hS : ((FamilyPermutations (2 * n.succ + 1)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g f : Fin n.succ → ℚ) (hS1 : S.val = P g + P! f):
     ∃ (g' f' : Fin n.succ → ℚ),

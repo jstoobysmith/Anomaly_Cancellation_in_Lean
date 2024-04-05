@@ -297,7 +297,7 @@ lemma basis!_accCube (j : Fin n) :
 
 
 @[simps!]
-def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
+def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).LinSols :=
   ⟨basisAsCharges j, by
     intro i
     simp at i
@@ -306,7 +306,7 @@ def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
     exact basis_linearACC j⟩
 
 @[simps!]
-def basis! (j : Fin n) : (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
+def basis! (j : Fin n) : (PureU1 (2 * n.succ)).LinSols :=
   ⟨basis!AsCharges j, by
     intro i
     simp at i
@@ -314,13 +314,13 @@ def basis! (j : Fin n) : (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
     | 0 =>
     exact basis!_linearACC j⟩
 
-def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).AnomalyFreeLinear := fun i =>
+def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).LinSols := fun i =>
   match i with
   | .inl i => basis i
   | .inr i => basis! i
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
-lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
+lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
     (hS : ((FamilyPermutations (2 * n.succ)).repAFL
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
@@ -518,11 +518,11 @@ lemma Pa_zero! (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
   simp [hf] at h
   exact P!_zero g h
 
-def P' (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).AnomalyFreeLinear := ∑ i, f i • basis i
+def P' (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis i
 
-def P!' (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).AnomalyFreeLinear := ∑ i, f i • basis! i
+def P!' (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis! i
 
-def Pa' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
+def Pa' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n.succ)).LinSols :=
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) :
@@ -638,17 +638,17 @@ lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
 
 
 lemma basisa_card :  Fintype.card ((Fin n.succ) ⊕ (Fin n)) =
-    FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ)).AnomalyFreeLinear := by
+    FiniteDimensional.finrank ℚ (PureU1 (2 * n.succ)).LinSols := by
   erw [BasisLinear.finrank_AnomalyFreeLinear]
   simp
   omega
 
 noncomputable def basisaAsBasis :
-    Basis (Fin (succ n) ⊕ Fin n) ℚ (PureU1 (2 * succ n)).AnomalyFreeLinear :=
+    Basis (Fin (succ n) ⊕ Fin n) ℚ (PureU1 (2 * succ n)).LinSols :=
   basisOfLinearIndependentOfCardEqFinrank (@basisa_linear_independent n) basisa_card
 
 
-lemma span_basis (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) :
+lemma span_basis (S : (PureU1 (2 * n.succ)).LinSols) :
       ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ), S.val = P g + P! f  := by
   have h := (mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
   obtain ⟨f, hf⟩ := h
@@ -665,7 +665,7 @@ lemma P!_in_span (f : Fin n → ℚ) : P! f ∈ Submodule.span ℚ (Set.range ba
      use f
      rfl
 
-lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).AnomalyFreeLinear) (j : Fin n) :
+lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).LinSols) (j : Fin n) :
     (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j ∈
     Submodule.span ℚ (Set.range basis!AsCharges) := by
   apply Submodule.smul_mem
@@ -673,7 +673,7 @@ lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).AnomalyFreeLinear
   apply Submodule.subset_span
   simp_all only [Set.mem_range, exists_apply_eq_apply]
 
-lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
+lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
     (hS : ((FamilyPermutations (2 * n.succ)).repAFL
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
      (h : S.val = P g + P! f):
@@ -698,7 +698,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (j : Fin n)
   apply swap!_as_add at hS
   exact hS
 
-lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear)
+lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
     (hS : vectorLikeEven S.val) :
    ∃ (M : (FamilyPermutations (2 * n.succ)).group),
     (FamilyPermutations (2 * n.succ)).repAFL M S

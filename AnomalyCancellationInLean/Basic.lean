@@ -61,19 +61,19 @@ structure ACCSystemLinear extends ACCSystemCharges where
 
 namespace ACCSystemLinear
 
-structure AnomalyFreeLinear (χ : ACCSystemLinear) where
+structure LinSols (χ : ACCSystemLinear) where
   val : χ.1.charges
   linearSol : ∀ i : Fin χ.numberLinear, χ.linearACCs i val = 0
 
 @[ext]
-lemma AnomalyFreeLinear.ext {χ : ACCSystemLinear} {S T : χ.AnomalyFreeLinear} (h : S.val = T.val) :
+lemma AnomalyFreeLinear.ext {χ : ACCSystemLinear} {S T : χ.LinSols} (h : S.val = T.val) :
     S = T := by
   cases' S
   simp_all only
 
 @[simps!]
 instance AnomalyFreeLinearAddCommMonoid (χ : ACCSystemLinear) :
-    AddCommMonoid χ.AnomalyFreeLinear where
+    AddCommMonoid χ.LinSols where
   add S T := ⟨S.val + T.val, by
     intro i
     rw [(χ.linearACCs i).map_add, S.linearSol i, T.linearSol i]
@@ -105,7 +105,7 @@ instance AnomalyFreeLinearAddCommMonoid (χ : ACCSystemLinear) :
     exact χ.chargesAddCommMonoid.nsmul_succ _ _
 
 @[simps!]
-instance AnomalyFreeLinearAddCommModule  (χ : ACCSystemLinear) : Module ℚ χ.AnomalyFreeLinear where
+instance AnomalyFreeLinearAddCommModule  (χ : ACCSystemLinear) : Module ℚ χ.LinSols where
   smul a S := ⟨a • S.val, by
     intro i
     rw [(χ.linearACCs i).map_smul, S.linearSol i]
@@ -130,13 +130,13 @@ instance AnomalyFreeLinearAddCommModule  (χ : ACCSystemLinear) : Module ℚ χ.
     exact χ.chargesModule.add_smul _ _ _
 
 instance AnomalyFreeLinearAddCommGroup (χ : ACCSystemLinear) :
-    AddCommGroup χ.AnomalyFreeLinear :=
+    AddCommGroup χ.LinSols :=
   Module.addCommMonoidToAddCommGroup ℚ
 
 /-- The linear map reperesenting the
  inclusion of charges satisfying the linear anomaly free equations into all charges. -/
 def anomalyFreeLinearIncl  (χ : ACCSystemLinear) :
-    χ.AnomalyFreeLinear →ₗ[ℚ] χ.charges where
+    χ.LinSols →ₗ[ℚ] χ.charges where
   toFun S := S.val
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
@@ -152,19 +152,19 @@ structure ACCSystemQuad extends ACCSystemLinear where
 
 namespace ACCSystemQuad
 
-structure AnomalyFreeQuad (χ : ACCSystemQuad) extends χ.AnomalyFreeLinear where
+structure QuadSols (χ : ACCSystemQuad) extends χ.LinSols where
   quadSol : ∀ i : Fin χ.numberQuadratic, (χ.quadraticACCs i) val = 0
 
 @[ext]
-lemma AnomalyFreeQuad.ext {χ : ACCSystemQuad} {S T : χ.AnomalyFreeQuad} (h : S.val = T.val) :
+lemma AnomalyFreeQuad.ext {χ : ACCSystemQuad} {S T : χ.QuadSols} (h : S.val = T.val) :
     S = T := by
   have h  := ACCSystemLinear.AnomalyFreeLinear.ext h
   cases' S
   simp_all only
 
 /-- The scalar multiple of any solution to the linear + quadratic equations is still a solution. -/
-instance AnomalyFreeQuadMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.AnomalyFreeQuad where
-  smul a S :=  ⟨a • S.toAnomalyFreeLinear , by
+instance AnomalyFreeQuadMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.QuadSols where
+  smul a S :=  ⟨a • S.toLinSols , by
     intro i
     erw [(χ.quadraticACCs i).map_smul]
     rw [S.quadSol i]
@@ -178,18 +178,18 @@ instance AnomalyFreeQuadMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.Anomal
     exact one_smul _ _
 
 def AnomalyFreeQuadInclLinear (χ : ACCSystemQuad) :
-    MulActionHom ℚ χ.AnomalyFreeQuad χ.AnomalyFreeLinear  where
-  toFun  := AnomalyFreeQuad.toAnomalyFreeLinear
+    MulActionHom ℚ χ.QuadSols χ.LinSols  where
+  toFun  := QuadSols.toLinSols
   map_smul' _ _ := rfl
 
 
 def AnomalyFreeQuadInv (χ : ACCSystemQuad) (h : χ.numberQuadratic = 0) :
-    MulActionHom ℚ χ.AnomalyFreeLinear χ.AnomalyFreeQuad where
+    MulActionHom ℚ χ.LinSols χ.QuadSols where
   toFun S := ⟨S, by intro i; rw [h] at i; exact Fin.elim0 i⟩
   map_smul' _ _ := rfl
 
 def AnomalyFreeQuadIncl (χ : ACCSystemQuad) :
-    MulActionHom ℚ χ.AnomalyFreeQuad χ.charges :=
+    MulActionHom ℚ χ.QuadSols χ.charges :=
   MulActionHom.comp χ.anomalyFreeLinearIncl  χ.AnomalyFreeQuadInclLinear
 
 end ACCSystemQuad
@@ -200,19 +200,19 @@ structure ACCSystem extends ACCSystemQuad where
 
 namespace ACCSystem
 
-structure AnomalyFree (χ : ACCSystem) extends χ.AnomalyFreeQuad where
+structure Sols (χ : ACCSystem) extends χ.QuadSols where
   cubicSol : χ.cubicACC val = 0
 
 
-lemma AnomalyFree.ext {χ : ACCSystem} {S T : χ.AnomalyFree} (h : S.val = T.val) :
+lemma AnomalyFree.ext {χ : ACCSystem} {S T : χ.Sols} (h : S.val = T.val) :
     S = T := by
   have h  := ACCSystemQuad.AnomalyFreeQuad.ext h
   cases' S
   simp_all only
 
 /-- The scalar multiple of any solution to the linear + quadratic equations is still a solution. -/
-instance AnomalyFreeMulAction (χ : ACCSystem) : MulAction ℚ χ.AnomalyFree where
-  smul a S :=  ⟨a • S.toAnomalyFreeQuad , by
+instance AnomalyFreeMulAction (χ : ACCSystem) : MulAction ℚ χ.Sols where
+  smul a S :=  ⟨a • S.toQuadSols , by
     erw [(χ.cubicACC).map_smul]
     rw [S.cubicSol]
     simp
@@ -227,21 +227,21 @@ instance AnomalyFreeMulAction (χ : ACCSystem) : MulAction ℚ χ.AnomalyFree wh
 /-- The inclusion of the anomaly free solution into solutions of the quadratic and
 linear equations -/
 def AnomalyFreeInclQuad (χ : ACCSystem) :
-    MulActionHom ℚ χ.AnomalyFree χ.AnomalyFreeQuad  where
-  toFun  := AnomalyFree.toAnomalyFreeQuad
+    MulActionHom ℚ χ.Sols χ.QuadSols  where
+  toFun  := Sols.toQuadSols
   map_smul' _ _ := rfl
 
 /-- The inclusion of anomaly free solutions into all solutions of the linear equations. -/
-def AnomalyFreeInclLinear (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.AnomalyFreeLinear :=
+def AnomalyFreeInclLinear (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.LinSols :=
   MulActionHom.comp χ.AnomalyFreeQuadInclLinear χ.AnomalyFreeInclQuad
 
 /-- The inclusion of anomaly free solutions into all charges. -/
-def AnomalyFreeIncl (χ : ACCSystem) : MulActionHom ℚ χ.AnomalyFree χ.charges :=
+def AnomalyFreeIncl (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.charges :=
   MulActionHom.comp χ.AnomalyFreeQuadIncl χ.AnomalyFreeInclQuad
 
 structure Hom (χ η : ACCSystem) where
   charges : χ.charges →ₗ[ℚ] η.charges
-  anomalyFree : χ.AnomalyFree → η.AnomalyFree
+  anomalyFree : χ.Sols → η.Sols
   commute : charges ∘ χ.AnomalyFreeIncl = η.AnomalyFreeIncl ∘ anomalyFree
 
 def Hom.comp {χ η ε : ACCSystem} (g : Hom η ε) (f : Hom χ η) : Hom χ ε where

@@ -43,7 +43,7 @@ def constAbsSorted (S : (PureU1 n).charges) : Prop := constAbs S ∧ sorted S
 namespace constAbsSorted
 section charges
 
-variable {S : (PureU1 n.succ).charges} {A : (PureU1 n.succ).AnomalyFreeLinear}
+variable {S : (PureU1 n.succ).charges} {A : (PureU1 n.succ).LinSols}
 variable (hS : constAbsSorted S) (hA : constAbsSorted A.val)
 
 lemma lt_eq  {k i : Fin n.succ} (hk : S k ≤ 0) (hik : i ≤ k) : S i = S k := by
@@ -164,7 +164,7 @@ lemma AFL_hasBoundary (h : A.val (0 : Fin n.succ) ≠ 0) : hasBoundary A.val := 
   linarith
   simp_all
 
-lemma AFL_odd_noBoundary {A : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+lemma AFL_odd_noBoundary {A : (PureU1 (2 * n + 1)).LinSols} (h : constAbsSorted A.val)
   (hA : A.val (0 : Fin (2*n +1)) ≠ 0) :
     ¬ hasBoundary A.val := by
   by_contra hn
@@ -179,17 +179,17 @@ lemma AFL_odd_noBoundary {A : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : const
     linear_combination - h0
   omega
 
-lemma AFL_odd_zero {A : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : constAbsSorted A.val) :
+lemma AFL_odd_zero {A : (PureU1 (2 * n + 1)).LinSols} (h : constAbsSorted A.val) :
     A.val (0 : Fin (2 * n + 1)) = 0 := by
   by_contra hn
   exact (AFL_odd_noBoundary h hn ) (AFL_hasBoundary h hn)
 
-theorem AFL_odd (A : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (h : constAbsSorted A.val) :
+theorem AFL_odd (A : (PureU1 (2 * n + 1)).LinSols) (h : constAbsSorted A.val) :
     A = 0 := by
   apply ACCSystemLinear.AnomalyFreeLinear.ext
   exact  is_zero h (AFL_odd_zero h)
 
-lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).LinSols} (h : constAbsSorted A.val)
     (hA : A.val (0 : Fin (2 * n.succ)) ≠ 0) {k : Fin (2 * n + 1)} (hk : boundary A.val k) : k.val = n := by
   have h0 := boundary_accGrav'' h k hk
   change ∑ i : Fin (succ (Nat.mul 2 n + 1)), A.val i = _ at h0
@@ -198,7 +198,7 @@ lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : const
   rw [← @Nat.cast_inj ℚ]
   linear_combination h0 / 2
 
-lemma AFL_even_below' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+lemma AFL_even_below' {A : (PureU1 (2 * n.succ)).LinSols} (h : constAbsSorted A.val)
     (hA : A.val  (0 : Fin (2 * n.succ)) ≠ 0) (i : Fin n.succ)  :
     A.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i)) = A.val (0 : Fin (2*n.succ)) := by
   obtain ⟨k, hk⟩ := AFL_hasBoundary h hA
@@ -209,7 +209,7 @@ lemma AFL_even_below' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAb
   rw [AFL_even_Boundary h hA hk]
   omega
 
-lemma AFL_even_below (A : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (h : constAbsSorted A.val)
+lemma AFL_even_below (A : (PureU1 (2 * n.succ)).LinSols) (h : constAbsSorted A.val)
     (i : Fin n.succ) :
      A.val (Fin.cast (split_equal n.succ)  (Fin.castAdd n.succ i)) = A.val (0 : Fin (2*n.succ)) := by
   by_cases hA : A.val (0 : Fin (2*n.succ)) = 0
@@ -218,7 +218,7 @@ lemma AFL_even_below (A : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (h : constAbs
   rfl
   exact AFL_even_below' h hA i
 
-lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAbsSorted A.val)
+lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).LinSols} (h : constAbsSorted A.val)
     (hA : A.val (0 : Fin (2*n.succ)) ≠ 0) (i : Fin n.succ)  :
     A.val (Fin.cast (split_equal n.succ)  (Fin.natAdd n.succ i)) =
     - A.val (0 : Fin (2*n.succ)) := by
@@ -230,7 +230,7 @@ lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).AnomalyFreeLinear} (h : constAb
   rw [AFL_even_Boundary h hA hk]
   omega
 
-lemma AFL_even_above (A : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (h : constAbsSorted A.val)
+lemma AFL_even_above (A : (PureU1 (2 * n.succ)).LinSols) (h : constAbsSorted A.val)
     (i : Fin n.succ) :
     A.val (Fin.cast (split_equal n.succ)  (Fin.natAdd n.succ i)) =
     - A.val (0 : Fin (2*n.succ)) := by
@@ -248,13 +248,13 @@ end constAbsSorted
 
 namespace ConstAbs
 
-theorem boundary_value_odd (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) (hs : constAbs S.val) :
+theorem boundary_value_odd (S : (PureU1 (2 * n + 1)).LinSols) (hs : constAbs S.val) :
     S = 0 :=
   have hS := And.intro (constAbs_sort hs) (sort_sorted S.val)
   sortAFL_zero S (constAbsSorted.AFL_odd (sortAFL S) hS)
 
 
-theorem boundary_value_even (S : (PureU1 (2 * n.succ)).AnomalyFreeLinear) (hs : constAbs S.val) :
+theorem boundary_value_even (S : (PureU1 (2 * n.succ)).LinSols) (hs : constAbs S.val) :
     vectorLikeEven S.val := by
   have hS := And.intro (constAbs_sort hs) (sort_sorted S.val)
   intro i

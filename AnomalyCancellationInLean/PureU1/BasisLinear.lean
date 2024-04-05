@@ -49,7 +49,7 @@ lemma asCharges_ne_castSucc {k j : Fin n} (h : k ≠ j) :
   rfl
 
 @[simps!]
-def asAnomalyFreeLinear (j : Fin n) : (PureU1 n.succ).AnomalyFreeLinear :=
+def asAnomalyFreeLinear (j : Fin n) : (PureU1 n.succ).LinSols :=
   ⟨asCharges j, by
     intro i
     simp at i
@@ -75,7 +75,7 @@ def asAnomalyFreeLinear (j : Fin n) : (PureU1 n.succ).AnomalyFreeLinear :=
     simp at hk⟩
 
 
-lemma sum_of_vectors {n : ℕ} (f : Fin k → (PureU1 n).AnomalyFreeLinear) (j : Fin n) :
+lemma sum_of_vectors {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j : Fin n) :
     (∑ i : Fin k, (f i)).1 j = (∑ i : Fin k, (f i).1 j) := by
   induction k
   simp
@@ -88,7 +88,7 @@ lemma sum_of_vectors {n : ℕ} (f : Fin k → (PureU1 n).AnomalyFreeLinear) (j :
 
 
 noncomputable
-def coordinateMap : ((PureU1 n.succ).AnomalyFreeLinear) ≃ₗ[ℚ] Fin n →₀ ℚ where
+def coordinateMap : ((PureU1 n.succ).LinSols) ≃ₗ[ℚ] Fin n →₀ ℚ where
   toFun S := Finsupp.equivFunOnFinite.invFun (S.1 ∘ Fin.castSucc)
   map_add' S T := by
     simp
@@ -131,14 +131,14 @@ def coordinateMap : ((PureU1 n.succ).AnomalyFreeLinear) ≃ₗ[ℚ] Fin n →₀
     simp
 
 noncomputable
-def asBasis : Basis (Fin n) ℚ ((PureU1 n.succ).AnomalyFreeLinear) where
+def asBasis : Basis (Fin n) ℚ ((PureU1 n.succ).LinSols) where
   repr := coordinateMap
 
-instance : Module.Finite ℚ ((PureU1 n.succ).AnomalyFreeLinear) :=
+instance : Module.Finite ℚ ((PureU1 n.succ).LinSols) :=
    Module.Finite.of_basis asBasis
 
 lemma finrank_AnomalyFreeLinear :
-    FiniteDimensional.finrank ℚ (((PureU1 n.succ).AnomalyFreeLinear)) = n := by
+    FiniteDimensional.finrank ℚ (((PureU1 n.succ).LinSols)) = n := by
   have h  :=  Module.mk_finrank_eq_card_basis (@asBasis n)
   simp_all
   simp [FiniteDimensional.finrank]

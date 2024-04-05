@@ -42,4 +42,3 @@ import AnomalyCancellationInLean.SMRHN.PlusU1.FamilyMaps
 import AnomalyCancellationInLean.SMRHN.PlusU1.HyperCharge
 import AnomalyCancellationInLean.SMRHN.PlusU1.QuadSol
 import AnomalyCancellationInLean.SMRHN.PlusU1.QuadSolToSol
-

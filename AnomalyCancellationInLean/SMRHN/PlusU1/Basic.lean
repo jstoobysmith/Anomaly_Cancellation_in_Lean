@@ -32,39 +32,39 @@ namespace PlusU1
 
 variable {n : ℕ}
 
-lemma gravSol  (S : (PlusU1 n).AnomalyFreeLinear) : accGrav S.val = 0 := by
+lemma gravSol  (S : (PlusU1 n).LinSols) : accGrav S.val = 0 := by
   have hS := S.linearSol
   simp at hS
   exact hS 0
 
-lemma SU2Sol  (S : (PlusU1 n).AnomalyFreeLinear) : accSU2 S.val = 0 := by
+lemma SU2Sol  (S : (PlusU1 n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
   simp at hS
   exact hS 1
 
-lemma SU3Sol  (S : (PlusU1 n).AnomalyFreeLinear) : accSU3 S.val = 0 := by
+lemma SU3Sol  (S : (PlusU1 n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol
   simp at hS
   exact hS 2
 
-lemma YYsol  (S : (PlusU1 n).AnomalyFreeLinear) : accYY S.val = 0 := by
+lemma YYsol  (S : (PlusU1 n).LinSols) : accYY S.val = 0 := by
   have hS := S.linearSol
   simp at hS
   exact hS 3
 
-lemma quadSol  (S : (PlusU1 n).AnomalyFreeQuad) : accQuad S.val = 0 := by
+lemma quadSol  (S : (PlusU1 n).QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
   simp at hS
   exact hS 0
 
-lemma cubeSol  (S : (PlusU1 n).AnomalyFree) : accCube S.val = 0 := by
+lemma cubeSol  (S : (PlusU1 n).Sols) : accCube S.val = 0 := by
   exact S.cubicSol
 
 /-- An element of `charges` which satisfies the linear ACCs
   gives us a element of `AnomalyFreeLinear`. -/
 def chargeToLinear (S : (PlusU1 n).charges) (hGrav : accGrav S = 0)
     (hSU2 : accSU2 S = 0) (hSU3 : accSU3 S = 0) (hYY : accYY S = 0) :
-    (PlusU1 n).AnomalyFreeLinear :=
+    (PlusU1 n).LinSols :=
   ⟨S, by
     intro i
     simp at i
@@ -76,8 +76,8 @@ def chargeToLinear (S : (PlusU1 n).charges) (hGrav : accGrav S = 0)
 
 /-- An element of `AnomalyFreeLinear` which satisfies the quadratic ACCs
   gives us a element of `AnomalyFreeQuad`. -/
-def linearToQuad (S : (PlusU1 n).AnomalyFreeLinear) (hQ : accQuad S.val = 0) :
-    (PlusU1 n).AnomalyFreeQuad :=
+def linearToQuad (S : (PlusU1 n).LinSols) (hQ : accQuad S.val = 0) :
+    (PlusU1 n).QuadSols :=
   ⟨S, by
     intro i
     simp at i
@@ -86,27 +86,27 @@ def linearToQuad (S : (PlusU1 n).AnomalyFreeLinear) (hQ : accQuad S.val = 0) :
 
 /-- An element of `AnomalyFreeQuad` which satisfies the quadratic ACCs
   gives us a element of `AnomalyFree`. -/
-def quadToAF (S : (PlusU1 n).AnomalyFreeQuad) (hc : accCube S.val = 0) :
-    (PlusU1 n).AnomalyFree := ⟨S, hc⟩
+def quadToAF (S : (PlusU1 n).QuadSols) (hc : accCube S.val = 0) :
+    (PlusU1 n).Sols := ⟨S, hc⟩
 
 /-- An element of `charges` which satisfies the linear and quadratic ACCs
   gives us a element of `AnomalyFreeQuad`. -/
 def chargeToQuad (S : (PlusU1 n).charges) (hGrav : accGrav S = 0)
     (hSU2 : accSU2 S = 0) (hSU3 : accSU3 S = 0) (hYY : accYY S = 0) (hQ : accQuad S = 0) :
-    (PlusU1 n).AnomalyFreeQuad :=
+    (PlusU1 n).QuadSols :=
   linearToQuad (chargeToLinear S hGrav hSU2 hSU3 hYY) hQ
 
 /-- An element of `charges` which satisfies the linear, quadratic and cubic ACCs
   gives us a element of `AnomalyFree`. -/
 def chargeToAF (S : (PlusU1 n).charges) (hGrav : accGrav S = 0) (hSU2 : accSU2 S = 0)
     (hSU3 : accSU3 S = 0) (hYY : accYY S = 0) (hQ : accQuad S = 0) (hc : accCube S = 0) :
-    (PlusU1 n).AnomalyFree :=
+    (PlusU1 n).Sols :=
   quadToAF (chargeToQuad S hGrav hSU2 hSU3 hYY hQ) hc
 
 /-- An element of `AnomalyFreeLinear` which satisfies the  quadratic and cubic ACCs
   gives us a element of `AnomalyFree`. -/
-def linearToAF (S : (PlusU1 n).AnomalyFreeLinear) (hQ : accQuad S.val = 0)
-    (hc : accCube S.val = 0) : (PlusU1 n).AnomalyFree :=
+def linearToAF (S : (PlusU1 n).LinSols) (hQ : accQuad S.val = 0)
+    (hc : accCube S.val = 0) : (PlusU1 n).Sols :=
   quadToAF (linearToQuad S hQ) hc
 
 def perm (n : ℕ) : ACCSystemGroupAction (PlusU1 n) where

@@ -18,9 +18,9 @@ open BigOperators
 namespace QuadSol
 
 variable {n : ℕ}
-variable (C : (PlusU1 n).AnomalyFreeQuad)
+variable (C : (PlusU1 n).QuadSols)
 
-lemma add_AFL_quad (S : (PlusU1 n).AnomalyFreeLinear) (a b : ℚ) :
+lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • C.val) =
     a * (a * accQuad S.val + 2 * b * quadBiLin (S.val, C.val)) := by
   erw [BiLinearSymm.toHomogeneousQuad_add, quadSol (b • C)]
@@ -28,75 +28,75 @@ lemma add_AFL_quad (S : (PlusU1 n).AnomalyFreeLinear) (a b : ℚ) :
   erw [accQuad.map_smul]
   ring
 
-def α₁ (S : (PlusU1 n).AnomalyFreeLinear) : ℚ := - 2 * quadBiLin (S.val, C.val)
+def α₁ (S : (PlusU1 n).LinSols) : ℚ := - 2 * quadBiLin (S.val, C.val)
 
-def α₂ (S : (PlusU1 n).AnomalyFreeLinear) : ℚ := accQuad S.val
+def α₂ (S : (PlusU1 n).LinSols) : ℚ := accQuad S.val
 
-lemma α₂_AFQ (S : (PlusU1 n).AnomalyFreeQuad) : α₂ S.1 = 0 := quadSol S
+lemma α₂_AFQ (S : (PlusU1 n).QuadSols) : α₂ S.1 = 0 := quadSol S
 
-lemma accQuad_α₁_α₂ (S : (PlusU1 n).AnomalyFreeLinear) :
+lemma accQuad_α₁_α₂ (S : (PlusU1 n).LinSols) :
     accQuad ((α₁ C S) • S + α₂ S • C.1).val = 0 := by
   erw [add_AFL_quad]
   rw [α₁, α₂]
   ring
-lemma accQuad_α₁_α₂_zero (S : (PlusU1 n).AnomalyFreeLinear) (h1 : α₁ C S = 0)
+lemma accQuad_α₁_α₂_zero (S : (PlusU1 n).LinSols) (h1 : α₁ C S = 0)
     (h2 : α₂ S = 0) (a b : ℚ) : accQuad (a • S + b • C.1).val = 0 := by
   erw [add_AFL_quad]
   simp [α₁, α₂] at h1 h2
   field_simp [h1, h2]
 
-def genericToQuad (S : (PlusU1 n).AnomalyFreeLinear) :
-    (PlusU1 n).AnomalyFreeQuad :=
+def genericToQuad (S : (PlusU1 n).LinSols) :
+    (PlusU1 n).QuadSols :=
   linearToQuad ((α₁ C S) • S + α₂ S • C.1)  (accQuad_α₁_α₂ C S)
 
-lemma genericToQuad_on_quad (S : (PlusU1 n).AnomalyFreeQuad) :
+lemma genericToQuad_on_quad (S : (PlusU1 n).QuadSols) :
     genericToQuad C S.1 = (α₁ C S.1) • S := by
   apply ACCSystemQuad.AnomalyFreeQuad.ext
   change ((α₁ C S.1) • S.val + α₂ S.1 • C.val) = (α₁ C S.1) • S.val
   rw [α₂_AFQ]
   simp
 
-lemma genericToQuad_neq_zero (S : (PlusU1 n).AnomalyFreeQuad) (h : α₁ C S.1 ≠ 0) :
+lemma genericToQuad_neq_zero (S : (PlusU1 n).QuadSols) (h : α₁ C S.1 ≠ 0) :
     (α₁ C S.1)⁻¹ • genericToQuad C S.1 = S := by
   rw [genericToQuad_on_quad, smul_smul, inv_mul_cancel h, one_smul]
 
 
-def specialToQuad (S : (PlusU1 n).AnomalyFreeLinear) (a b : ℚ) (h1 : α₁ C S = 0)
-    (h2 : α₂ S = 0) : (PlusU1 n).AnomalyFreeQuad :=
+def specialToQuad (S : (PlusU1 n).LinSols) (a b : ℚ) (h1 : α₁ C S = 0)
+    (h2 : α₂ S = 0) : (PlusU1 n).QuadSols :=
   linearToQuad (a • S + b • C.1) (accQuad_α₁_α₂_zero C S h1 h2 a b)
 
-lemma special_on_quad (S : (PlusU1 n).AnomalyFreeQuad)  (h1 : α₁ C S.1 = 0) :
+lemma special_on_quad (S : (PlusU1 n).QuadSols)  (h1 : α₁ C S.1 = 0) :
     specialToQuad C S.1 1 0 h1 (α₂_AFQ S) = S := by
   apply ACCSystemQuad.AnomalyFreeQuad.ext
   change (1 • S.val + 0 • C.val) = S.val
   simp
 
-def toQuad : (PlusU1 n).AnomalyFreeLinear × ℚ × ℚ → (PlusU1 n).AnomalyFreeQuad := fun S =>
+def toQuad : (PlusU1 n).LinSols × ℚ × ℚ → (PlusU1 n).QuadSols := fun S =>
   if h : α₁ C S.1 = 0 ∧ α₂ S.1 = 0 then
     specialToQuad C S.1 S.2.1 S.2.2 h.1 h.2
   else
     S.2.1 • genericToQuad C S.1
 
 @[simp]
-def toQuadInv : (PlusU1 n).AnomalyFreeQuad → (PlusU1 n).AnomalyFreeLinear × ℚ × ℚ := fun S =>
+def toQuadInv : (PlusU1 n).QuadSols → (PlusU1 n).LinSols × ℚ × ℚ := fun S =>
   if α₁ C S.1 = 0 then
     (S.1, 1, 0)
   else
     (S.1, (α₁ C S.1)⁻¹, 0)
 
-lemma toQuadInv_fst (S : (PlusU1 n).AnomalyFreeQuad) :
+lemma toQuadInv_fst (S : (PlusU1 n).QuadSols) :
     (toQuadInv C S).1 = S.1 := by
   rw [toQuadInv]
   split
   rfl
   rfl
 
-lemma toQuadInv_α₁_α₂ (S : (PlusU1 n).AnomalyFreeQuad) :
+lemma toQuadInv_α₁_α₂ (S : (PlusU1 n).QuadSols) :
     α₁ C S.1 = 0 ↔ α₁ C (toQuadInv C S).1 = 0 ∧ α₂ (toQuadInv C S).1 = 0 := by
   rw [toQuadInv_fst, α₂_AFQ]
   simp
 
-lemma toQuadInv_special (S : (PlusU1 n).AnomalyFreeQuad) (h : α₁ C S.1 = 0) :
+lemma toQuadInv_special (S : (PlusU1 n).QuadSols) (h : α₁ C S.1 = 0) :
     specialToQuad C (toQuadInv C S).1 (toQuadInv C S).2.1 (toQuadInv C S).2.2
     ((toQuadInv_α₁_α₂ C S).mp h).1 ((toQuadInv_α₁_α₂ C S).mp h).2 = S := by
   simp only [toQuadInv_fst]
@@ -104,7 +104,7 @@ lemma toQuadInv_special (S : (PlusU1 n).AnomalyFreeQuad) (h : α₁ C S.1 = 0) :
   rw [show (toQuadInv C S).2.2 = 0 by rw [toQuadInv, if_pos h]]
   rw [special_on_quad]
 
-lemma toQuadInv_generic (S : (PlusU1 n).AnomalyFreeQuad) (h : α₁ C S.1 ≠ 0) :
+lemma toQuadInv_generic (S : (PlusU1 n).QuadSols) (h : α₁ C S.1 ≠ 0) :
     (toQuadInv C S).2.1 • genericToQuad C (toQuadInv C S).1  = S := by
   simp only [toQuadInv_fst]
   rw [show (toQuadInv C S).2.1  = (α₁ C S.1)⁻¹ by rw [toQuadInv, if_neg h]]

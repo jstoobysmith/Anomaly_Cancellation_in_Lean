@@ -13,9 +13,9 @@ open MSSMCharges
 open MSSMACCs
 open BigOperators
 
-def YAsCharge : MSSMACC.charges := toSpecies.invFun 
-  ⟨fun s => fun i => 
-    match s, i with 
+def YAsCharge : MSSMACC.charges := toSpecies.invFun
+  ⟨fun s => fun i =>
+    match s, i with
     | 0, 0 => 1
     | 0, 1 => 1
     | 0, 2 => 1
@@ -34,12 +34,12 @@ def YAsCharge : MSSMACC.charges := toSpecies.invFun
     | 5, 0 => 0
     | 5, 1 => 0
     | 5, 2 => 0,
-  fun s => 
-    match s with 
-    | 0 => -3 
+  fun s =>
+    match s with
+    | 0 => -3
     | 1 => 3⟩
 
-def Y : MSSMACC.AnomalyFree :=
+def Y : MSSMACC.Sols :=
   MSSMACC.AnomalyFreeMk YAsCharge (by rfl) (by rfl) (by rfl) (by rfl) (by rfl) (by rfl)
 
 

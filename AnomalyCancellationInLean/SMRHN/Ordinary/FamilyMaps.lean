@@ -17,7 +17,7 @@ open BigOperators
 variable {n : ℕ}
 
 def familyUniversalLinear (n : ℕ) :
-    (SM 1).AnomalyFreeLinear →ₗ[ℚ] (SM n).AnomalyFreeLinear where
+    (SM 1).LinSols →ₗ[ℚ] (SM n).LinSols where
   toFun S := chargeToLinear (familyUniversal n S.val)
     (by rw [familyUniversal_accGrav, gravSol S, mul_zero])
     (by rw [familyUniversal_accSU2, SU2Sol S, mul_zero])
@@ -30,14 +30,14 @@ def familyUniversalLinear (n : ℕ) :
     exact (familyUniversal n).map_smul' _ _
 
 def familyUniversalQuad (n : ℕ) :
-    (SM 1).AnomalyFreeQuad → (SM n).AnomalyFreeQuad := fun S =>
+    (SM 1).QuadSols → (SM n).QuadSols := fun S =>
   chargeToQuad (familyUniversal n S.val)
     (by rw [familyUniversal_accGrav, gravSol S.1, mul_zero])
     (by rw [familyUniversal_accSU2, SU2Sol S.1, mul_zero])
     (by rw [familyUniversal_accSU3, SU3Sol S.1, mul_zero])
 
 def familyUniversalAF (n : ℕ) :
-    (SM 1).AnomalyFree → (SM n).AnomalyFree := fun S =>
+    (SM 1).Sols → (SM n).Sols := fun S =>
   chargeToAF (familyUniversal n S.val)
     (by rw [familyUniversal_accGrav, gravSol S.1.1, mul_zero])
     (by rw [familyUniversal_accSU2, SU2Sol S.1.1, mul_zero])

@@ -22,11 +22,11 @@ variable {n : ℕ}
 def lineInPlaneProp : ℚ × ℚ × ℚ → Prop := fun s =>
   s.1 = s.2.1 ∨ s.1 = - s.2.1 ∨ 2 * s.2.2 + s.1 + s.2.1 = 0
 
-def lineInPlaneCond (S : (PureU1 (n)).AnomalyFreeLinear) : Prop :=
+def lineInPlaneCond (S : (PureU1 (n)).LinSols) : Prop :=
   ∀ (i1 i2 i3 : Fin (n)) (_ : i1 ≠ i2) (_ : i2 ≠ i3) (_ : i1 ≠ i3),
   lineInPlaneProp (S.val i1, (S.val i2, S.val i3))
 
-lemma lineInPlaneCond_perm {S : (PureU1 (n)).AnomalyFreeLinear} (hS : lineInPlaneCond S)
+lemma lineInPlaneCond_perm {S : (PureU1 (n)).LinSols} (hS : lineInPlaneCond S)
     (M : (FamilyPermutations n).group) :
     lineInPlaneCond ((FamilyPermutations n).repAFL M S) := by
   intro i1 i2 i3 h1 h2 h3
@@ -37,7 +37,7 @@ lemma lineInPlaneCond_perm {S : (PureU1 (n)).AnomalyFreeLinear} (hS : lineInPlan
     not_false_eq_true]
 
 
-lemma lineInPlaneCond_eq_last' {S : (PureU1 (n.succ.succ)).AnomalyFreeLinear} (hS : lineInPlaneCond S)
+lemma lineInPlaneCond_eq_last' {S : (PureU1 (n.succ.succ)).LinSols} (hS : lineInPlaneCond S)
    (h : ¬ (S.val ((Fin.last n).castSucc))^2 = (S.val ((Fin.last n).succ))^2 ) :
     (2 - n) * S.val (Fin.last (n + 1)) =
     - (2 - n)* S.val (Fin.castSucc (Fin.last n)) := by
@@ -60,7 +60,7 @@ lemma lineInPlaneCond_eq_last' {S : (PureU1 (n.succ.succ)).AnomalyFreeLinear} (h
   field_simp at h2
   linear_combination h2
 
-lemma lineInPlaneCond_eq_last {S : (PureU1 (n.succ.succ.succ.succ.succ)).AnomalyFreeLinear}
+lemma lineInPlaneCond_eq_last {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
     (hS : lineInPlaneCond S) :
     constAbsProp
     ((S.val ((Fin.last n.succ.succ.succ).castSucc)), (S.val ((Fin.last n.succ.succ.succ).succ)))
@@ -85,7 +85,7 @@ lemma lineInPlaneCond_eq_last {S : (PureU1 (n.succ.succ.succ.succ.succ)).Anomaly
     ring
   simp_all
 
-lemma linesInPlane_eq_sq {S : (PureU1 (n.succ.succ.succ.succ.succ)).AnomalyFreeLinear}
+lemma linesInPlane_eq_sq {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
     (hS : lineInPlaneCond S) : ∀ (i j : Fin n.succ.succ.succ.succ.succ) (_ : i ≠ j),
     constAbsProp (S.val i, S.val j) := by
   have hneq : ((Fin.last n.succ.succ.succ).castSucc) ≠ ((Fin.last n.succ.succ.succ).succ) := by
@@ -94,7 +94,7 @@ lemma linesInPlane_eq_sq {S : (PureU1 (n.succ.succ.succ.succ.succ)).AnomalyFreeL
   intro M
   exact lineInPlaneCond_eq_last (lineInPlaneCond_perm hS M)
 
-theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).AnomalyFreeLinear}
+theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
       (hS : lineInPlaneCond S) : constAbs S.val := by
   intro i j
   by_cases hij : i ≠ j
@@ -102,7 +102,7 @@ theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).Anomaly
   simp at hij
   rw [hij]
 
-lemma linesInPlane_four (S : (PureU1 4).AnomalyFree) (hS : lineInPlaneCond S.1.1) :
+lemma linesInPlane_four (S : (PureU1 4).Sols) (hS : lineInPlaneCond S.1.1) :
      constAbsProp (S.val (0 : Fin 4), S.val (1 : Fin 4))  := by
   simp [constAbsProp]
   by_contra hn
@@ -144,7 +144,7 @@ lemma linesInPlane_four (S : (PureU1 4).AnomalyFree) (hS : lineInPlaneCond S.1.1
   simp_all
 
 
-lemma linesInPlane_eq_sq_four {S : (PureU1 4).AnomalyFree}
+lemma linesInPlane_eq_sq_four {S : (PureU1 4).Sols}
     (hS : lineInPlaneCond S.1.1) : ∀ (i j : Fin 4) (_ : i ≠ j),
     constAbsProp (S.val i, S.val j) := by
   refine Prop_two constAbsProp (by simp : (0 : Fin 4) ≠ 1) ?_
@@ -155,7 +155,7 @@ lemma linesInPlane_eq_sq_four {S : (PureU1 4).AnomalyFree}
   exact linesInPlane_four S' hS'
 
 
-lemma linesInPlane_constAbs_four (S : (PureU1 4).AnomalyFree)
+lemma linesInPlane_constAbs_four (S : (PureU1 4).Sols)
       (hS : lineInPlaneCond S.1.1) : constAbs S.val := by
   intro i j
   by_cases hij : i ≠ j
@@ -163,7 +163,7 @@ lemma linesInPlane_constAbs_four (S : (PureU1 4).AnomalyFree)
   simp at hij
   rw [hij]
 
-theorem linesInPlane_constAbs_AF (S : (PureU1 (n.succ.succ.succ.succ)).AnomalyFree)
+theorem linesInPlane_constAbs_AF (S : (PureU1 (n.succ.succ.succ.succ)).Sols)
       (hS : lineInPlaneCond S.1.1) : constAbs S.val := by
   induction n
   exact linesInPlane_constAbs_four S hS

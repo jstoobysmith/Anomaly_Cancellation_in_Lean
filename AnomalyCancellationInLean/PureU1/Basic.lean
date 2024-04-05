@@ -114,26 +114,26 @@ def pureU1_eq_charges {n m : ℕ} (h : n = m):
 
 open BigOperators
 
-lemma pureU1_linear {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
+lemma pureU1_linear {n : ℕ} (S : (PureU1 n.succ).LinSols) :
     ∑ i, S.val i = 0 := by
   have hS := S.linearSol
   simp at hS
   exact hS 0
 
-lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).AnomalyFree) :
+lemma pureU1_cube {n : ℕ} (S : (PureU1 n.succ).Sols) :
     ∑ i, (S.val i) ^ 3 = 0 := by
   have hS := S.cubicSol
   erw [PureU1.accCube_explicit] at hS
   exact hS
 
-lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).AnomalyFreeLinear) :
+lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).LinSols) :
     S.val (Fin.last n) = - ∑ i : Fin n, S.val i.castSucc := by
   have hS := pureU1_linear S
   simp at hS
   rw [Fin.sum_univ_castSucc] at hS
   linear_combination hS
 
-lemma pureU1_anomalyFree_ext {n : ℕ} {S T : (PureU1 n.succ).AnomalyFreeLinear}
+lemma pureU1_anomalyFree_ext {n : ℕ} {S T : (PureU1 n.succ).LinSols}
     (h : ∀ (i : Fin n), S.val i.castSucc = T.val i.castSucc) : S = T := by
   apply ACCSystemLinear.AnomalyFreeLinear.ext
   funext i
@@ -166,7 +166,7 @@ lemma sum_of_charges {n : ℕ} (f : Fin k → (PureU1 n).charges) (j : Fin n) :
   simp
 
 
-lemma sum_of_anomaly_free_linear {n : ℕ} (f : Fin k → (PureU1 n).AnomalyFreeLinear) (j : Fin n) :
+lemma sum_of_anomaly_free_linear {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j : Fin n) :
     (∑ i : Fin k, (f i)).1 j = (∑ i : Fin k, (f i).1 j) := by
   induction k
   simp

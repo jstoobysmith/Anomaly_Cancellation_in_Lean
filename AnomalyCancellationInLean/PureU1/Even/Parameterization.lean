@@ -27,7 +27,7 @@ rational `a ∈ ℚ`, we get a
 point in `(PureU1 (2 * n.succ)).AnomalyFreeLinear`, which we will later show extends to an anomaly
 free point. -/
 def parameterizationAsLinear (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
-    (PureU1 (2 * n.succ)).AnomalyFreeLinear :=
+    (PureU1 (2 * n.succ)).LinSols :=
   a • ((accCubeTriLinSymm (P! f, P! f, P g)) • P' g +
   (- accCubeTriLinSymm (P g, P g, P! f)) • P!' f)
 
@@ -52,11 +52,11 @@ lemma parameterizationCharge_cube (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (
 
 /-- Given  -/
 def parameterization (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
-    (PureU1 (2 * n.succ)).AnomalyFree :=
+    (PureU1 (2 * n.succ)).Sols :=
   ⟨⟨parameterizationAsLinear g f a, by intro i; simp at i; exact Fin.elim0 i⟩,
   parameterizationCharge_cube g f a⟩
 
-lemma anomalyFree_param {S : (PureU1 (2 * n.succ)).AnomalyFree}
+lemma anomalyFree_param {S : (PureU1 (2 * n.succ)).Sols}
     (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (hS : S.val = P g + P! f) :
     accCubeTriLinSymm (P g, P g, P! f) = - accCubeTriLinSymm (P! f, P! f, P g) := by
   have hC := S.cubicSol
@@ -67,11 +67,11 @@ lemma anomalyFree_param {S : (PureU1 (2 * n.succ)).AnomalyFree}
   erw [P!_accCube] at hC
   linear_combination hC / 3
 
-def genericCase (S : (PureU1 (2 * n.succ)).AnomalyFree) : Prop :=
+def genericCase (S : (PureU1 (2 * n.succ)).Sols) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f) ,
   accCubeTriLinSymm (P g, P g, P! f) ≠  0
 
-lemma genericCase_exists (S : (PureU1 (2 * n.succ)).AnomalyFree)
+lemma genericCase_exists (S : (PureU1 (2 * n.succ)).Sols)
     (hs : ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ), S.val = P g + P! f ∧
     accCubeTriLinSymm (P g, P g, P! f) ≠  0) : genericCase S := by
   intro g f hS hC
@@ -81,11 +81,11 @@ lemma genericCase_exists (S : (PureU1 (2 * n.succ)).AnomalyFree)
   rw [hS'.1, hS'.2] at hC
   exact hC' hC
 
-def specialCase  (S : (PureU1 (2 * n.succ)).AnomalyFree) : Prop :=
+def specialCase  (S : (PureU1 (2 * n.succ)).Sols) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f) ,
   accCubeTriLinSymm (P g, P g, P! f) = 0
 
-lemma specialCase_exists (S : (PureU1 (2 * n.succ)).AnomalyFree)
+lemma specialCase_exists (S : (PureU1 (2 * n.succ)).Sols)
     (hs : ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ), S.val = P g + P! f ∧
     accCubeTriLinSymm (P g, P g, P! f) =  0) : specialCase S := by
   intro g f hS
@@ -95,7 +95,7 @@ lemma specialCase_exists (S : (PureU1 (2 * n.succ)).AnomalyFree)
   rw [hS'.1, hS'.2]
   exact hC'
 
-lemma generic_or_special (S : (PureU1 (2 * n.succ)).AnomalyFree) :
+lemma generic_or_special (S : (PureU1 (2 * n.succ)).Sols) :
     genericCase S ∨ specialCase S := by
   obtain ⟨g, f, h⟩ := span_basis S.1.1
   have h1 :  accCubeTriLinSymm (P g, P g, P! f) ≠  0 ∨
@@ -105,7 +105,7 @@ lemma generic_or_special (S : (PureU1 (2 * n.succ)).AnomalyFree) :
   exact Or.inl (genericCase_exists S ⟨g, f, h, h1⟩)
   exact Or.inr (specialCase_exists S ⟨g, f, h, h1⟩)
 
-theorem generic_case {S : (PureU1 (2 * n.succ)).AnomalyFree} (h : genericCase S) :
+theorem generic_case {S : (PureU1 (2 * n.succ)).Sols} (h : genericCase S) :
       ∃ g f a,  S = parameterization g f a := by
   obtain ⟨g, f, hS⟩ := span_basis S.1.1
   use g, f, (accCubeTriLinSymm (P! f, P! f, P g))⁻¹
@@ -122,7 +122,7 @@ theorem generic_case {S : (PureU1 (2 * n.succ)).AnomalyFree} (h : genericCase S)
   exact h
 
 
-lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).AnomalyFree}
+lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).Sols}
     (h : specialCase S) : lineInCubic S.1.1 := by
   intro g f hS a b
   erw [TriLinearSymm.toCubic_add]
@@ -140,7 +140,7 @@ lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).AnomalyFree}
   simp
 
 
-lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).AnomalyFree}
+lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ)).group),
     specialCase ((FamilyPermutations (2 * n.succ)).actionAF.toFun S M)) :
     lineInCubicPerm S.1.1 := by
@@ -148,7 +148,7 @@ lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).AnomalyFree}
   exact special_case_lineInCubic (h M)
 
 
-theorem special_case {S : (PureU1 (2 * n.succ.succ)).AnomalyFree}
+theorem special_case {S : (PureU1 (2 * n.succ.succ)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ.succ)).group),
     specialCase ((FamilyPermutations (2 * n.succ.succ)).actionAF.toFun S M)) :
     ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),

@@ -19,7 +19,7 @@ open SMACCs
 open BigOperators
 
 
-lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).AnomalyFree} : Q S.val (0 : Fin 1) = 0 ↔
+lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).Sols} : Q S.val (0 : Fin 1) = 0 ↔
     E S.val  (0 : Fin 1) = 0 := by
   let S' := linearParameters.bijection.symm S.1.1
   have hC := cubeSol S
@@ -34,7 +34,7 @@ lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).AnomalyFree} : Q S.val (0 : Fin 1) = 0
 
 
 
-lemma accGrav_Q_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val  (0 : Fin 1) = 0) :
+lemma accGrav_Q_zero {S : (SMNoGrav 1).Sols} (hQ : Q S.val  (0 : Fin 1) = 0) :
     accGrav S.val = 0 := by
   rw [accGrav]
   simp only [SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
@@ -48,7 +48,7 @@ lemma accGrav_Q_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val  (0 : Fin 1) =
   simp_all
   linear_combination 3 * h2
 
-lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val (0 : Fin 1) ≠ 0) :
+lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).Sols} (hQ : Q S.val (0 : Fin 1) ≠ 0) :
     accGrav S.val = 0 := by
   have hE := E_zero_iff_Q_zero.mpr.mt hQ
   let S' := linearParametersQENeqZero.bijection.symm ⟨S.1.1, And.intro hQ hE⟩
@@ -61,7 +61,7 @@ lemma accGrav_Q_neq_zero {S : (SMNoGrav 1).AnomalyFree} (hQ : Q S.val (0 : Fin 1
   exact S'.grav_of_cubic hC
 
 /-- The result of https://arxiv.org/abs/1907.00514. -/
-theorem accGravSatisfied {S : (SMNoGrav 1).AnomalyFree} : accGrav S.val = 0 := by
+theorem accGravSatisfied {S : (SMNoGrav 1).Sols} : accGrav S.val = 0 := by
   by_cases hQ : Q S.val (0 : Fin 1)= 0
   exact accGrav_Q_zero hQ
   exact accGrav_Q_neq_zero hQ

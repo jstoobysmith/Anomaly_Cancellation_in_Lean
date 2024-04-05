@@ -17,7 +17,7 @@ variable {n : ℕ}
 
 namespace One
 
-theorem solEqZero (S : (PureU1 1).AnomalyFreeLinear) : S = 0 := by
+theorem solEqZero (S : (PureU1 1).LinSols) : S = 0 := by
   apply ACCSystemLinear.AnomalyFreeLinear.ext
   have hLin := pureU1_linear S
   simp at hLin

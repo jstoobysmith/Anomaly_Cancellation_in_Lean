@@ -17,7 +17,7 @@ variable {n : ℕ}
 
 namespace Two
 
-def equiv : (PureU1 2).AnomalyFreeLinear ≃ (PureU1 2).AnomalyFree where
+def equiv : (PureU1 2).LinSols ≃ (PureU1 2).Sols where
   toFun S := ⟨⟨S, by intro i; simp at i; exact Fin.elim0 i⟩, by
     have hLin := pureU1_linear S
     simp at hLin

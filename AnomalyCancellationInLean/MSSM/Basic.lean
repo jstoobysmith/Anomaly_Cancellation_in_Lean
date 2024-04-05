@@ -425,7 +425,7 @@ def MSSMACC : ACCSystem where
 
 namespace MSSMACC
 open MSSMCharges
-lemma quadSol  (S : MSSMACC.AnomalyFreeQuad) : accQuad S.val = 0 := by
+lemma quadSol  (S : MSSMACC.QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
   simp  [MSSMACCs.accQuad, HomogeneousQuadratic.toFun] at hS
   exact hS 0
@@ -433,7 +433,7 @@ lemma quadSol  (S : MSSMACC.AnomalyFreeQuad) : accQuad S.val = 0 := by
 @[simp]
 def AnomalyFreeMk (S : MSSMACC.charges) (hg : accGrav S = 0)
     (hsu2 : accSU2 S = 0) (hsu3 : accSU3 S = 0) (hyy : accYY S = 0)
-    (hquad : accQuad S = 0) (hcube : accCube S = 0) : MSSMACC.AnomalyFree :=
+    (hquad : accQuad S = 0) (hcube : accCube S = 0) : MSSMACC.Sols :=
   ⟨⟨⟨S, by
     intro i
     simp at i
@@ -455,8 +455,8 @@ lemma AnomalyFreeMk_val (S : MSSMACC.charges) (hg : accGrav S = 0)
   rfl
 
 @[simp]
-def AnomalyFreeQuadMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 0) :
-    MSSMACC.AnomalyFreeQuad :=
+def AnomalyFreeQuadMk' (S : MSSMACC.LinSols) (hquad : accQuad S.val = 0) :
+    MSSMACC.QuadSols :=
   ⟨S, by
     intro i
     simp at i
@@ -465,8 +465,8 @@ def AnomalyFreeQuadMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 
     ⟩
 
 @[simp]
-def AnomalyFreeMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 0)
-    (hcube : accCube S.val = 0) : MSSMACC.AnomalyFree :=
+def AnomalyFreeMk' (S : MSSMACC.LinSols) (hquad : accQuad S.val = 0)
+    (hcube : accCube S.val = 0) : MSSMACC.Sols :=
   ⟨⟨S, by
     intro i
     simp at i
@@ -475,11 +475,11 @@ def AnomalyFreeMk' (S : MSSMACC.AnomalyFreeLinear) (hquad : accQuad S.val = 0)
     ⟩ , by exact hcube ⟩
 
 @[simp]
-def AnomalyFreeMk'' (S : MSSMACC.AnomalyFreeQuad)
-    (hcube : accCube S.val = 0) : MSSMACC.AnomalyFree :=
+def AnomalyFreeMk'' (S : MSSMACC.QuadSols)
+    (hcube : accCube S.val = 0) : MSSMACC.Sols :=
   ⟨S , by exact hcube ⟩
 
-lemma AnomalyFreeMk''_val (S : MSSMACC.AnomalyFreeQuad)
+lemma AnomalyFreeMk''_val (S : MSSMACC.QuadSols)
     (hcube : accCube S.val = 0) :
     (AnomalyFreeMk'' S hcube).val = S.val := by
   rfl

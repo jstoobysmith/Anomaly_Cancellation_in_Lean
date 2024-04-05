@@ -16,13 +16,13 @@ open MSSMCharges
 open MSSMACCs
 open BigOperators
 
-structure MSSMACC.AnomalyFreePerp extends MSSMACC.AnomalyFreeLinear where
+structure AnomalyFreePerp extends MSSMACC.LinSols where
   perpY₃ : dot (Y₃.val, val) = 0
   perpB₃ : dot (B₃.val, val) = 0
 
 /-- The projection of an object in `MSSMACC.AnomalyFreeLinear` onto the subspace
   orthgonal to `Y₃` and`B₃`. -/
-def proj (T : MSSMACC.AnomalyFreeLinear) : MSSMACC.AnomalyFreePerp :=
+def proj (T : MSSMACC.LinSols) : MSSMACC.AnomalyFreePerp :=
   ⟨(dot (B₃.val, T.val) - dot (Y₃.val, T.val)) • Y₃.1.1
   + (dot (Y₃.val, T.val) - 2 * dot (B₃.val, T.val)) • B₃.1.1
   + dot (Y₃.val, B₃.val) • T,
@@ -42,13 +42,13 @@ def proj (T : MSSMACC.AnomalyFreeLinear) : MSSMACC.AnomalyFreePerp :=
     rw [show dot (B₃.val, B₃.val) = 108 by rfl]
     ring⟩
 
-lemma proj_val (T : MSSMACC.AnomalyFreeLinear) :
+lemma proj_val (T : MSSMACC.LinSols) :
     (proj T).val = (dot (B₃.val, T.val) - dot (Y₃.val, T.val)) • Y₃.val +
     ( (dot (Y₃.val, T.val) - 2 * dot (B₃.val, T.val))) • B₃.val +
     dot (Y₃.val, B₃.val) • T.val := by
   rfl
 
-lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.AnomalyFreeLinear) (a b c : ℚ) :
+lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.LinSols) (a b c : ℚ) :
     a • Y₃.val + b • B₃.val + c • (proj T).val =
     (a + c * (dot (B₃.val, T.val) - dot (Y₃.val, T.val))) • Y₃.val
     + (b + c * (dot (Y₃.val, T.val) - 2 * dot (B₃.val, T.val))) • B₃.val
@@ -68,7 +68,7 @@ lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.AnomalyFreeLinear) (a b c : ℚ) :
 
 
 
-lemma quad_Y₃_proj (T : MSSMACC.AnomalyFreeLinear) :
+lemma quad_Y₃_proj (T : MSSMACC.LinSols) :
     quadBiLin (Y₃.val, (proj T).val) = dot (Y₃.val, B₃.val) * quadBiLin (Y₃.val, T.val) := by
   rw [proj_val]
   rw [quadBiLin.map_add₂, quadBiLin.map_add₂]
@@ -77,7 +77,7 @@ lemma quad_Y₃_proj (T : MSSMACC.AnomalyFreeLinear) :
   rw [show quadBiLin (Y₃.val, Y₃.val) = 0 by rfl]
   ring
 
-lemma quad_B₃_proj (T : MSSMACC.AnomalyFreeLinear) :
+lemma quad_B₃_proj (T : MSSMACC.LinSols) :
     quadBiLin (B₃.val, (proj T).val) = dot (Y₃.val, B₃.val) * quadBiLin (B₃.val, T.val) := by
   rw [proj_val]
   rw [quadBiLin.map_add₂, quadBiLin.map_add₂]
@@ -86,7 +86,7 @@ lemma quad_B₃_proj (T : MSSMACC.AnomalyFreeLinear) :
   rw [show quadBiLin (B₃.val, B₃.val) = 0 by rfl]
   ring
 
-lemma quad_self_proj (T : MSSMACC.AnomalyFree) :
+lemma quad_self_proj (T : MSSMACC.Sols) :
     quadBiLin (T.val, (proj T.1.1).val) =
     (dot (B₃.val, T.val) - dot (Y₃.val, T.val)) * quadBiLin (Y₃.val, T.val) +
     (dot (Y₃.val, T.val) - 2 * dot (B₃.val, T.val)) * quadBiLin (B₃.val, T.val) := by
@@ -97,7 +97,7 @@ lemma quad_self_proj (T : MSSMACC.AnomalyFree) :
   rw [quadBiLin.swap T.val Y₃.val, quadBiLin.swap T.val B₃.val]
   ring
 
-lemma quad_proj (T : MSSMACC.AnomalyFree) :
+lemma quad_proj (T : MSSMACC.Sols) :
     quadBiLin ((proj T.1.1).val, (proj T.1.1).val) = 2 * (dot (Y₃.val, B₃.val)) *
      ((dot (B₃.val, T.val) - dot (Y₃.val, T.val)) * quadBiLin (Y₃.val, T.val) +
    (dot (Y₃.val, T.val) - 2 * dot (B₃.val, T.val)) * quadBiLin (B₃.val, T.val) ) := by
@@ -108,7 +108,7 @@ lemma quad_proj (T : MSSMACC.AnomalyFree) :
   ring
 
 
-lemma cube_proj_proj_Y₃ (T : MSSMACC.AnomalyFreeLinear) :
+lemma cube_proj_proj_Y₃ (T : MSSMACC.LinSols) :
     cubeTriLin ((proj T).val, (proj T).val, Y₃.val) =
     (dot (Y₃.val, B₃.val))^2 * cubeTriLin (T.val, T.val, Y₃.val):= by
   rw [proj_val]
@@ -130,7 +130,7 @@ lemma cube_proj_proj_Y₃ (T : MSSMACC.AnomalyFreeLinear) :
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   ring
 
-lemma cube_proj_proj_B₃ (T : MSSMACC.AnomalyFreeLinear) :
+lemma cube_proj_proj_B₃ (T : MSSMACC.LinSols) :
     cubeTriLin ((proj T).val, (proj T).val, B₃.val) =
     (dot (Y₃.val, B₃.val))^2 * cubeTriLin (T.val, T.val, B₃.val):= by
   rw [proj_val]
@@ -146,7 +146,7 @@ lemma cube_proj_proj_B₃ (T : MSSMACC.AnomalyFreeLinear) :
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   ring
 
-lemma cube_proj_proj_self (T : MSSMACC.AnomalyFree) :
+lemma cube_proj_proj_self (T : MSSMACC.Sols) :
     cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, T.val) =
     2 * dot (Y₃.val, B₃.val) *
     ((dot (B₃.val, T.val) - dot (Y₃.val, T.val)) * cubeTriLin (T.val, T.val, Y₃.val)  +
@@ -163,7 +163,7 @@ lemma cube_proj_proj_self (T : MSSMACC.AnomalyFree) :
   rw [cubeTriLin.swap₁ B₃.val T.val T.val, cubeTriLin.swap₂ T.val  B₃.val T.val]
   ring
 
-lemma cube_proj (T : MSSMACC.AnomalyFree) :
+lemma cube_proj (T : MSSMACC.Sols) :
     cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, (proj T.1.1).val) =
     3 *  dot (Y₃.val, B₃.val) ^ 2 *
     ((dot (B₃.val, T.val) - dot (Y₃.val, T.val)) * cubeTriLin (T.val, T.val, Y₃.val) +

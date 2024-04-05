@@ -18,7 +18,7 @@ open BigOperators
 variable {n : ℕ}
 
 @[simps!]
-def BL₁ : (PlusU1 1).AnomalyFree where
+def BL₁ : (PlusU1 1).Sols where
   val := fun i =>
     match i with
     | (0 : Fin 6) => 1
@@ -43,7 +43,7 @@ def BL₁ : (PlusU1 1).AnomalyFree where
   cubicSol := by rfl
 
 @[simps!]
-def BL (n : ℕ) : (PlusU1 n).AnomalyFree :=
+def BL (n : ℕ) : (PlusU1 n).Sols :=
   familyUniversalAF n BL₁
 
 namespace BL
@@ -57,27 +57,27 @@ lemma on_quadBiLin (S : (PlusU1 n).charges) :
   simp
   ring
 
-lemma on_quadBiLin_AFL (S : (PlusU1 n).AnomalyFreeLinear) : quadBiLin ((BL n).val, S.val) = 0 := by
+lemma on_quadBiLin_AFL (S : (PlusU1 n).LinSols) : quadBiLin ((BL n).val, S.val) = 0 := by
   rw [on_quadBiLin]
   rw [YYsol S, SU2Sol S, SU3Sol S]
   simp
 
-lemma add_AFL_quad (S : (PlusU1 n).AnomalyFreeLinear) (a b : ℚ) :
+lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • (BL n).val) = a ^ 2 * accQuad S.val := by
   erw [BiLinearSymm.toHomogeneousQuad_add, quadSol (b • (BL n)).1]
   rw [quadBiLin.map_smul₁, quadBiLin.map_smul₂, quadBiLin.swap, on_quadBiLin_AFL]
   erw [accQuad.map_smul]
   simp
 
-lemma add_quad (S : (PlusU1 n).AnomalyFreeQuad) (a b : ℚ) :
+lemma add_quad (S : (PlusU1 n).QuadSols) (a b : ℚ) :
     accQuad (a • S.val + b • (BL n).val) = 0 := by
   rw [add_AFL_quad, quadSol S]
   simp
 
-def addQuad (S : (PlusU1 n).AnomalyFreeQuad) (a b : ℚ) : (PlusU1 n).AnomalyFreeQuad :=
+def addQuad (S : (PlusU1 n).QuadSols) (a b : ℚ) : (PlusU1 n).QuadSols :=
   linearToQuad (a • S.1 + b • (BL n).1.1) (add_quad S a b)
 
-lemma addQuad_zero (S : (PlusU1 n).AnomalyFreeQuad) (a : ℚ): addQuad S a 0 = a • S := by
+lemma addQuad_zero (S : (PlusU1 n).QuadSols) (a : ℚ): addQuad S a 0 = a • S := by
   simp [addQuad, linearToQuad]
   rfl
 
@@ -88,13 +88,13 @@ lemma on_cubeTriLin (S : (PlusU1 n).charges) :
   simp
   ring
 
-lemma on_cubeTriLin_AFL (S : (PlusU1 n).AnomalyFreeLinear) :
+lemma on_cubeTriLin_AFL (S : (PlusU1 n).LinSols) :
     cubeTriLin ((BL n).val, (BL n).val, S.val) = 0 := by
   rw [on_cubeTriLin]
   rw [gravSol S, SU3Sol S]
   simp
 
-lemma add_AFL_cube (S : (PlusU1 n).AnomalyFreeLinear) (a b : ℚ) :
+lemma add_AFL_cube (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accCube (a • S.val + b • (BL n).val) =
     a ^ 2 * (a * accCube S.val + 3 * b * cubeTriLin (S.val, S.val, (BL n).val)) := by
   erw [TriLinearSymm.toCubic_add, cubeSol (b • (BL n)), accCube.map_smul]

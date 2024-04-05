@@ -23,11 +23,11 @@ variable {n : ℕ}
 open VectorLikeOddPlane
 
 /-- The line from P to P! through S is within the cubic. -/
-def lineInCubic (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) : Prop :=
+def lineInCubic (S : (PureU1 (2 * n + 1)).LinSols) : Prop :=
   ∀ (g f : Fin n → ℚ)  (_ : S.val = Pa g f) (a b : ℚ) ,
   accCube (2 * n + 1) (a • P g + b • P! f) = 0
 
-lemma lineInCubic_expand {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lineInCubic S) :
+lemma lineInCubic_expand {S : (PureU1 (2 * n + 1)).LinSols} (h : lineInCubic S) :
     ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f) (a b : ℚ) ,
     3 * a * b * (a * accCubeTriLinSymm (P g, P g, P! f)
     + b * accCubeTriLinSymm (P! f, P! f, P g)) = 0 := by
@@ -42,7 +42,7 @@ lemma lineInCubic_expand {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lineI
   ring
 
 
-lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lineInCubic S) :
+lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).LinSols} (h : lineInCubic S) :
     ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val =  P g + P! f),
     accCubeTriLinSymm (P g, P g, P! f) = 0 := by
   intro g f hS
@@ -53,16 +53,16 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (h : lin
 
 
 /-- The line from P to P! through S is within the cubic for all permutations of S. -/
-def lineInCubicPerm (S : (PureU1 (2 * n + 1)).AnomalyFreeLinear) : Prop :=
+def lineInCubicPerm (S : (PureU1 (2 * n + 1)).LinSols) : Prop :=
   ∀ (M : (FamilyPermutations (2 * n + 1)).group ),
     lineInCubic ((FamilyPermutations (2 * n + 1)).repAFL M S)
 
 /-- If `lineInCubicPerm S` then `lineInCubic S`.  -/
-lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear} (hS : lineInCubicPerm S) :
+lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).LinSols} (hS : lineInCubicPerm S) :
     lineInCubic S := hS 1
 
 /-- If `lineInCubicPerm S` then `lineInCubicPerm (M S)` for all permutations `M`. -/
-lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear}
+lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).LinSols}
     (hS : lineInCubicPerm S) (M' : (FamilyPermutations (2 * n + 1)).group) :
     lineInCubicPerm ((FamilyPermutations (2 * n + 1)).repAFL M' S) := by
   rw [lineInCubicPerm]
@@ -76,7 +76,7 @@ lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).AnomalyFreeLinear}
   exact hS (M * M')
 
 
-lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear}
+lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).LinSols}
     (LIC : lineInCubicPerm S) :
     ∀ (j : Fin n.succ) (g f : Fin n.succ → ℚ) (_ : S.val = Pa g f) ,
       (S.val (δ!₂ j) - S.val (δ!₁ j))
@@ -94,7 +94,7 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).AnomalyFreeLinear}
   rw [accCubeTriLinSymm.map_add₃, h1, accCubeTriLinSymm.map_smul₃] at h2
   simpa using h2
 
-lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLinear}
+lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ + 1)).LinSols}
     (f g : Fin n.succ.succ → ℚ) (hS : S.val = Pa f g) :
     accCubeTriLinSymm.toFun (P f, P f, basis!AsCharges 0) =
     (S.val (δ!₁ 0) + S.val (δ!₂ 0)) * (2 * S.val δ!₃ + S.val (δ!₁ 0) + S.val (δ!₂ 0)) := by
@@ -122,7 +122,7 @@ lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLinear}
   rw [h0, δa₁_δ!₃]
   ring
 
-lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ+1)).AnomalyFreeLinear}
+lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ+1)).LinSols}
     (LIC : lineInCubicPerm S) :
     lineInPlaneProp ((S.val (δ!₂ 0)), ((S.val (δ!₁ 0)), (S.val δ!₃))) := by
   obtain ⟨g, f, hfg⟩ := span_basis S
@@ -140,7 +140,7 @@ lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ+1)).AnomalyFreeLin
   apply Or.inr
   linear_combination h1
 
-lemma lineInCubicPerm_last_perm  {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLinear}
+lemma lineInCubicPerm_last_perm  {S : (PureU1 (2 * n.succ.succ + 1)).LinSols}
     (LIC : lineInCubicPerm S) : lineInPlaneCond S := by
   refine @Prop_three (2 * n.succ.succ + 1) lineInPlaneProp S (δ!₂ 0) (δ!₁ 0)
     δ!₃ ?_ ?_ ?_ ?_
@@ -150,11 +150,11 @@ lemma lineInCubicPerm_last_perm  {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFree
   intro M
   exact lineInCubicPerm_last_cond (lineInCubicPerm_permute LIC M)
 
-lemma lineInCubicPerm_constAbs  {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLinear}
+lemma lineInCubicPerm_constAbs  {S : (PureU1 (2 * n.succ.succ + 1)).LinSols}
     (LIC : lineInCubicPerm S) : constAbs S.val :=
   linesInPlane_constAbs (lineInCubicPerm_last_perm LIC)
 
-theorem  lineInCubicPerm_zero {S : (PureU1 (2 * n.succ.succ + 1)).AnomalyFreeLinear}
+theorem  lineInCubicPerm_zero {S : (PureU1 (2 * n.succ.succ + 1)).LinSols}
     (LIC : lineInCubicPerm S) : S = 0 :=
   ConstAbs.boundary_value_odd S (lineInCubicPerm_constAbs LIC)
 

@@ -46,7 +46,7 @@ lemma speciesVal (S : linearParameters) : (toSpecies i) S.asCharges (0 : Fin 1) 
   | 3 => rfl
   | 4 => rfl
 
-def asLinear (S : linearParameters) : (SMNoGrav 1).AnomalyFreeLinear :=
+def asLinear (S : linearParameters) : (SMNoGrav 1).LinSols :=
   chargeToLinear S.asCharges (by
     simp only [accSU2, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero,
       Fin.isValue, Finset.sum_singleton, LinearMap.coe_mk, AddHom.coe_mk]
@@ -96,7 +96,7 @@ lemma cubic_zero_E'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
   exact h2.1
   exact hc
 
-def bijection : linearParameters ≃ (SMNoGrav 1).AnomalyFreeLinear where
+def bijection : linearParameters ≃ (SMNoGrav 1).LinSols where
   toFun S := S.asLinear
   invFun S := ⟨SMCharges.Q S.val (0 : Fin 1), (SMCharges.U S.val (0 : Fin 1) -
      SMCharges.D S.val (0 : Fin 1))/2 ,
@@ -145,7 +145,7 @@ def bijection : linearParameters ≃ (SMNoGrav 1).AnomalyFreeLinear where
     | 4 => rfl
 
 def bijectionQEZero : {S : linearParameters // S.Q' ≠ 0 ∧ S.E' ≠ 0} ≃
-  {S : (SMNoGrav 1).AnomalyFreeLinear // Q S.val (0 : Fin 1) ≠ 0 ∧ E S.val (0 : Fin 1) ≠ 0} where
+  {S : (SMNoGrav 1).LinSols // Q S.val (0 : Fin 1) ≠ 0 ∧ E S.val (0 : Fin 1) ≠ 0} where
   toFun S := ⟨bijection S, S.2⟩
   invFun S := ⟨bijection.symm S, S.2⟩
   left_inv S := by
@@ -238,7 +238,7 @@ def bijectionLinearParameters :
     ring
 
 def bijection : linearParametersQENeqZero ≃
-    {S : (SMNoGrav 1).AnomalyFreeLinear // Q S.val (0 : Fin 1) ≠ 0 ∧ E S.val (0 : Fin 1)  ≠ 0} :=
+    {S : (SMNoGrav 1).LinSols // Q S.val (0 : Fin 1) ≠ 0 ∧ E S.val (0 : Fin 1)  ≠ 0} :=
   bijectionLinearParameters.trans (linearParameters.bijectionQEZero)
 
 lemma cubic (S : linearParametersQENeqZero) :

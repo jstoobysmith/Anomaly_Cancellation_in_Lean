@@ -15,7 +15,7 @@ namespace PureU1
 
 variable {n : ℕ}
 
-lemma three_sol_zero (S : (PureU1 3).AnomalyFree) :  S.val (0 : Fin 3) = 0 ∨ S.val (1 : Fin 3) = 0
+lemma three_sol_zero (S : (PureU1 3).Sols) :  S.val (0 : Fin 3) = 0 ∨ S.val (1 : Fin 3) = 0
    ∨ S.val (2 : Fin 3) = 0 := by
   have hL := pureU1_linear S.1.1
   have hC := pureU1_cube S
@@ -36,9 +36,9 @@ lemma three_sol_zero (S : (PureU1 3).AnomalyFree) :  S.val (0 : Fin 3) = 0 ∨ S
   rw [add_assoc, hC] at hL
   simpa using hL
 
-def solOfLinear (S : (PureU1 3).AnomalyFreeLinear)
+def solOfLinear (S : (PureU1 3).LinSols)
     (hS : S.val (0 : Fin 3) = 0 ∨ S.val (1 : Fin 3) = 0 ∨ S.val (2 : Fin 3) = 0) :
-    (PureU1 3).AnomalyFree :=
+    (PureU1 3).Sols :=
   ⟨⟨S, by intro i; simp at i; exact Fin.elim0 i⟩, by
   simp
   change accCube _ _ = _
@@ -64,8 +64,8 @@ def solOfLinear (S : (PureU1 3).AnomalyFreeLinear)
   rw [hS, h0]
   ring⟩
 
-theorem solOfLinear_surjects (S : (PureU1 3).AnomalyFree) :
-    ∃ (T : (PureU1 3).AnomalyFreeLinear) (hT : T.val (0 : Fin 3) = 0 ∨ T.val (1 : Fin 3) = 0
+theorem solOfLinear_surjects (S : (PureU1 3).Sols) :
+    ∃ (T : (PureU1 3).LinSols) (hT : T.val (0 : Fin 3) = 0 ∨ T.val (1 : Fin 3) = 0
     ∨ T.val (2 : Fin 3) = 0),
     solOfLinear T hT = S := by
   use S.1.1

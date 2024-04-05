@@ -54,14 +54,14 @@ lemma sort_zero {n : ℕ} (S : (PureU1 n).charges)  (hS : sort S = 0) : S = 0 :=
 lemma sort_projection {n : ℕ} (S : (PureU1 n).charges) : sort (sort S) = sort S :=
   sort_perm S (Tuple.sort S).symm
 
-def sortAFL  {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) : (PureU1 n).AnomalyFreeLinear :=
+def sortAFL  {n : ℕ} (S : (PureU1 n).LinSols) : (PureU1 n).LinSols :=
   ((FamilyPermutations n).repAFL (Tuple.sort S.val).symm S)
 
-lemma sortAFL_val {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear) :  (sortAFL S).val = sort S.val := by
+lemma sortAFL_val {n : ℕ} (S : (PureU1 n).LinSols) :  (sortAFL S).val = sort S.val := by
   rfl
 
 
-lemma sortAFL_zero {n : ℕ} (S : (PureU1 n).AnomalyFreeLinear)  (hS : sortAFL S = 0) : S = 0 := by
+lemma sortAFL_zero {n : ℕ} (S : (PureU1 n).LinSols)  (hS : sortAFL S = 0) : S = 0 := by
   apply ACCSystemLinear.AnomalyFreeLinear.ext
   have h1 : sort S.val = 0 := by
     rw [← sortAFL_val]
