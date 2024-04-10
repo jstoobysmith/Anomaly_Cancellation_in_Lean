@@ -40,23 +40,34 @@ namespace ACCSystemCharges
 /-- The charges as functions from `Fin χ.numberCharges → ℚ`. -/
 def charges (χ : ACCSystemCharges) : Type := Fin χ.numberCharges → ℚ
 
+/--
+  An instance to provide the necessary operations and properties for `charges` to form an additive
+  commutative monoid.
+-/
 @[simps!]
 instance chargesAddCommMonoid (χ : ACCSystemCharges) : AddCommMonoid χ.charges :=
   Pi.addCommMonoid
 
+/--
+  An instance to provide the necessary operations and properties for `charges` to form a module over
+  the field `ℚ`.
+-/
 @[simps!]
 instance chargesModule (χ : ACCSystemCharges) : Module ℚ χ.charges :=
   Pi.module _ _ _
 
-instance ChargesAddCommGroup (χ : ACCSystemCharges) :
-    AddCommGroup χ.charges :=
+/--
+  An instance provides the necessary operations and properties for `charges` to form an additive
+  commutative group.
+-/
+instance ChargesAddCommGroup (χ : ACCSystemCharges) : AddCommGroup χ.charges :=
   Module.addCommMonoidToAddCommGroup ℚ
 
 end ACCSystemCharges
 
 structure ACCSystemLinear extends ACCSystemCharges where
   numberLinear : ℕ
-  linearACCs :  Fin numberLinear → (toACCSystemCharges.charges →ₗ[ℚ] ℚ)
+  linearACCs : Fin numberLinear → (toACCSystemCharges.charges →ₗ[ℚ] ℚ)
 
 namespace ACCSystemLinear
 
