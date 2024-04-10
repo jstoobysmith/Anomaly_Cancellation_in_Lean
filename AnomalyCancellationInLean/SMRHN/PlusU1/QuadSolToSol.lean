@@ -45,7 +45,7 @@ def generic (S : (PlusU1 n).QuadSols) : (PlusU1 n).Sols :=
   quadToAF (BL.addQuad S (α₁ S) (α₂ S)) (BL_add_α₁_α₂_cube S)
 
 lemma generic_on_AF (S : (PlusU1 n).Sols) : generic S.1 = (α₁ S.1) • S := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (BL.addQuad S.1 (α₁ S.1) (α₂ S.1)).val = _
   rw [BL_add_α₁_α₂_AF]
   rfl
@@ -60,7 +60,7 @@ def special (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂
 
 lemma special_on_AF (S : (PlusU1 n).Sols)  (h1 : α₁ S.1 = 0) :
     special S.1 1 0 h1 (α₂_AF S) = S := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (BL.addQuad S.1 1 0).val = _
   rw [BL.addQuad_zero]
   simp

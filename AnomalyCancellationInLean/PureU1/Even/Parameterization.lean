@@ -110,7 +110,7 @@ theorem generic_case {S : (PureU1 (2 * n.succ)).Sols} (h : genericCase S) :
   obtain ⟨g, f, hS⟩ := span_basis S.1.1
   use g, f, (accCubeTriLinSymm (P! f, P! f, P g))⁻¹
   rw [parameterization]
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   rw [parameterizationAsLinear_val]
   change S.val = _ • ( _ • P g + _• P! f)
   rw [anomalyFree_param _ _ hS]
@@ -142,7 +142,7 @@ lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).Sols}
 
 lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ)).group),
-    specialCase ((FamilyPermutations (2 * n.succ)).actionAF.toFun S M)) :
+    specialCase ((FamilyPermutations (2 * n.succ)).solAction.toFun S M)) :
     lineInCubicPerm S.1.1 := by
   intro M
   exact special_case_lineInCubic (h M)
@@ -150,9 +150,9 @@ lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ)).Sols}
 
 theorem special_case {S : (PureU1 (2 * n.succ.succ)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ.succ)).group),
-    specialCase ((FamilyPermutations (2 * n.succ.succ)).actionAF.toFun S M)) :
+    specialCase ((FamilyPermutations (2 * n.succ.succ)).solAction.toFun S M)) :
     ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
-    ((FamilyPermutations (2 * n.succ.succ)).actionAF.toFun S M).1.1
+    ((FamilyPermutations (2 * n.succ.succ)).solAction.toFun S M).1.1
     ∈ Submodule.span ℚ (Set.range basis) :=
   lineInCubicPerm_in_plane S (special_case_lineInCubic_perm h)
 

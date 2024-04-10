@@ -135,7 +135,7 @@ lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).LinSols) :
 
 lemma pureU1_anomalyFree_ext {n : ℕ} {S T : (PureU1 n.succ).LinSols}
     (h : ∀ (i : Fin n), S.val i.castSucc = T.val i.castSucc) : S = T := by
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   funext i
   by_cases hi : i ≠ Fin.last n
   have hiCast : ∃ j : Fin n, j.castSucc = i := by

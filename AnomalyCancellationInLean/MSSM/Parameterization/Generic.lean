@@ -72,7 +72,7 @@ def genericProjCoeff (T : MSSMACC.Sols) : ℚ :=
 
 lemma generic_proj (T : MSSMACC.Sols) :
     generic (proj T.1.1) = (genericProjCoeff T) • T := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   erw [generic_eq_planeY₃B₃_on_α]
   rw [planeY₃B₃_val]
   rw [Y₃_plus_B₃_plus_proj]
@@ -146,7 +146,7 @@ def case₁ (R : MSSMACC.AnomalyFreePerp) (c₁ c₂ c₃ : ℚ)
 
 lemma case₁_smul (R : MSSMACC.AnomalyFreePerp) (c₁ c₂ c₃ d : ℚ)
     (h : case₁prop R) : case₁ R (d * c₁) (d * c₂) (d * c₃) h = d • case₁ R c₁ c₂ c₃ h := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (lineQuad _ _ _ _).val = _
   rw [lineQuad_smul]
   rfl
@@ -172,7 +172,7 @@ lemma case₁_proj (T : MSSMACC.Sols) (h1 : genericProjCoeff T = 0) :
        (case₁ProjC₃ T)
        ((genericProjCoeff_zero T).mp h1)
        = (case₁ProjCoeff T) • T := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (lineQuad _ _ _ _).val = _
   rw [lineQuad_val]
   rw [planeY₃B₃_val]
@@ -284,7 +284,7 @@ def case₂ (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ)
 
 lemma case₂_smul (R : MSSMACC.AnomalyFreePerp) (c₁ c₂ c₃ d : ℚ)
     (h : case₂prop R) : case₂ R (d * c₁) (d * c₂) (d * c₃) h = d • case₂ R c₁ c₂ c₃ h := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (lineCube _ _ _ _).val = _
   rw [lineCube_smul]
   rfl
@@ -309,7 +309,7 @@ lemma case₂_proj (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T = 0) :
        (case₂ProjC₂ T)
        (case₂ProjC₃ T)
        ((case₁ProjCoeff_zero T).mp h1)  = (case₂ProjCoeff T) • T := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (planeY₃B₃ _ _ _ _).val = _
   rw [planeY₃B₃_val]
   rw [Y₃_plus_B₃_plus_proj]
@@ -425,7 +425,7 @@ def case₃ (R : MSSMACC.AnomalyFreePerp) (b₁ b₂ b₃ : ℚ)
 
 lemma case₃_smul (R : MSSMACC.AnomalyFreePerp) (c₁ c₂ c₃ d : ℚ)
     (h : case₃prop R) : case₃ R (d * c₁) (d * c₂) (d * c₃) h = d • case₃ R c₁ c₂ c₃ h := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (planeY₃B₃ _ _ _ _).val = _
   rw [planeY₃B₃_smul]
   rfl
@@ -445,7 +445,7 @@ lemma case₃_proj (T : MSSMACC.Sols) (h0 : case₁ProjCoeff T = 0) (h1 : case�
        (case₃ProjC₂ T)
        1
        ((case₂ProjCoeff_zero T).mp (And.intro h0 h1))  =  case₃ProjCoeff • T := by
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   change (planeY₃B₃ _ _ _ _).val = _
   rw [planeY₃B₃_val]
   rw [Y₃_plus_B₃_plus_proj]

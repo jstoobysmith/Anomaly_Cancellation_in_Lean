@@ -51,7 +51,7 @@ def genericToQuad (S : (PlusU1 n).LinSols) :
 
 lemma genericToQuad_on_quad (S : (PlusU1 n).QuadSols) :
     genericToQuad C S.1 = (α₁ C S.1) • S := by
-  apply ACCSystemQuad.AnomalyFreeQuad.ext
+  apply ACCSystemQuad.QuadSols.ext
   change ((α₁ C S.1) • S.val + α₂ S.1 • C.val) = (α₁ C S.1) • S.val
   rw [α₂_AFQ]
   simp
@@ -67,7 +67,7 @@ def specialToQuad (S : (PlusU1 n).LinSols) (a b : ℚ) (h1 : α₁ C S = 0)
 
 lemma special_on_quad (S : (PlusU1 n).QuadSols)  (h1 : α₁ C S.1 = 0) :
     specialToQuad C S.1 1 0 h1 (α₂_AFQ S) = S := by
-  apply ACCSystemQuad.AnomalyFreeQuad.ext
+  apply ACCSystemQuad.QuadSols.ext
   change (1 • S.val + 0 • C.val) = S.val
   simp
 

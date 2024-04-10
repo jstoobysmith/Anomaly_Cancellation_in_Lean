@@ -107,7 +107,7 @@ theorem generic_case {S : (PureU1 (2 * n.succ + 1)).Sols} (h : genericCase S) :
   obtain ⟨g, f, hS⟩ := span_basis S.1.1
   use g, f, (accCubeTriLinSymm (P! f, P! f, P g))⁻¹
   rw [parameterization]
-  apply ACCSystem.AnomalyFree.ext
+  apply ACCSystem.Sols.ext
   rw [parameterizationAsLinear_val]
   change S.val = _ • ( _ • P g + _• P! f)
   rw [anomalyFree_param _ _ hS]
@@ -140,7 +140,7 @@ lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ + 1)).Sols}
 
 lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ + 1)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ + 1)).group),
-    specialCase ((FamilyPermutations (2 * n.succ + 1)).actionAF.toFun S M)) :
+    specialCase ((FamilyPermutations (2 * n.succ + 1)).solAction.toFun S M)) :
     lineInCubicPerm S.1.1 := by
   intro M
   have hM := special_case_lineInCubic (h M)
@@ -148,7 +148,7 @@ lemma special_case_lineInCubic_perm {S : (PureU1 (2 * n.succ + 1)).Sols}
 
 theorem special_case {S : (PureU1 (2 * n.succ.succ + 1)).Sols}
     (h : ∀ (M : (FamilyPermutations (2 * n.succ.succ + 1)).group),
-    specialCase ((FamilyPermutations (2 * n.succ.succ + 1)).actionAF.toFun S M)) :
+    specialCase ((FamilyPermutations (2 * n.succ.succ + 1)).solAction.toFun S M)) :
     S.1.1 = 0 := by
   have ht :=  special_case_lineInCubic_perm h
   exact lineInCubicPerm_zero ht

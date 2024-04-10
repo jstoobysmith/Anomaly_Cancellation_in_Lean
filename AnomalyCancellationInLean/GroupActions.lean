@@ -5,7 +5,22 @@ Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.Basic
 import Mathlib.RepresentationTheory.Basic
+/-!
+# Group actions on ACC systems.
 
+We define a group action on an ACC system as a representation on the vector spaces of charges
+under which the anomaly equations are invariant.
+
+From this we define
+- The representation acting on the vector space of solutions to the linear ACCs.
+- The group action acting on solutions to the linera + quadratic equations.
+- The group action acting on solutions to the anomaly cancellation conditions.
+
+-/
+
+/-- The type of of a group action on a system of charges is defined as a representation on
+the vector spaces of charges under which the anomaly equations are invariant.
+-/
 structure ACCSystemGroupAction (χ : ACCSystem) where
   group : Type
   groupInst : Group group
@@ -18,103 +33,106 @@ namespace ACCSystemGroupAction
 
 instance {χ : ACCSystem} (G : ACCSystemGroupAction χ) : Group G.group := G.groupInst
 
-
-def anomalyFreeLinearMap {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group) :
+/-- The action of a group element on the vector space of linear solutions. -/
+def linSolMap {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group) :
     χ.LinSols →ₗ[ℚ] χ.LinSols where
   toFun S := ⟨G.rep g S.val, by
    intro i
    rw [G.linearInvariant, S.linearSol]
    ⟩
   map_add' S T := by
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     exact (G.rep g).map_add' _ _
   map_smul' a S := by
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     exact (G.rep g).map_smul' _ _
 
+/-- The representation acting on the vector space of solutions to the linear ACCs. -/
 @[simps!]
-def repAFL {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+def linSolRep {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     Representation ℚ G.group χ.LinSols where
-  toFun := G.anomalyFreeLinearMap
+  toFun := G.linSolMap
   map_mul' g1 g2 := by
     apply LinearMap.ext
     intro S
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     change (G.rep (g1 * g2)) S.val = _
     rw [G.rep.map_mul]
     rfl
   map_one' := by
     apply LinearMap.ext
     intro S
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     change (G.rep.toFun 1) S.val = _
     rw [G.rep.map_one']
     rfl
 
+/-- The representation on the charges and anomaly free solutions
+commutes with the inclusion. -/
 lemma rep_repAFL_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.LinSols) : χ.anomalyFreeLinearIncl (G.repAFL g S) =
-    G.rep g (χ.anomalyFreeLinearIncl S) := rfl
+    (S : χ.LinSols) : χ.linSolsIncl (G.linSolRep g S) =
+    G.rep g (χ.linSolsIncl S) := rfl
 
-
-instance actionAFQ {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+/-- The group action acting on solutions to the quadratic equations. -/
+instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.QuadSols where
-  smul f S := ⟨G.repAFL f S.1, by
+  smul f S := ⟨G.linSolRep f S.1, by
    intro i
    simp
    rw [G.quadInvariant, S.quadSol]
   ⟩
   mul_smul f1 f2 S := by
-    apply ACCSystemQuad.AnomalyFreeQuad.ext
+    apply ACCSystemQuad.QuadSols.ext
     change (G.rep.toFun (f1 * f2)) S.val = _
     rw [G.rep.map_mul']
     rfl
   one_smul S := by
-    apply ACCSystemQuad.AnomalyFreeQuad.ext
+    apply ACCSystemQuad.QuadSols.ext
     change (G.rep.toFun 1) S.val = _
     rw [G.rep.map_one']
     rfl
 
-lemma repAnomalyFreeLinear_actionAnomalyFreeQuad_commute {χ : ACCSystem}
-    (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.QuadSols) :  χ.AnomalyFreeQuadInclLinear (G.actionAFQ.toFun S g) =
-    G.repAFL g (χ.AnomalyFreeQuadInclLinear S) := rfl
+lemma linSolAction_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+    (S : χ.QuadSols) :  χ.quadSolsInclLinSols (G.quadSolAction.toFun S g) =
+    G.linSolRep g (χ.quadSolsInclLinSols S) := rfl
 
 lemma rep_actionAnomalyFreeQuad_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.QuadSols) :  χ.AnomalyFreeQuadIncl (G.actionAFQ.toFun S g) =
-    G.rep g (χ.AnomalyFreeQuadIncl S) := rfl
+    (S : χ.QuadSols) :  χ.quadSolsIncl (G.quadSolAction.toFun S g) =
+    G.rep g (χ.quadSolsIncl S) := rfl
 
-instance actionAF {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
+/-- The group action acting on solutions to the anomaly cancellation conditions. -/
+instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.Sols where
-  smul g S := ⟨G.actionAFQ.toFun S.1 g, by
+  smul g S := ⟨G.quadSolAction.toFun S.1 g, by
    simp
    change χ.cubicACC (G.rep g S.val) = 0
    rw [G.cubicInvariant, S.cubicSol]
   ⟩
   mul_smul f1 f2 S := by
-    apply ACCSystem.AnomalyFree.ext
+    apply ACCSystem.Sols.ext
     change (G.rep.toFun (f1 * f2)) S.val = _
     rw [G.rep.map_mul']
     rfl
   one_smul S := by
-    apply ACCSystem.AnomalyFree.ext
+    apply ACCSystem.Sols.ext
     change (G.rep.toFun 1) S.val = _
     rw [G.rep.map_one']
     rfl
 
 lemma actionAnomalyFreeQuad_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.Sols) :  χ.AnomalyFreeInclQuad (G.actionAF.toFun S g) =
-    G.actionAFQ.toFun (χ.AnomalyFreeInclQuad S) g := rfl
+    (S : χ.Sols) :  χ.solsInclQuadSols (G.solAction.toFun S g) =
+    G.quadSolAction.toFun (χ.solsInclQuadSols S) g := rfl
 
 lemma repAnomalyFreeLinear_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.Sols) :  χ.AnomalyFreeInclLinear (G.actionAF.toFun S g) =
-    G.repAFL g (χ.AnomalyFreeInclLinear S) := rfl
+    (S : χ.Sols) :  χ.solsInclLinSols (G.solAction.toFun S g) =
+    G.linSolRep g (χ.solsInclLinSols S) := rfl
 
 lemma rep_actionAnomalyFree_commute {χ : ACCSystem}
     (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.Sols) :  χ.AnomalyFreeIncl (G.actionAF.toFun S g) =
-    G.rep g (χ.AnomalyFreeIncl S) := rfl
+    (S : χ.Sols) :  χ.solsIncl (G.solAction.toFun S g) =
+    G.rep g (χ.solsIncl S) := rfl
 
 end ACCSystemGroupAction

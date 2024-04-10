@@ -186,7 +186,7 @@ lemma AFL_odd_zero {A : (PureU1 (2 * n + 1)).LinSols} (h : constAbsSorted A.val)
 
 theorem AFL_odd (A : (PureU1 (2 * n + 1)).LinSols) (h : constAbsSorted A.val) :
     A = 0 := by
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   exact  is_zero h (AFL_odd_zero h)
 
 lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).LinSols} (h : constAbsSorted A.val)

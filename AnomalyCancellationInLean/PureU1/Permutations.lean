@@ -93,7 +93,7 @@ lemma FamilyPermutations_charges_apply (S : (PureU1 n).charges)
 
 lemma FamilyPermutations_anomalyFreeLinear_apply (S : (PureU1 n).LinSols)
     (i : Fin n) (f : (FamilyPermutations n).group) :
-    ((FamilyPermutations n).repAFL f S).val i = S.val (f.invFun i) := by
+    ((FamilyPermutations n).linSolRep f S).val i = S.val (f.invFun i) := by
   rfl
 
 
@@ -289,8 +289,8 @@ end permThree
 lemma Prop_two (P : ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
     {a b : Fin n} (hab : a ≠ b)
     (h : ∀ (f : (FamilyPermutations n).group),
-    P ((((FamilyPermutations n).repAFL f S).val a),
-      (((FamilyPermutations n).repAFL f S).val b)
+    P ((((FamilyPermutations n).linSolRep f S).val a),
+      (((FamilyPermutations n).linSolRep f S).val b)
     )) : ∀ (i j : Fin n) (_ : i ≠ j),
     P (S.val i, S.val j) := by
   intro i j hij
@@ -306,9 +306,9 @@ lemma Prop_two (P : ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
 lemma Prop_three (P : ℚ × ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
     {a b c : Fin n} (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
     (h : ∀ (f : (FamilyPermutations n).group),
-    P ((((FamilyPermutations n).repAFL f S).val a),(
-      (((FamilyPermutations n).repAFL f S).val b),
-      (((FamilyPermutations n).repAFL f S).val c)
+    P ((((FamilyPermutations n).linSolRep f S).val a),(
+      (((FamilyPermutations n).linSolRep f S).val b),
+      (((FamilyPermutations n).linSolRep f S).val c)
     ))) : ∀ (i j k : Fin n) (_ : i ≠ j) (_ : j ≠ k)  (_ : i ≠ k),
     P (S.val i, (S.val j, S.val k)) := by
   intro i j k hij hjk hik

@@ -27,7 +27,7 @@ lemma planeY₃B₃_val (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
 
 lemma planeY₃B₃_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
     planeY₃B₃ R (d * a) (d * b) (d * c) = d • planeY₃B₃ R a b c := by
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   change _ = d • (planeY₃B₃ R a b c).val
   rw [planeY₃B₃_val, planeY₃B₃_val]
   rw [smul_add, smul_add]
@@ -141,7 +141,7 @@ lemma lineQuad_val (R : MSSMACC.AnomalyFreePerp) (c1 c2 c3 : ℚ) :
 
 lemma lineQuad_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
     lineQuad R (d * a) (d * b) (d * c) = d • lineQuad R a b c := by
-  apply ACCSystemQuad.AnomalyFreeQuad.ext
+  apply ACCSystemQuad.QuadSols.ext
   change _ = (d • planeY₃B₃ R _ _ _).val
   rw [← planeY₃B₃_smul]
   rw [lineQuad_val]
@@ -182,7 +182,7 @@ def lineCube (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ) :
 
 lemma lineCube_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
     lineCube R (d * a) (d * b) (d * c) = d • lineCube R a b c := by
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   change _ = (d • planeY₃B₃ R _ _ _).val
   rw [← planeY₃B₃_smul]
   change (planeY₃B₃ R _ _ _).val = (planeY₃B₃ R _ _ _).val

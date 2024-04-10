@@ -23,10 +23,10 @@ def familyUniversalLinear (n : ℕ) :
     (by rw [familyUniversal_accSU2, SU2Sol S, mul_zero])
     (by rw [familyUniversal_accSU3, SU3Sol S, mul_zero])
   map_add' S T := by
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     exact (familyUniversal n).map_add' _ _
   map_smul' a S := by
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     exact (familyUniversal n).map_smul' _ _
 
 def familyUniversalQuad (n : ℕ) :

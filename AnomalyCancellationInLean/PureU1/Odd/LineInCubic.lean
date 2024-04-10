@@ -55,7 +55,7 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).LinSols} (h : lineInCubic S
 /-- The line from P to P! through S is within the cubic for all permutations of S. -/
 def lineInCubicPerm (S : (PureU1 (2 * n + 1)).LinSols) : Prop :=
   ∀ (M : (FamilyPermutations (2 * n + 1)).group ),
-    lineInCubic ((FamilyPermutations (2 * n + 1)).repAFL M S)
+    lineInCubic ((FamilyPermutations (2 * n + 1)).linSolRep M S)
 
 /-- If `lineInCubicPerm S` then `lineInCubic S`.  -/
 lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).LinSols} (hS : lineInCubicPerm S) :
@@ -64,14 +64,13 @@ lemma lineInCubicPerm_self {S : (PureU1 (2 * n + 1)).LinSols} (hS : lineInCubicP
 /-- If `lineInCubicPerm S` then `lineInCubicPerm (M S)` for all permutations `M`. -/
 lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).LinSols}
     (hS : lineInCubicPerm S) (M' : (FamilyPermutations (2 * n + 1)).group) :
-    lineInCubicPerm ((FamilyPermutations (2 * n + 1)).repAFL M' S) := by
+    lineInCubicPerm ((FamilyPermutations (2 * n + 1)).linSolRep M' S) := by
   rw [lineInCubicPerm]
   intro M
-  have ht : (((ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) M)
-    (((ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) M') S))
-    = (ACCSystemGroupAction.repAFL (FamilyPermutations (2 * n + 1))) (M * M') S
-      := by
-    simp [(FamilyPermutations (2 * n.succ)).repAFL.map_mul']
+  have ht : ((FamilyPermutations (2 * n + 1)).linSolRep M)
+    ((FamilyPermutations (2 * n + 1)).linSolRep M' S)
+    = (FamilyPermutations (2 * n + 1)).linSolRep (M * M') S := by
+    simp [(FamilyPermutations (2 * n.succ)).linSolRep.map_mul']
   rw [ht]
   exact hS (M * M')
 
@@ -82,9 +81,9 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).LinSols}
       (S.val (δ!₂ j) - S.val (δ!₁ j))
       * accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j) = 0 := by
   intro j g f h
-  let S' :=  (FamilyPermutations (2 * n.succ + 1)).repAFL
+  let S' :=  (FamilyPermutations (2 * n.succ + 1)).linSolRep
     (pairSwap (δ!₁ j) (δ!₂ j)) S
-  have hSS' : ((FamilyPermutations (2 * n.succ + 1)).repAFL
+  have hSS' : ((FamilyPermutations (2 * n.succ + 1)).linSolRep
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S' := rfl
   obtain ⟨g', f', hall⟩ := span_basis_swap! j hSS' g f h
   have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h

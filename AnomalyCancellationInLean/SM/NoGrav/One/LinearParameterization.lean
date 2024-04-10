@@ -116,7 +116,7 @@ def bijection : linearParameters ≃ (SMNoGrav 1).LinSols where
     rfl
   right_inv S := by
     simp
-    apply ACCSystemLinear.AnomalyFreeLinear.ext
+    apply ACCSystemLinear.LinSols.ext
     rw [charges_eq_toSpecies_eq]
     intro i
     rw [asLinear_val]

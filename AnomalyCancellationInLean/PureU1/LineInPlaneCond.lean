@@ -28,7 +28,7 @@ def lineInPlaneCond (S : (PureU1 (n)).LinSols) : Prop :=
 
 lemma lineInPlaneCond_perm {S : (PureU1 (n)).LinSols} (hS : lineInPlaneCond S)
     (M : (FamilyPermutations n).group) :
-    lineInPlaneCond ((FamilyPermutations n).repAFL M S) := by
+    lineInPlaneCond ((FamilyPermutations n).linSolRep M S) := by
   intro i1 i2 i3 h1 h2 h3
   rw [FamilyPermutations_anomalyFreeLinear_apply, FamilyPermutations_anomalyFreeLinear_apply,
     FamilyPermutations_anomalyFreeLinear_apply]
@@ -149,7 +149,7 @@ lemma linesInPlane_eq_sq_four {S : (PureU1 4).Sols}
     constAbsProp (S.val i, S.val j) := by
   refine Prop_two constAbsProp (by simp : (0 : Fin 4) ≠ 1) ?_
   intro M
-  let S' := (FamilyPermutations 4).actionAF.toFun S M
+  let S' := (FamilyPermutations 4).solAction.toFun S M
   have hS' :  lineInPlaneCond S'.1.1 :=
     (lineInPlaneCond_perm hS M)
   exact linesInPlane_four S' hS'

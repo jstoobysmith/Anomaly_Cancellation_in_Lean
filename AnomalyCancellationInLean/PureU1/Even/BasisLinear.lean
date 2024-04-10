@@ -321,7 +321,7 @@ def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).LinSols := fun i
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
 lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n.succ)).repAFL
+    (hS : ((FamilyPermutations (2 * n.succ)).linSolRep
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
   funext i
@@ -587,7 +587,7 @@ lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n) → ℚ)  : Pa' f = Pa' f' ↔ f =
   funext i
   rw [Pa', Pa'] at h
   have h1 : ∑ i : Fin (succ n) ⊕ Fin n, (f i + (- f' i)) • basisa i = 0 := by
-    simp only [(PureU1 _).AnomalyFreeLinearAddCommModule.add_smul, neg_smul]
+    simp only [add_smul, neg_smul]
     rw [Finset.sum_add_distrib]
     rw [h]
     rw [← Finset.sum_add_distrib]
@@ -625,7 +625,7 @@ lemma join_Pa (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
   rw [join_ext] at h
   rw [h.left, h.right]
   intro h
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   rw [Pa'_P'_P!', Pa'_P'_P!']
   simp [P'_val, P!'_val]
   exact h
@@ -674,7 +674,7 @@ lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ )).LinSols) (j : Fin
   simp_all only [Set.mem_range, exists_apply_eq_apply]
 
 lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n.succ)).repAFL
+    (hS : ((FamilyPermutations (2 * n.succ)).linSolRep
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
      (h : S.val = P g + P! f):
     ∃
@@ -701,14 +701,14 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
 lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
     (hS : vectorLikeEven S.val) :
    ∃ (M : (FamilyPermutations (2 * n.succ)).group),
-    (FamilyPermutations (2 * n.succ)).repAFL M S
+    (FamilyPermutations (2 * n.succ)).linSolRep M S
     ∈ Submodule.span ℚ (Set.range basis) := by
   use (Tuple.sort S.val).symm
   change sortAFL S ∈ Submodule.span ℚ (Set.range basis)
   rw [mem_span_range_iff_exists_fun ℚ]
   let f : Fin n.succ → ℚ := fun i => (sortAFL S).val (δ₁ i)
   use f
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   rw [sortAFL_val]
   erw [P'_val]
   apply ext_δ

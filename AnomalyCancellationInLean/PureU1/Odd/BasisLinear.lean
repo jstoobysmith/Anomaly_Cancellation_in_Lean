@@ -313,7 +313,7 @@ end theBasisVectors
 
 /-- Swapping the elements δ!₁ j and δ!₂ j is equivalent to adding a vector basis!AsCharges j. -/
 lemma swap!_as_add {S S' : (PureU1 (2 * n + 1)).LinSols} (j : Fin n)
-    (hS : ((FamilyPermutations (2 * n + 1)).repAFL
+    (hS : ((FamilyPermutations (2 * n + 1)).linSolRep
     (pairSwap (δ!₁ j)  (δ!₂ j))) S = S') :
     S'.val = S.val + (S.val (δ!₂ j) - S.val (δ!₁ j)) • basis!AsCharges j := by
   funext i
@@ -572,7 +572,7 @@ lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n.succ) → ℚ)  : Pa' f = Pa' f' �
   funext i
   rw [Pa', Pa'] at h
   have h1 : ∑ i : Fin n.succ ⊕ Fin n.succ, (f i + (- f' i)) • basisa i = 0 := by
-    simp only [(PureU1 _).AnomalyFreeLinearAddCommModule.add_smul, neg_smul]
+    simp only [add_smul, neg_smul]
     rw [Finset.sum_add_distrib]
     rw [h]
     rw [← Finset.sum_add_distrib]
@@ -610,7 +610,7 @@ lemma join_Pa (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
   rw [join_ext] at h
   rw [h.left, h.right]
   intro h
-  apply ACCSystemLinear.AnomalyFreeLinear.ext
+  apply ACCSystemLinear.LinSols.ext
   rw [Pa'_P'_P!', Pa'_P'_P!']
   simp [P'_val, P!'_val]
   exact h
@@ -646,7 +646,7 @@ lemma span_basis (S : (PureU1 (2 * n.succ + 1)).LinSols) :
   rfl
 
 lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
-    (hS : ((FamilyPermutations (2 * n.succ + 1)).repAFL
+    (hS : ((FamilyPermutations (2 * n.succ + 1)).linSolRep
     (pairSwap (δ!₁ j) (δ!₂ j))) S = S') (g f : Fin n.succ → ℚ) (hS1 : S.val = P g + P! f):
     ∃ (g' f' : Fin n.succ → ℚ),
      S'.val = P g' + P! f' ∧ P! f' = P! f +

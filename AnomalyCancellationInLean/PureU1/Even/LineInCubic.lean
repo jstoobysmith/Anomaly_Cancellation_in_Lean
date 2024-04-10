@@ -56,7 +56,7 @@ lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).LinSols} (h : lineInCubic 
 
 def lineInCubicPerm (S : (PureU1 (2 * n.succ)).LinSols) : Prop :=
   ∀ (M : (FamilyPermutations (2 * n.succ)).group ),
-  lineInCubic ((FamilyPermutations (2 * n.succ)).repAFL M S)
+  lineInCubic ((FamilyPermutations (2 * n.succ)).linSolRep M S)
 
 /-- If `lineInCubicPerm S` then `lineInCubic S`.  -/
 lemma lineInCubicPerm_self {S : (PureU1 (2 * n.succ)).LinSols}
@@ -65,12 +65,12 @@ lemma lineInCubicPerm_self {S : (PureU1 (2 * n.succ)).LinSols}
 /-- If `lineInCubicPerm S` then `lineInCubicPerm (M S)` for all permutations `M`. -/
 lemma lineInCubicPerm_permute {S : (PureU1 (2 * n.succ)).LinSols}
     (hS : lineInCubicPerm S) (M' : (FamilyPermutations (2 * n.succ)).group) :
-    lineInCubicPerm ((FamilyPermutations (2 * n.succ)).repAFL M' S) := by
+    lineInCubicPerm ((FamilyPermutations (2 * n.succ)).linSolRep M' S) := by
   rw [lineInCubicPerm]
   intro M
   change lineInCubic
-    (((FamilyPermutations (2 * n.succ)).repAFL M * (FamilyPermutations (2 * n.succ)).repAFL M') S)
-  erw [← (FamilyPermutations (2 * n.succ)).repAFL.map_mul M M']
+    (((FamilyPermutations (2 * n.succ)).linSolRep M * (FamilyPermutations (2 * n.succ)).linSolRep M') S)
+  erw [← (FamilyPermutations (2 * n.succ)).linSolRep.map_mul M M']
   exact hS (M * M')
 
 lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
@@ -79,8 +79,8 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
       (S.val (δ!₂ j) - S.val (δ!₁ j))
       * accCubeTriLinSymm.toFun (P g, P g, basis!AsCharges j) = 0 := by
   intro j g f h
-  let S' :=  (FamilyPermutations (2 * n.succ)).repAFL (pairSwap (δ!₁ j) (δ!₂ j)) S
-  have hSS' : ((FamilyPermutations (2 * n.succ)).repAFL (pairSwap (δ!₁ j) (δ!₂ j))) S = S' := rfl
+  let S' :=  (FamilyPermutations (2 * n.succ)).linSolRep (pairSwap (δ!₁ j) (δ!₂ j)) S
+  have hSS' : ((FamilyPermutations (2 * n.succ)).linSolRep (pairSwap (δ!₁ j) (δ!₂ j))) S = S' := rfl
   obtain ⟨g', f', hall⟩ := span_basis_swap! j hSS' g f h
   have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h
   have h2 := line_in_cubic_P_P_P!
@@ -151,7 +151,7 @@ theorem  lineInCubicPerm_vectorLike  {S : (PureU1 (2 * n.succ.succ)).Sols}
 
 theorem lineInCubicPerm_in_plane  (S : (PureU1 (2 * n.succ.succ)).Sols)
     (LIC : lineInCubicPerm S.1.1) : ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
-    (FamilyPermutations (2 * n.succ.succ)).repAFL M S.1.1
+    (FamilyPermutations (2 * n.succ.succ)).linSolRep M S.1.1
     ∈ Submodule.span ℚ (Set.range basis) :=
   vectorLikeEven_in_span S.1.1 (lineInCubicPerm_vectorLike LIC)
 
