@@ -1,11 +1,12 @@
 # Anomaly cancellation in Lean 4 
 Copyright: Joseph Tooby-Smith 
 
-As a proof-of-concept of the use of lean 4 in high energy physics, we create a lean-4 project of results related to annomaly cancellation in physics. My aim is to slowly expand it other areas of high energy physics. 
+As a proof-of-concept of the use of lean 4 in high energy physics, we create a lean-4 project of results related to annomaly cancellation in physics. My aim is to slowly expand it other areas of high energy physics creating a project called `HEPLean`. 
 
 To learn more about this project see: 
 
 https://leanprover.zulipchat.com/#narrow/stream/395462-Natural-sciences/topic/Anomaly.20cancellation.20conditions
+
 
 
 ## Installation
@@ -36,3 +37,10 @@ To view the docs:
 3. Open the directory `.lake/build/doc` by running `cd .lake/build/doc`. 
 4. Run `python3 -m http.server`
 5. Open `.lake/build/doc/index.html` 
+
+## Workflows 
+
+This github repository uses a number of workflows.
+
+- `lean-upgrade-action` found at https://github.com/leanprover-contrib/lean-upgrade-action
+

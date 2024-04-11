@@ -20,8 +20,8 @@ It defines a module structure on the charges, and the solutions to the linear AC
 
 ## TODO
 
-In the future information about the fermionic representations, and the gauge algebra
-should lead to an ACCSystem.
+- Derive ACC systems from gauge algebras and fermionic representations.
+- Relate ACCSystems to algebraic varities.
 
 -/
 
@@ -65,22 +65,26 @@ instance ChargesAddCommGroup (χ : ACCSystemCharges) : AddCommGroup χ.charges :
 
 end ACCSystemCharges
 
+/-- The type of charges plus the linear ACCs. -/
 structure ACCSystemLinear extends ACCSystemCharges where
   numberLinear : ℕ
   linearACCs : Fin numberLinear → (toACCSystemCharges.charges →ₗ[ℚ] ℚ)
 
 namespace ACCSystemLinear
 
+/-- The type of solutions to the linear ACCs. -/
 structure LinSols (χ : ACCSystemLinear) where
   val : χ.1.charges
   linearSol : ∀ i : Fin χ.numberLinear, χ.linearACCs i val = 0
 
+/-- Two solutions are equal if the underlying charges are equal. -/
 @[ext]
-lemma LinSols.ext {χ : ACCSystemLinear} {S T : χ.LinSols} (h : S.val = T.val) :
-    S = T := by
+lemma LinSols.ext {χ : ACCSystemLinear} {S T : χ.LinSols} (h : S.val = T.val) : S = T := by
   cases' S
   simp_all only
 
+/-- An instance providng the operations and properties for `LinSols` to form an
+  addative commutative monoid. -/
 @[simps!]
 instance linSolsAddCommMonoid (χ : ACCSystemLinear) :
     AddCommMonoid χ.LinSols where
@@ -114,6 +118,8 @@ instance linSolsAddCommMonoid (χ : ACCSystemLinear) :
     apply LinSols.ext
     exact χ.chargesAddCommMonoid.nsmul_succ _ _
 
+/-- An instance providng the operations and properties for `LinSols` to form an
+  module over `ℚ`. -/
 @[simps!]
 instance linSolsModule  (χ : ACCSystemLinear) : Module ℚ χ.LinSols where
   smul a S := ⟨a • S.val, by
@@ -139,12 +145,12 @@ instance linSolsModule  (χ : ACCSystemLinear) : Module ℚ χ.LinSols where
     apply LinSols.ext
     exact χ.chargesModule.add_smul _ _ _
 
-instance linSolsAddCommGroup (χ : ACCSystemLinear) :
-    AddCommGroup χ.LinSols :=
+/-- An instance providing the operations and properties for `LinSols` to form an
+  an addative community. -/
+instance linSolsAddCommGroup (χ : ACCSystemLinear) : AddCommGroup χ.LinSols :=
   Module.addCommMonoidToAddCommGroup ℚ
 
-/-- The linear map reperesenting the
- inclusion of charges satisfying the linear anomaly free equations into all charges. -/
+/-- The inclusion of `LinSols` into `charges`. -/
 def linSolsIncl (χ : ACCSystemLinear) : χ.LinSols →ₗ[ℚ] χ.charges where
   toFun S := S.val
   map_add' _ _ := rfl
@@ -152,15 +158,18 @@ def linSolsIncl (χ : ACCSystemLinear) : χ.LinSols →ₗ[ℚ] χ.charges where
 
 end ACCSystemLinear
 
+/-- The type of charges plus the linear ACCs plus the quadratic ACCs. -/
 structure ACCSystemQuad extends ACCSystemLinear where
   numberQuadratic : ℕ
   quadraticACCs : Fin numberQuadratic → HomogeneousQuadratic toACCSystemCharges.charges
 
 namespace ACCSystemQuad
 
+/-- The type of solutions to the linear and quadratic ACCs. -/
 structure QuadSols (χ : ACCSystemQuad) extends χ.LinSols where
   quadSol : ∀ i : Fin χ.numberQuadratic, (χ.quadraticACCs i) val = 0
 
+/-- Two `QuadSols` are equal if the underlying charges are equal. -/
 @[ext]
 lemma QuadSols.ext {χ : ACCSystemQuad} {S T : χ.QuadSols} (h : S.val = T.val) :
     S = T := by
@@ -168,7 +177,7 @@ lemma QuadSols.ext {χ : ACCSystemQuad} {S T : χ.QuadSols} (h : S.val = T.val) 
   cases' S
   simp_all only
 
-/-- The scalar multiple of any solution to the linear + quadratic equations is still a solution. -/
+/-- An instance giving the properties and structures to define an action of `ℚ` on `QuadSols`. -/
 instance quadSolsMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.QuadSols where
   smul a S :=  ⟨a • S.toLinSols , by
     intro i
@@ -183,38 +192,43 @@ instance quadSolsMulAction (χ : ACCSystemQuad) : MulAction ℚ χ.QuadSols wher
     apply QuadSols.ext
     exact one_smul _ _
 
+/-- The inclusion of quadratic solutions into linear solutions. -/
 def quadSolsInclLinSols (χ : ACCSystemQuad) :
     MulActionHom ℚ χ.QuadSols χ.LinSols  where
   toFun  := QuadSols.toLinSols
   map_smul' _ _ := rfl
 
-
+/-- If there are no quadratic equations (i.e. no U(1)'s in the underlying gauge group. The inclusion
+  of linear solutions into quadratic solutions. -/
 def linSolsInclQuadSolsZero (χ : ACCSystemQuad) (h : χ.numberQuadratic = 0) :
     MulActionHom ℚ χ.LinSols χ.QuadSols where
   toFun S := ⟨S, by intro i; rw [h] at i; exact Fin.elim0 i⟩
   map_smul' _ _ := rfl
 
-def quadSolsIncl (χ : ACCSystemQuad) :
-    MulActionHom ℚ χ.QuadSols χ.charges :=
-  MulActionHom.comp χ.linSolsIncl  χ.quadSolsInclLinSols
+/-- The inclusion of quadratic solutions into all charges. -/
+def quadSolsIncl (χ : ACCSystemQuad) : MulActionHom ℚ χ.QuadSols χ.charges :=
+  MulActionHom.comp χ.linSolsIncl χ.quadSolsInclLinSols
 
 end ACCSystemQuad
 
+/-- The type of charges plus the anomaly cancellation conditions. -/
 structure ACCSystem extends ACCSystemQuad where
   cubicACC : HomogeneousCubic toACCSystemCharges.charges
 
 namespace ACCSystem
 
+/-- The type of solutions to the anomaly cancellation conditions. -/
 structure Sols (χ : ACCSystem) extends χ.QuadSols where
   cubicSol : χ.cubicACC val = 0
 
+/-- Two solutions are equal if the underlying charges are equal. -/
 lemma Sols.ext {χ : ACCSystem} {S T : χ.Sols} (h : S.val = T.val) :
     S = T := by
   have h  := ACCSystemQuad.QuadSols.ext h
   cases' S
   simp_all only
 
-/-- The scalar multiple of any solution to the linear + quadratic equations is still a solution. -/
+/-- An instance giving the properties and structures to define an action of `ℚ` on `Sols`. -/
 instance solsMulAction (χ : ACCSystem) : MulAction ℚ χ.Sols where
   smul a S :=  ⟨a • S.toQuadSols , by
     erw [(χ.cubicACC).map_smul]
@@ -227,26 +241,26 @@ instance solsMulAction (χ : ACCSystem) : MulAction ℚ χ.Sols where
     apply Sols.ext
     exact one_smul _ _
 
-/-- The inclusion of the anomaly free solution into solutions of the quadratic and
-linear equations -/
-def solsInclQuadSols (χ : ACCSystem) :
-    MulActionHom ℚ χ.Sols χ.QuadSols  where
+/-- The inclusion of `Sols` into `QuadSols`. -/
+def solsInclQuadSols (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.QuadSols  where
   toFun  := Sols.toQuadSols
   map_smul' _ _ := rfl
 
-/-- The inclusion of anomaly free solutions into all solutions of the linear equations. -/
+/-- The inclusion of `Sols` into `LinSols`. -/
 def solsInclLinSols (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.LinSols :=
   MulActionHom.comp χ.quadSolsInclLinSols χ.solsInclQuadSols
 
-/-- The inclusion of anomaly free solutions into all charges. -/
+/-- The inclusion of `Sols` into `LinSols`. -/
 def solsIncl (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.charges :=
   MulActionHom.comp χ.quadSolsIncl χ.solsInclQuadSols
 
+/-- The structure of a map between two ACCSystems. -/
 structure Hom (χ η : ACCSystem) where
   charges : χ.charges →ₗ[ℚ] η.charges
   anomalyFree : χ.Sols → η.Sols
   commute : charges ∘ χ.solsIncl = η.solsIncl ∘ anomalyFree
 
+/-- The definition of composition between two ACCSystems. -/
 def Hom.comp {χ η ε : ACCSystem} (g : Hom η ε) (f : Hom χ η) : Hom χ ε where
   charges := LinearMap.comp g.charges f.charges
   anomalyFree := g.anomalyFree ∘ f.anomalyFree
