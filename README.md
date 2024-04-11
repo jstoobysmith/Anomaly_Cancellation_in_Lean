@@ -44,3 +44,6 @@ This github repository uses a number of workflows.
 
 - `lean-upgrade-action` found at https://github.com/leanprover-contrib/lean-upgrade-action
 
+Run lint using (TODO : Make into workflow): 
+
+`./.lake/packages/mathlib/scripts/lint-style.py $(find AnomalyCancellationInLean -name '*.lean')`

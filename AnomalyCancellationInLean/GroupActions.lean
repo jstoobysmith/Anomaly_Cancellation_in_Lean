@@ -22,11 +22,17 @@ From this we define
 the vector spaces of charges under which the anomaly equations are invariant.
 -/
 structure ACCSystemGroupAction (χ : ACCSystem) where
+  /-- The underlying type of the group-/
   group : Type
+  /-- An instance given group the structure of a group. -/
   groupInst : Group group
+  /-- The representation of group acting on the vector space of charges. -/
   rep : Representation ℚ group χ.charges
+  /-- The invariance of the linear ACCs under the group action. -/
   linearInvariant : ∀ i g S, χ.linearACCs i (rep g S) = χ.linearACCs i S
+  /-- The invariance of the quadratic ACCs under the group action. -/
   quadInvariant : ∀ i g S, (χ.quadraticACCs i) (rep g S) = (χ.quadraticACCs i) S
+  /-- The invariance of the cubic ACC under the group action. -/
   cubicInvariant : ∀ g S, χ.cubicACC (rep g S) = χ.cubicACC S
 
 namespace ACCSystemGroupAction
