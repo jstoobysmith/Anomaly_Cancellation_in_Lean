@@ -27,6 +27,7 @@ It defines a module structure on the charges, and the solutions to the linear AC
 
 /-- A system of charges, specified by the number of charges. -/
 structure ACCSystemCharges where
+  /-- The number of charges. -/
   numberCharges : ℕ
 
 /--
@@ -67,14 +68,18 @@ end ACCSystemCharges
 
 /-- The type of charges plus the linear ACCs. -/
 structure ACCSystemLinear extends ACCSystemCharges where
+  /-- The number of linear ACCs. -/
   numberLinear : ℕ
+  /-- The linear ACCs. -/
   linearACCs : Fin numberLinear → (toACCSystemCharges.charges →ₗ[ℚ] ℚ)
 
 namespace ACCSystemLinear
 
 /-- The type of solutions to the linear ACCs. -/
 structure LinSols (χ : ACCSystemLinear) where
+  /-- The underlying charge. -/
   val : χ.1.charges
+  /-- The condition that the charge satifies the linear ACCs. -/
   linearSol : ∀ i : Fin χ.numberLinear, χ.linearACCs i val = 0
 
 /-- Two solutions are equal if the underlying charges are equal. -/
@@ -160,13 +165,16 @@ end ACCSystemLinear
 
 /-- The type of charges plus the linear ACCs plus the quadratic ACCs. -/
 structure ACCSystemQuad extends ACCSystemLinear where
+  /-- The number of quadratic ACCs. -/
   numberQuadratic : ℕ
+  /-- The quadratic ACCs. -/
   quadraticACCs : Fin numberQuadratic → HomogeneousQuadratic toACCSystemCharges.charges
 
 namespace ACCSystemQuad
 
 /-- The type of solutions to the linear and quadratic ACCs. -/
 structure QuadSols (χ : ACCSystemQuad) extends χ.LinSols where
+  /-- The condition that the charge satifies the quadratic ACCs. -/
   quadSol : ∀ i : Fin χ.numberQuadratic, (χ.quadraticACCs i) val = 0
 
 /-- Two `QuadSols` are equal if the underlying charges are equal. -/
@@ -213,12 +221,14 @@ end ACCSystemQuad
 
 /-- The type of charges plus the anomaly cancellation conditions. -/
 structure ACCSystem extends ACCSystemQuad where
+  /-- The cubic ACC. -/
   cubicACC : HomogeneousCubic toACCSystemCharges.charges
 
 namespace ACCSystem
 
 /-- The type of solutions to the anomaly cancellation conditions. -/
 structure Sols (χ : ACCSystem) extends χ.QuadSols where
+  /-- The condition that the charge satifies the cubic ACC. -/
   cubicSol : χ.cubicACC val = 0
 
 /-- Two solutions are equal if the underlying charges are equal. -/
@@ -256,8 +266,11 @@ def solsIncl (χ : ACCSystem) : MulActionHom ℚ χ.Sols χ.charges :=
 
 /-- The structure of a map between two ACCSystems. -/
 structure Hom (χ η : ACCSystem) where
+  /-- The linear map between vector spaces of charges. -/
   charges : χ.charges →ₗ[ℚ] η.charges
+  /-- The map between solutions. -/
   anomalyFree : χ.Sols → η.Sols
+  /-- The condition that the map commutes with the relevent inclusions. -/
   commute : charges ∘ χ.solsIncl = η.solsIncl ∘ anomalyFree
 
 /-- The definition of composition between two ACCSystems. -/

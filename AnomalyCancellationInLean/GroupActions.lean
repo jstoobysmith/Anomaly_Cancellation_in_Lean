@@ -69,11 +69,12 @@ def linSolRep {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
 
 /-- The representation on the charges and anomaly free solutions
 commutes with the inclusion. -/
-lemma rep_repAFL_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+lemma rep_linSolRep_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.LinSols) : χ.linSolsIncl (G.linSolRep g S) =
     G.rep g (χ.linSolsIncl S) := rfl
 
-/-- The group action acting on solutions to the quadratic equations. -/
+/-- An instance given the structure to define a multiplicative action of `G.group` on `quadSols`.
+ -/
 instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.QuadSols where
   smul f S := ⟨G.linSolRep f S.1, by
@@ -92,18 +93,16 @@ instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     rw [G.rep.map_one']
     rfl
 
-lemma linSolAction_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+lemma linSolRep_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.QuadSols) :  χ.quadSolsInclLinSols (G.quadSolAction.toFun S g) =
     G.linSolRep g (χ.quadSolsInclLinSols S) := rfl
 
-lemma rep_actionAnomalyFreeQuad_commute {χ : ACCSystem}
-    (G : ACCSystemGroupAction χ) (g : G.group)
+lemma rep_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.QuadSols) :  χ.quadSolsIncl (G.quadSolAction.toFun S g) =
     G.rep g (χ.quadSolsIncl S) := rfl
 
 /-- The group action acting on solutions to the anomaly cancellation conditions. -/
-instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
-    MulAction G.group χ.Sols where
+instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) : MulAction G.group χ.Sols where
   smul g S := ⟨G.quadSolAction.toFun S.1 g, by
    simp
    change χ.cubicACC (G.rep g S.val) = 0
@@ -120,19 +119,15 @@ instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     rw [G.rep.map_one']
     rfl
 
-lemma actionAnomalyFreeQuad_actionAnomalyFree_commute {χ : ACCSystem}
-    (G : ACCSystemGroupAction χ) (g : G.group)
+lemma quadSolAction_solAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.Sols) :  χ.solsInclQuadSols (G.solAction.toFun S g) =
     G.quadSolAction.toFun (χ.solsInclQuadSols S) g := rfl
 
-lemma repAnomalyFreeLinear_actionAnomalyFree_commute {χ : ACCSystem}
-    (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.Sols) :  χ.solsInclLinSols (G.solAction.toFun S g) =
+lemma linSolRep_solAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+    (S : χ.Sols) : χ.solsInclLinSols (G.solAction.toFun S g) =
     G.linSolRep g (χ.solsInclLinSols S) := rfl
 
-lemma rep_actionAnomalyFree_commute {χ : ACCSystem}
-    (G : ACCSystemGroupAction χ) (g : G.group)
-    (S : χ.Sols) :  χ.solsIncl (G.solAction.toFun S g) =
-    G.rep g (χ.solsIncl S) := rfl
+lemma rep_solAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
+    (S : χ.Sols) : χ.solsIncl (G.solAction.toFun S g) = G.rep g (χ.solsIncl S) := rfl
 
 end ACCSystemGroupAction
