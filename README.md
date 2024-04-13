@@ -47,3 +47,5 @@ This github repository uses a number of workflows.
 Run lint using (TODO : Make into workflow): 
 
 `./.lake/packages/mathlib/scripts/lint-style.py $(find AnomalyCancellationInLean -name '*.lean')`
+
+`lake exe runLinter AnomalyCancellationInLean`

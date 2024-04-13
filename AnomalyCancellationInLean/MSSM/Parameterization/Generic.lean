@@ -6,9 +6,23 @@ Authors: Joseph Tooby-Smith
 import AnomalyCancellationInLean.MSSM.Basic
 import AnomalyCancellationInLean.MSSM.Parameterization.LineY3B3
 import AnomalyCancellationInLean.MSSM.Parameterization.PlaneY3B3
-
 import Mathlib.Tactic.Polyrith
--- Reference : https://arxiv.org/pdf/2107.07926.pdf
+/-!
+# Parameterization of solutions to the MSSM anomaly cancellation equations
+
+Split into four cases:
+- The generic case.
+- `case₁`: The case when the quadratic and cubic lines agree (if they exist uniquely).
+- `case₂`: The case where the plane lies entirely within the quadratic.
+- `case₃`: The case where the plane lies entirely within the cubic and quadratic.
+
+# References
+
+The main reference for the material in this file is:
+
+- https://arxiv.org/pdf/2107.07926.pdf
+
+-/
 
 universe v u
 
@@ -45,11 +59,8 @@ lemma generic_eq_planeY₃B₃_on_α (R : MSSMACC.AnomalyFreePerp) :
 def case₁prop (R : MSSMACC.AnomalyFreePerp) : Prop :=
     α₁ R = 0 ∧ α₂ R = 0 ∧ α₃ R = 0
 
-
-
 def case₂prop (R : MSSMACC.AnomalyFreePerp) : Prop :=
     quadBiLin (R.val, R.val) = 0 ∧ quadBiLin (Y₃.val, R.val) = 0 ∧ quadBiLin (B₃.val, R.val) = 0
-
 
 def case₃prop (R : MSSMACC.AnomalyFreePerp) : Prop :=
     quadBiLin (R.val, R.val) = 0 ∧ quadBiLin (Y₃.val, R.val) = 0 ∧ quadBiLin (B₃.val, R.val) = 0 ∧
@@ -108,7 +119,7 @@ lemma genericProjCoeff_zero (T : MSSMACC.Sols) :
   intro hT
   rw [case₁prop]
   rw [genericProjCoeff_zero_α₁ T hT, genericProjCoeff_zero_α₂ T hT, genericProjCoeff_zero_α₃ T hT]
-  simp
+  simp only [and_self]
   intro h
   rw [case₁prop] at h
   rw [genericProjCoeff]
@@ -251,7 +262,7 @@ lemma case₁ProjCoeff_zero (T : MSSMACC.Sols) :
   intro h1
   rw [case₂prop]
   rw [case₁ProjCoeff_zero_self T h1, case₁ProjCoeff_zero_Y₃ T h1, case₁ProjCoeff_zero_B₃ T h1]
-  simp
+  simp only [and_self]
   intro h
   rw [case₂prop] at h
   rw [case₁ProjCoeff]
@@ -275,8 +286,8 @@ end proj
 /-- The case where the plane lies entirely within the quadratic. -/
 def case₂ (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ)
     (h : case₂prop R) : MSSMACC.Sols :=
-  AnomalyFreeMk' (lineCube R a₁ a₂ a₃) (
-    by
+  AnomalyFreeMk' (lineCube R a₁ a₂ a₃)
+    (by
       erw [planeY₃B₃_quad]
       rw [h.1, h.2.1, h.2.2]
       simp)
@@ -320,18 +331,18 @@ lemma case₂_proj (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T = 0) :
   rfl
 
 lemma case₂ProjCoeff_ne_zero (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T = 0)
-      (hT : case₂ProjCoeff T ≠ 0 ) :
+    (hT : case₂ProjCoeff T ≠ 0 ) :
     (case₂ProjCoeff T)⁻¹ • case₂ (proj T.1.1)
-       (case₂ProjC₁ T)
-       (case₂ProjC₂ T)
-       (case₂ProjC₃ T)
-       ((case₁ProjCoeff_zero T).mp h1) = T := by
+      (case₂ProjC₁ T)
+      (case₂ProjC₂ T)
+      (case₂ProjC₃ T)
+      ((case₁ProjCoeff_zero T).mp h1) = T := by
   rw [case₂_proj T h1, ← MulAction.mul_smul, mul_comm, mul_inv_cancel hT]
   simp
 
 lemma case₂ProjCoeff_zero_Y₃_B₃ (T : MSSMACC.Sols) (h1 : case₂ProjCoeff T = 0) :
-     cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, Y₃.val) = 0 ∧
-     cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, B₃.val) = 0 := by
+    cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, Y₃.val) = 0 ∧
+    cubeTriLin ((proj T.1.1).val, (proj T.1.1).val, B₃.val) = 0 := by
   rw [case₂ProjCoeff, mul_eq_zero] at h1
   rw [show dot (Y₃.val, B₃.val) = 108 by rfl] at h1
   simp at h1
@@ -389,21 +400,21 @@ lemma case₂ProjCoeff_zero (T : MSSMACC.Sols) :
   rw [case₃prop]
   rw [case₂ProjCoeff_zero_self T h1.2, case₂ProjCoeff_zero_Y₃ T h1.2, case₂ProjCoeff_zero_B₃ T h1.2]
   rw [case₁ProjCoeff_zero_self T h1.1, case₁ProjCoeff_zero_Y₃ T h1.1, case₁ProjCoeff_zero_B₃ T h1.1]
-  simp
+  simp only [and_self]
   intro h
   rw [case₃prop] at h
   rw [case₁ProjCoeff, case₂ProjCoeff]
   simp_all only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero,
     mul_zero,  mul_eq_zero, pow_eq_zero_iff, false_or, true_and]
   erw [show dot (Y₃.val, B₃.val) = 108 by rfl]
-  simp
+  simp only [OfNat.ofNat_ne_zero, false_or]
   have h1' := cube_proj_proj_B₃ T.1.1
   have h2' := cube_proj_proj_Y₃ T.1.1
   erw [show dot (Y₃.val, B₃.val) = 108 by rfl] at h1' h2'
   simp_all
 
 lemma case₂ProjCoeff_ne_zero_case₃ (T : MSSMACC.Sols) (h1 : case₂ProjCoeff T ≠ 0) :
-     ¬ case₃prop (proj T.1.1) := by
+    ¬ case₃prop (proj T.1.1) := by
   have h1 : ¬ (case₁ProjCoeff T = 0 ∧ case₂ProjCoeff T = 0) := by
     simp_all
   exact (case₂ProjCoeff_zero T).mpr.mt h1
@@ -462,7 +473,7 @@ lemma case₃_smul_coeff (T : MSSMACC.Sols) (h0 : case₁ProjCoeff T = 0) (h1 : 
        ((case₂ProjCoeff_zero T).mp (And.intro h0 h1)) = T := by
   rw [case₃_proj T h0 h1]
   rw [← MulAction.mul_smul, mul_comm, mul_inv_cancel]
-  simp
+  simp only [one_smul]
   rw [case₃ProjCoeff]
   rw [show dot (Y₃.val, B₃.val) = 108 by rfl]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true]
@@ -515,15 +526,13 @@ lemma parameterization_is₁_not₂₃ (R : MSSMACC.AnomalyFreePerp) (a b c : �
   rw [dif_neg h2]
   rw [dif_pos h1]
 
-lemma parameterization_is₁₂_not₃ (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ)
-     (h2 : case₂prop R) (h3 : ¬ case₃prop R) :
-    parameterization (R, a, b, c) = case₂ R a b c h2 := by
+lemma parameterization_is₁₂_not₃ (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (h2 : case₂prop R)
+    (h3 : ¬ case₃prop R) : parameterization (R, a, b, c) = case₂ R a b c h2 := by
   rw [parameterization]
   rw [dif_neg h3]
   rw [dif_pos h2]
 
-lemma parameterization_is₃ (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ)
-     (h3 : case₃prop R) :
+lemma parameterization_is₃ (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (h3 : case₃prop R) :
     parameterization (R, a, b, c) = case₃ R a b c h3 := by
   rw [parameterization]
   rw [dif_pos h3]
@@ -548,23 +557,20 @@ lemma inverse_generic (R : MSSMACC.Sols) (h : genericProjCoeff R ≠ 0) :
   rw [inverse, if_pos h]
 
 lemma inverse_case₁ (R : MSSMACC.Sols) (h0 : genericProjCoeff R = 0)
-      (h1 : case₁ProjCoeff R ≠ 0) :
-    inverse R = (proj R.1.1, (case₁ProjCoeff R)⁻¹ * case₁ProjC₁
-      R, (case₁ProjCoeff R)⁻¹ * case₁ProjC₂ R,
-     (case₁ProjCoeff R)⁻¹ * case₁ProjC₃ R) := by
+    (h1 : case₁ProjCoeff R ≠ 0) : inverse R = (proj R.1.1, (case₁ProjCoeff R)⁻¹ * case₁ProjC₁ R,
+    (case₁ProjCoeff R)⁻¹ * case₁ProjC₂ R, (case₁ProjCoeff R)⁻¹ * case₁ProjC₃ R) := by
   rw [inverse]
   simp_all
 
 lemma inverse_case₂ (R : MSSMACC.Sols) (h0 : genericProjCoeff R = 0)
-      (h1 : case₁ProjCoeff R = 0) (h2 : case₂ProjCoeff R ≠ 0) :
-    inverse R = (proj R.1.1, (case₂ProjCoeff R)⁻¹ * case₂ProjC₁
-      R, (case₂ProjCoeff R)⁻¹ * case₂ProjC₂ R,
-     (case₂ProjCoeff R)⁻¹ * case₂ProjC₃ R) := by
+    (h1 : case₁ProjCoeff R = 0) (h2 : case₂ProjCoeff R ≠ 0) : inverse R = (proj R.1.1,
+    (case₂ProjCoeff R)⁻¹ * case₂ProjC₁ R,
+    (case₂ProjCoeff R)⁻¹ * case₂ProjC₂ R, (case₂ProjCoeff R)⁻¹ * case₂ProjC₃ R) := by
   rw [inverse]
   simp_all
 
 lemma inverse_case₃ (R : MSSMACC.Sols) (h0 : genericProjCoeff R = 0)
-      (h1 : case₁ProjCoeff R = 0) (h2 : case₂ProjCoeff R = 0)  :
+    (h1 : case₁ProjCoeff R = 0) (h2 : case₂ProjCoeff R = 0)  :
     inverse R =  (proj R.1.1, (case₃ProjCoeff)⁻¹ * case₃ProjC₁ R,
     (case₃ProjCoeff)⁻¹ * case₃ProjC₂ R,
     (case₃ProjCoeff)⁻¹ * 1) := by

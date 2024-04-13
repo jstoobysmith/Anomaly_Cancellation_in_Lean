@@ -11,7 +11,7 @@ import AnomalyCancellationInLean.Basic
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Logic.Equiv.Fin
 /-!
-# Anomaly cancellation conditions for n families with RHN.
+# The MSSM with n families and RHNs
 
 -/
 
@@ -90,7 +90,7 @@ lemma charges_eq_toSpecies_eq (S T : MSSMCharges.charges) :
   apply Iff.intro
   intro h
   rw [h]
-  simp
+  simp only [forall_const, Hd_apply, Fin.reduceFinMk, Fin.isValue, Hu_apply, and_self]
   intro h
   apply toSpecies.injective
   apply Prod.ext
@@ -207,7 +207,8 @@ def accSU3 : MSSMCharges.charges →ₗ[ℚ] ℚ where
 lemma accSU3_ext {S T : MSSMCharges.charges}
     (hj : ∀ (j : Fin 6),  ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i) :
     accSU3 S = accSU3 T := by
-  simp
+  simp only [accSU3, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk,
+    AddHom.coe_mk]
   repeat erw [Finset.sum_add_distrib]
   repeat erw [← Finset.mul_sum]
   repeat erw [hj]
@@ -260,9 +261,9 @@ def quadBiLin  : BiLinearSymm MSSMCharges.charges where
     apply Fintype.sum_congr
     intro i
     repeat erw [map_smul]
-    simp [HSMul.hSMul, SMul.smul]
+    simp only [HSMul.hSMul, SMul.smul, toSMSpecies_apply, Fin.isValue, neg_mul, one_mul]
     ring
-    simp
+    simp only [map_smul, Hd_apply, Fin.reduceFinMk, Fin.isValue, smul_eq_mul, neg_mul, Hu_apply]
     ring
   map_add₁' S T R := by
     simp only
@@ -275,15 +276,17 @@ def quadBiLin  : BiLinearSymm MSSMCharges.charges where
     apply Fintype.sum_congr
     intro i
     repeat erw [map_add]
-    simp
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, Fin.isValue, neg_mul,
+      one_mul]
     ring
     rw [Hd.map_add, Hu.map_add]
     ring
   swap' S L := by
-    simp
+    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, neg_mul, one_mul,
+      Hd_apply, Fin.reduceFinMk, Hu_apply]
     congr 1
     rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp
+    simp only [Fin.isValue]
     ring
     ring
 
@@ -332,9 +335,9 @@ lemma cubeTriLinToFun_map_smul₁ (a : ℚ)  (S T R : MSSMCharges.charges) :
   apply Fintype.sum_congr
   intro i
   repeat erw [map_smul]
-  simp [HSMul.hSMul, SMul.smul]
+  simp only [HSMul.hSMul, SMul.smul, toSMSpecies_apply, Fin.isValue]
   ring
-  simp
+  simp only [map_smul, Hd_apply, Fin.reduceFinMk, Fin.isValue, smul_eq_mul, Hu_apply]
   ring
 
 
@@ -351,7 +354,7 @@ lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.charges) :
   apply Fintype.sum_congr
   intro i
   repeat erw [map_add]
-  simp
+  simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, Fin.isValue]
   ring
   rw [Hd.map_add, Hu.map_add]
   ring
@@ -359,19 +362,21 @@ lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.charges) :
 
 lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (T, S, R) := by
-  simp
+  simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
+    Fin.reduceFinMk, Hu_apply]
   congr 1
   rw [Fin.sum_univ_three, Fin.sum_univ_three]
-  simp
+  simp only [Fin.isValue]
   ring
   ring
 
 lemma cubeTriLinToFun_swap2 (S T R : MSSMCharges.charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (S, R, T) := by
-  simp
+  simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
+    Fin.reduceFinMk, Hu_apply]
   congr 1
   rw [Fin.sum_univ_three, Fin.sum_univ_three]
-  simp
+  simp only [Fin.isValue]
   ring
   ring
 
@@ -496,18 +501,21 @@ def dot  : BiLinearSymm MSSMCharges.charges where
     repeat rw [(toSMSpecies _).map_smul]
     rw [Hd.map_smul, Hu.map_smul]
     rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp [HSMul.hSMul, SMul.smul]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, Hd_apply, Fin.reduceFinMk,
+      Hu_apply]
     ring
   map_add₁' S T R := by
-    simp
+    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
+      ACCSystemCharges.chargesAddCommMonoid_add, map_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
     repeat erw [AddHom.map_add]
     rw [Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-    simp
+    simp only [Fin.isValue]
     ring
   swap' S L := by
-    simp
+    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk,
+      Hu_apply]
     rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp
+    simp only [Fin.isValue]
     ring
 
 end MSSMACC

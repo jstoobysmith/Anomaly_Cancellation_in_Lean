@@ -85,7 +85,7 @@ instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.QuadSols where
   smul f S := ⟨G.linSolRep f S.1, by
    intro i
-   simp
+   simp only [linSolRep_apply_apply_val]
    rw [G.quadInvariant, S.quadSol]
   ⟩
   mul_smul f1 f2 S := by
@@ -110,7 +110,7 @@ lemma rep_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (
 /-- The group action acting on solutions to the anomaly cancellation conditions. -/
 instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) : MulAction G.group χ.Sols where
   smul g S := ⟨G.quadSolAction.toFun S.1 g, by
-   simp
+   simp only [MulAction.toFun_apply]
    change χ.cubicACC (G.rep g S.val) = 0
    rw [G.cubicInvariant, S.cubicSol]
   ⟩

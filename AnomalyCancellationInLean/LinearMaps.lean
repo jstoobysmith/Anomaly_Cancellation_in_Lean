@@ -6,9 +6,23 @@ Authors: Joseph Tooby-Smith
 import Mathlib.Tactic.Polyrith
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Module.LinearMap.Basic
+/-!
+# Linear maps
 
+Some definitions and properites of linear, bilinear, and trilinear maps, along with homogeneous
+quadratic and cubic equations.
+
+## TODO
+
+Use definitions in `Mathlib4` for definitions where possible.
+
+-/
+
+/-- The structure defining a homogeneous quadratic equation. -/
 structure HomogeneousQuadratic (V : Type) [AddCommMonoid V] [Module ℚ V] where
+  /-- The quadratic equation. -/
   toFun : V → ℚ
+  /-- The equation is homogeneous. -/
   map_smul' : ∀ a S,  toFun (a • S) = a ^ 2 * toFun S
 
 namespace HomogeneousQuadratic
@@ -102,13 +116,12 @@ lemma map_add₂ (f : BiLinearSymm V) (S : V) (T1 T2 : V) :
   rw [f.swap, f.map_add₁, f.swap T1 S, f.swap T2 S]
 
 
-
 @[simps!]
 def toHomogeneousQuad {V : Type} [AddCommMonoid V] [Module ℚ V]
     (τ : BiLinearSymm V) : HomogeneousQuadratic V where
   toFun S := τ (S, S)
   map_smul' a S := by
-    simp
+    simp only
     rw [τ.map_smul₁, τ.map_smul₂]
     ring
 
@@ -116,7 +129,7 @@ lemma toHomogeneousQuad_add {V : Type} [AddCommMonoid V] [Module ℚ V]
     (τ : BiLinearSymm V) (S T : V) :
     τ.toHomogeneousQuad (S + T) = τ.toHomogeneousQuad S +
     τ.toHomogeneousQuad T + 2 * τ (S, T) := by
-  simp
+  simp only [toHomogeneousQuad_toFun]
   rw [τ.map_add₁, τ.map_add₂, τ.map_add₂, τ.swap T S]
   ring
 
@@ -225,7 +238,7 @@ def toCubic {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
     (τ : TriLinearSymm charges) : HomogeneousCubic charges where
   toFun S := τ (S, S, S)
   map_smul' a S := by
-    simp
+    simp only
     rw [τ.map_smul₁, τ.map_smul₂, τ.map_smul₃]
     ring
 
@@ -233,7 +246,7 @@ lemma toCubic_add {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
     (τ : TriLinearSymm charges) (S T : charges) :
     τ.toCubic (S + T) = τ.toCubic S +
     τ.toCubic T + 3 * τ (S, S, T) + 3 * τ (T, T, S) := by
-  simp
+  simp only [toCubic_toFun]
   rw [τ.map_add₁, τ.map_add₂, τ.map_add₂, τ.map_add₃, τ.map_add₃, τ.map_add₃, τ.map_add₃]
   rw [τ.swap₂ S T S, τ.swap₁ T S S, τ.swap₂ S T S, τ.swap₂ T S T, τ.swap₁ S T T, τ.swap₂ T S T]
   ring

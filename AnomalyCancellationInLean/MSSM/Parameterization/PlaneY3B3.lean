@@ -6,9 +6,19 @@ Authors: Joseph Tooby-Smith
 import AnomalyCancellationInLean.MSSM.Basic
 import AnomalyCancellationInLean.MSSM.Parameterization.LineY3B3
 import AnomalyCancellationInLean.MSSM.Parameterization.OrthogonalSpace
-
 import Mathlib.Tactic.Polyrith
--- Reference : https://arxiv.org/pdf/2107.07926.pdf
+/-!
+# Plane Y₃ B₃ and a third point
+
+The plane spanned by Y₃, B₃ and third orthogonal point.
+
+# References
+
+- https://arxiv.org/pdf/2107.07926.pdf
+
+-/
+
+
 
 universe v u
 
@@ -116,7 +126,6 @@ lemma planeY₃B₃_cubic (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
   rw [show (TriLinearSymm.toCubic cubeTriLin) R.val = cubeTriLin (R.val, R.val, R.val) by rfl]
   ring
 
-
 def lineQuadAFL (R : MSSMACC.AnomalyFreePerp) (c1 c2 c3 : ℚ) : MSSMACC.LinSols :=
   planeY₃B₃ R (c2 * quadBiLin (R.val, R.val) - 2 * c3 * quadBiLin (B₃.val, R.val))
   (2 * c3 * quadBiLin (Y₃.val, R.val) - c1 * quadBiLin (R.val, R.val))
@@ -196,7 +205,7 @@ lemma lineCube_cube (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ) :
   ring_nf
 
 lemma lineCube_quad (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ) :
-      accQuad (lineCube R a₁ a₂ a₃).val =
+    accQuad (lineCube R a₁ a₂ a₃).val =
     3 * (a₁ * cubeTriLin (R.val, R.val, B₃.val) - a₂ * cubeTriLin (R.val, R.val, Y₃.val)) *
     (α₁ R * a₁ + α₂ R * a₂ + α₃ R * a₃) := by
   erw [planeY₃B₃_quad]
@@ -207,7 +216,7 @@ lemma lineCube_quad (R : MSSMACC.AnomalyFreePerp) (a₁ a₂ a₃ : ℚ) :
 section proj
 
 lemma α₃_proj  (T : MSSMACC.Sols) : α₃ (proj T.1.1) =
-  6 * dot (Y₃.val, B₃.val) ^ 3 * (
+    6 * dot (Y₃.val, B₃.val) ^ 3 * (
     cubeTriLin (T.val, T.val, Y₃.val) * quadBiLin (B₃.val, T.val) -
     cubeTriLin (T.val, T.val, B₃.val) * quadBiLin (Y₃.val, T.val)) := by
   rw [α₃]

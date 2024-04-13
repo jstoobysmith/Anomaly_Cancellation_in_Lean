@@ -65,12 +65,12 @@ def chargeMap (f : permGroup n) : (SMCharges n).charges →ₗ[ℚ] (SMCharges n
 def repCharges {n : ℕ} : Representation ℚ (permGroup n) (SMCharges n).charges where
   toFun f := chargeMap f⁻¹
   map_mul' f g :=by
-    simp
+    simp only [permGroup, mul_inv_rev]
     apply LinearMap.ext
     intro S
     rw [charges_eq_toSpecies_eq]
     intro i
-    simp
+    simp only [chargeMap_apply, Pi.mul_apply, Pi.inv_apply, Equiv.Perm.coe_mul, LinearMap.mul_apply]
     repeat erw [toSMSpecies_toSpecies_inv]
     rfl
   map_one' := by
