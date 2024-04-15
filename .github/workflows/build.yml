@@ -9,7 +9,7 @@ jobs:
     name: Lint style
     runs-on: ubuntu-latest
     steps:
-       - name: cleanup
+      - name: cleanup
         run: |
           find . -name . -o -prune -exec rm -rf -- {} +
 
