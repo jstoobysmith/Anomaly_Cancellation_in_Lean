@@ -4,6 +4,12 @@ Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.SM.Basic
+/-!
+# Anomaly cancellation conditions for 1 family SM.
+
+Lemmas and properties for the 1 family Standard Model.
+
+-/
 universe v u
 
 namespace SM

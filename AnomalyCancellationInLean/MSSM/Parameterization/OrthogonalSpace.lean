@@ -7,8 +7,19 @@ import AnomalyCancellationInLean.MSSM.Basic
 import AnomalyCancellationInLean.MSSM.Parameterization.LineY3B3
 
 import Mathlib.Tactic.Polyrith
--- Reference : https://arxiv.org/pdf/2107.07926.pdf
+/-!
+# The type of solutions perpendicular to `Y₃` and `B₃`
 
+We define the type of solutions which are orthogonal to `Y₃` and `B₃` and prove some basic lemmas
+about them.
+
+# References
+
+The main reference for the material in this file is:
+
+- https://arxiv.org/pdf/2107.07926.pdf
+
+-/
 universe v u
 
 namespace MSSMACC

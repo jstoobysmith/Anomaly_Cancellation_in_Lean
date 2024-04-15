@@ -4,6 +4,13 @@ Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.SM.Basic
+/-!
+# Family maps for the Standard Model ACCs
+
+We define the a series of maps between the charges for different numbers of famlies.
+
+-/
+
 universe v u
 
 namespace SM

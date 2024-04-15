@@ -6,6 +6,13 @@ Authors: Joseph Tooby-Smith
 import AnomalyCancellationInLean.SM.Basic
 import Mathlib.Tactic.Polyrith
 import AnomalyCancellationInLean.GroupActions
+/-!
+# Permutations of SM with no RHN.
+
+We define the group of permutations for the SM charges with no RHN.
+
+-/
+
 universe v u
 
 open Nat

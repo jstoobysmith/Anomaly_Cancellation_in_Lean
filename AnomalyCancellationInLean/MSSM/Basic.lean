@@ -11,7 +11,10 @@ import AnomalyCancellationInLean.Basic
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Logic.Equiv.Fin
 /-!
-# The MSSM with n families and RHNs
+# The MSSM with 3 families and RHNs
+
+We define the system of ACCs for the MSSM with 3 families and RHNs.
+We define the system of charges for 1-species. We prove some basic lemmas about them.
 
 -/
 
@@ -481,8 +484,7 @@ def AnomalyFreeMk' (S : MSSMACC.LinSols) (hquad : accQuad S.val = 0)
     ⟩ , by exact hcube ⟩
 
 @[simp]
-def AnomalyFreeMk'' (S : MSSMACC.QuadSols)
-    (hcube : accCube S.val = 0) : MSSMACC.Sols :=
+def AnomalyFreeMk'' (S : MSSMACC.QuadSols) (hcube : accCube S.val = 0) : MSSMACC.Sols :=
   ⟨S , by exact hcube ⟩
 
 lemma AnomalyFreeMk''_val (S : MSSMACC.QuadSols)

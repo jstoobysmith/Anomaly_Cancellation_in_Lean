@@ -1,0 +1,16 @@
+
+on: 
+  push: 
+
+name: continuous integration
+
+jobs: 
+  build: 
+    name: Build file 
+    runs-on: pr
+    steps:
+      - name: print lean and lake versions
+        run: |
+          lean --version
+          lake --version
+          

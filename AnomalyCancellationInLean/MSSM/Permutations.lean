@@ -7,7 +7,13 @@ import AnomalyCancellationInLean.MSSM.Basic
 import Mathlib.Tactic.Polyrith
 import AnomalyCancellationInLean.GroupActions
 universe v u
+/-!
+# Permutations of MSSM charges and solutions
 
+The three family MSSM charges has a family permutation of S₃⁶. This file defines this group
+and its action on the MSSM.
+
+-/
 open Nat
 open  Finset
 
@@ -162,8 +168,5 @@ lemma accCube_invariant (f : permGroup) (S : MSSMCharges.charges)  :
     (by simpa using toSpecies_sum_invariant 3 f S)
     (Hd_invariant f S)
     (Hu_invariant f S)
-
-
-
 
 end MSSM

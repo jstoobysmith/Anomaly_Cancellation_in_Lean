@@ -5,7 +5,20 @@ Authors: Joseph Tooby-Smith
 -/
 import AnomalyCancellationInLean.MSSM.Basic
 import Mathlib.Tactic.Polyrith
--- Reference : https://arxiv.org/pdf/2107.07926.pdf
+/-!
+# The line through B₃ and Y₃
+
+We give properties of lines through `B₃` and `Y₃`. We show that every point on this line
+is a solution to the quadratic  `lineY₃B₃Charges_quad` and a double point of the cubic
+`lineY₃B₃_doublePoint`.
+
+# References
+
+The main reference for the material in this file is:
+
+- https://arxiv.org/pdf/2107.07926.pdf
+
+-/
 
 universe v u
 
@@ -95,8 +108,7 @@ def B₃ : MSSMACC.Sols :=
 lemma B₃_val : B₃.val = B₃AsCharge := by
   rfl
 
-lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) :
-    cubeTriLin (B₃.val, B₃.val, R.val) = 0 := by
+lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin (B₃.val, B₃.val, R.val) = 0 := by
   rw [← TriLinearSymm.toFun_eq_coe]
   simp only [cubeTriLin, cubeTriLinToFun, MSSMSpecies_numberCharges]
   rw [Fin.sum_univ_three]
@@ -104,7 +116,8 @@ lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) :
   rw [B₃AsCharge]
   repeat rw [toSMSpecies_toSpecies_inv]
   rw [Hd_toSpecies_inv, Hu_toSpecies_inv]
-  simp
+  simp only [mul_one, Fin.isValue, toSMSpecies_apply, one_mul, mul_neg, neg_neg, neg_mul, Hd_apply,
+    Fin.reduceFinMk, Hu_apply]
   have hLin := R.linearSol
   simp at hLin
   have h0 := hLin 0

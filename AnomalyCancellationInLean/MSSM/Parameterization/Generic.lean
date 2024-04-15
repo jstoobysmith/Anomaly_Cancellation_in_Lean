@@ -31,7 +31,6 @@ open MSSMCharges
 open MSSMACCs
 open BigOperators
 
-
 def genericQuad (R : MSSMACC.AnomalyFreePerp) : MSSMACC.QuadSols :=
   lineQuad R
     (3 * cubeTriLin (R.val, R.val, Y₃.val))
@@ -127,18 +126,18 @@ lemma genericProjCoeff_zero (T : MSSMACC.Sols) :
   simp
 
 lemma genericProjCoeff_neq_zero_case₁ (T : MSSMACC.Sols) (hT : genericProjCoeff T ≠ 0) :
-     ¬ case₁prop (proj T.1.1) :=
+    ¬ case₁prop (proj T.1.1) :=
   (genericProjCoeff_zero T).mpr.mt hT
 
 lemma genericProjCoeff_neq_zero_case₂ (T : MSSMACC.Sols) (hT : genericProjCoeff T ≠ 0) :
-     ¬ case₂prop (proj T.1.1) := by
+    ¬ case₂prop (proj T.1.1) := by
   by_contra hn
   rw [case₂prop] at hn
   rw [genericProjCoeff, α₃] at hT
   simp_all
 
 lemma genericProjCoeff_neq_zero_case₃ (T : MSSMACC.Sols) (hT : genericProjCoeff T ≠ 0) :
-     ¬ case₃prop (proj T.1.1) := by
+    ¬ case₃prop (proj T.1.1) := by
   by_contra hn
   rw [case₃prop] at hn
   rw [genericProjCoeff, α₃] at hT
@@ -194,7 +193,7 @@ lemma case₁_proj (T : MSSMACC.Sols) (h1 : genericProjCoeff T = 0) :
   rfl
 
 lemma case₁ProjCoeff_ne_zero (T : MSSMACC.Sols) (h1 : genericProjCoeff T = 0)
-      (hT : case₁ProjCoeff T ≠ 0 ) :
+    (hT : case₁ProjCoeff T ≠ 0 ) :
     (case₁ProjCoeff T)⁻¹ • case₁ (proj T.1.1)
        (case₁ProjC₁ T)
        (case₁ProjC₂ T)
@@ -204,8 +203,8 @@ lemma case₁ProjCoeff_ne_zero (T : MSSMACC.Sols) (h1 : genericProjCoeff T = 0)
   simp
 
 lemma case₁ProjCoeff_zero_Y₃_B₃ (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T = 0) :
-     quadBiLin (Y₃.val, (proj T.1.1).val) = 0 ∧
-     quadBiLin (B₃.val, (proj T.1.1).val) = 0 := by
+    quadBiLin (Y₃.val, (proj T.1.1).val) = 0 ∧
+    quadBiLin (B₃.val, (proj T.1.1).val) = 0 := by
   rw [case₁ProjCoeff, mul_eq_zero] at h1
   simp only [OfNat.ofNat_ne_zero,  Fin.isValue, Fin.reduceFinMk, false_or] at h1
   have h : quadBiLin (Y₃.val, (proj T.1.1).val) ^ 2 = 0 ∧
@@ -270,11 +269,11 @@ lemma case₁ProjCoeff_zero (T : MSSMACC.Sols) :
   simp
 
 lemma case₁ProjCoeff_ne_zero_case₂ (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T ≠ 0) :
-     ¬ case₂prop (proj T.1.1) :=
+    ¬ case₂prop (proj T.1.1) :=
   (case₁ProjCoeff_zero T).mpr.mt h1
 
 lemma case₁ProjCoeff_ne_zero_case₃ (T : MSSMACC.Sols) (h1 : case₁ProjCoeff T ≠ 0) :
-     ¬ case₃prop (proj T.1.1) := by
+    ¬ case₃prop (proj T.1.1) := by
   by_contra hn
   rw [case₃prop] at hn
   rw [case₁ProjCoeff] at h1

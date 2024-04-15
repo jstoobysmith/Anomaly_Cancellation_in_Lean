@@ -12,6 +12,9 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Logic.Equiv.Fin
 /-!
 # Anomaly cancellation conditions for n family SM.
+
+We define the ACC system for the Standard Model with n-famlies and no RHN.
+
 -/
 
 
