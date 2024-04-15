@@ -7,10 +7,10 @@ name: continuous integration
 jobs: 
   build: 
     name: Build file 
-    runs-on: pr
+    runs-on: ubuntu-latest
     steps:
       - name: print lean and lake versions
         run: |
           lean --version
           lake --version
-          
+
