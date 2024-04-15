@@ -10,7 +10,7 @@ set -exo pipefail
 
 touch scripts/style-exceptions.txt
 
-git ls-files 'AnomalyCancellationInLean/*.lean' | xargs ./.lake/packages/mathlib/scripts/lint-style.py "$@"
+git ls-files 'AnomalyCancellationInLean/*.lean' | xargs ./scripts/lint-style.py "$@"
 
 # 2. Global checks on the mathlib repository
 
