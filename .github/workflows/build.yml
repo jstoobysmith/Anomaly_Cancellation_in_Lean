@@ -28,6 +28,10 @@ jobs:
         run: |
           ls -a
       
+      - name: build cache
+        run: |
+          lake build cache
+
   
 
 
