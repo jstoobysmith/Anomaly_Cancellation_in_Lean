@@ -5,6 +5,21 @@ on:
 name: continuous integration
 
 jobs: 
+  doc_lint: 
+    name: doc lint 
+    runs-on: ubuntu-latest
+    steps: 
+      - use: actions/checkout@v4
+      - name: Install lean
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+      - name: print lean version
+        run: lean --version
+
+
   style_lint: 
     name: Lint style
     runs-on: ubuntu-latest
