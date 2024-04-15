@@ -26,7 +26,9 @@ jobs:
       
       - name: check ls 
         run: |
-          ls
+          ls -a
+      
+  
 
 
 
