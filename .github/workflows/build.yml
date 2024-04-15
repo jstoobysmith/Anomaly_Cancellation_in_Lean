@@ -16,7 +16,11 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
           ~/.elan/bin/lean --version
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
-     
+      - name: docs 
+        uses: liskin/gh-problem-matcher-wrap@v3
+        with: 
+          linters: gcc 
+          run: env LEAN_ABORT_ON_PANIC=1 lake exe runLinter AnomalyCancellationInLean
 
 
   style_lint: 
