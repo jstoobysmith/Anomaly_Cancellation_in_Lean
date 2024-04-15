@@ -30,5 +30,6 @@ jobs:
 
       - name: lint
         run: |
+          chmod u+x scripts/lint-style.sh
           ./scripts/lint-style.sh
 
