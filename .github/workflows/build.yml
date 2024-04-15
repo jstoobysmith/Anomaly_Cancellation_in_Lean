@@ -5,12 +5,30 @@ on:
 name: continuous integration
 
 jobs: 
-  build: 
-    name: Build file 
+  style_lint: 
+    name: Lint style
     runs-on: ubuntu-latest
     steps:
-      - name: print lean and lake versions
+       - name: cleanup
         run: |
-          lean --version
-          lake --version
+          find . -name . -o -prune -exec rm -rf -- {} +
+
+      - uses: actions/checkout@v4
+
+      # Run the case checker action
+      - name: Check Case Sensitivity
+        uses: credfeto/action-case-checker@v1.3.0
+
+      - name: Look for ignored files
+        uses: credfeto/action-no-ignored-files@v1.1.0
+
+      - name: install Python
+        if: ${{ 'ubuntu-latest' == 'ubuntu-latest' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+
+      - name: lint
+        run: |
+          ./.lake/packages/mathlib/scripts/lint-style.sh
 
