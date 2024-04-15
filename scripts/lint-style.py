@@ -30,7 +30,7 @@ exceptions by redirecting the output to ``style-exceptions.txt``. Use:
 
     $ ./scripts/update-style-exceptions.sh
 
-to perform this update.
+to perform this update. 
 """
 
 # TODO: This is adapted from the linter for mathlib3. It should be rewritten in Lean.
