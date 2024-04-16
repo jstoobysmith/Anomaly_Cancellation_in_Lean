@@ -24,7 +24,8 @@ jobs:
       
       - name: build the docs
         run: |
-          lake -R -Kenv=dev build AnomalyCancellationInLean:docs
+          mkdir .lake/build/doc
+          touch .lake/build/doc/index.html
       
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
