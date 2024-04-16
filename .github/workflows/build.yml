@@ -12,7 +12,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Install lean
+      - name: Install elan
         run: |
           set -o pipefail
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
@@ -47,11 +47,6 @@ jobs:
         with:
           linters: gcc
           run: env LEAN_ABORT_ON_PANIC=1 lake exe runLinter AnomalyCancellationInLean
-
-
-  
-
-
 
   style_lint: 
     name: Lint style
