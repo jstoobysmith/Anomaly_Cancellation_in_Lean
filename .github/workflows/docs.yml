@@ -19,13 +19,12 @@ jobs:
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
       
       - name: build cache
-        run: |
-         lake build cache
+        run: ~/.elan/bin/lake -Kenv=dev exe cache get || true
       
+      - name: build project 
+        run:  ~/.elan/bin/lake -Kenv=dev build AnomalyCancellationInLean
       - name: build the docs
-        run: |
-          mkdir -p .lake/build/doc
-          lake -R -Kenv=dev build AnomalyCancellationInLean:docs
+        run: ~/.elan/bin/lake -Kenv=dev build AnomalyCancellationInLean:docs
       
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
