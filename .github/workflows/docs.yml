@@ -24,7 +24,7 @@ jobs:
       
       - name: build the docs
         run: |
-          mkdir .lake/build/doc
+          mkdir -p .lake/build/doc
           touch .lake/build/doc/index.html 
       
       - name: Deploy
