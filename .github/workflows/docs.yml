@@ -3,9 +3,6 @@ on:
     branches: 
       - master
 
-permissions:
-  contents: write
-
 jobs: 
   build_docs: 
     name: build docs
@@ -13,6 +10,7 @@ jobs:
     steps: 
 
       - uses: actions/checkout@v4
+
       - name: Install elan
         run: |
           set -o pipefail
@@ -29,7 +27,7 @@ jobs:
           lake -R -Kenv=dev build AnomalyCancellationInLean:docs
       
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.5.0
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           SINGLE_COMMIT: true
           BRANCH: gh-pages 
