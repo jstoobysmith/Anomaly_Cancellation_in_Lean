@@ -5,6 +5,31 @@ on:
 name: continuous integration
 
 jobs: 
+  doc_build: 
+    name: doc build
+    runs-on: ubuntu-latest
+    steps: 
+       - uses: actions/checkout@v4
+
+      - name: Install lean
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: build cache
+        run: |
+          lake build cache
+
+      - name: build AnomalyCancellationInLean
+        id: build
+        uses: liskin/gh-problem-matcher-wrap@v3
+        with:
+          linters: gcc
+          run: |
+            bash -o pipefail -c "env LEAN_ABORT_ON_PANIC=1 lake build -KCI | tee stdout.log"
+      
   doc_lint: 
     name: doc lint 
     runs-on: ubuntu-latest
@@ -32,26 +57,12 @@ jobs:
         run: |
           lake build cache
 
-      - name: build AnomalyCancellationInLean
-        id: build
-        uses: liskin/gh-problem-matcher-wrap@v3
-        with:
-          linters: gcc
-          run: |
-            bash -o pipefail -c "env LEAN_ABORT_ON_PANIC=1 lake build -KCI | tee stdout.log"
-      
       - name: lint AnomalyCancellationInLean
-        if: ${{ always() && steps.build.outcome == 'success' || steps.build.outcome == 'failure' }}
         id: lint
         uses: liskin/gh-problem-matcher-wrap@v3
         with:
           linters: gcc
           run: env LEAN_ABORT_ON_PANIC=1 lake exe runLinter AnomalyCancellationInLean
-
-
-  
-
-
 
   style_lint: 
     name: Lint style
