@@ -18,15 +18,15 @@ jobs:
           ~/.elan/bin/lean --version
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
       
-       - name: build cache
-         run: |
-          lake build cache
+      - name: build cache
+        run: |
+         lake build cache
       
       - name: build the docs
         run: |
           lake -R -Kenv=dev build AnomalyCancellationInLean:docs
       
-      - name: 🚀 Deploy
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           SINGLE_COMMIT: true
