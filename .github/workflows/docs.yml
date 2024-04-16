@@ -30,7 +30,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          SINGLE_COMMIT: true
-          BRANCH: gh-pages 
-          FOLDER: ./.lake/build/doc
+          single-commit: true
+          branch: gh-pages 
+          folder: ./.lake/build/doc
  
