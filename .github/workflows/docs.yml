@@ -54,14 +54,11 @@ jobs:
       - name: Build documentation
         run: ~/.elan/bin/lake -Kenv=dev build AnomalyCancellationInLean:docs
 
-      - name: Copy documentation to `docs`
-        run: |
-          mv .lake/build/doc docs
 
       - name: Upload docs & blueprint artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: docs
+          path: .lake/build/doc
 
       - name: Deploy to GitHub Pages
         id: deployment
