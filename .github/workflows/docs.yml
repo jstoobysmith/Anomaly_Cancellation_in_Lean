@@ -11,7 +11,7 @@ permissions:
 
 jobs: 
   build_project: 
-     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     name: Build project
     steps:
       - name: Checkout project
