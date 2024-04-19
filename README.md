@@ -1,6 +1,12 @@
 # Anomaly cancellation in Lean 4 
 Copyright: Joseph Tooby-Smith 
 
+I have moved this repository over to: 
+
+https://github.com/HEPLean/HepLean
+
+
+
 As a proof-of-concept of the use of lean 4 in high energy physics, we create a lean-4 project of results related to annomaly cancellation in physics. My aim is to slowly expand it other areas of high energy physics creating a project called `HEPLean`. 
 
 To learn more about this project see: 
